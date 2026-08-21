@@ -3,45 +3,83 @@
 PELItradershub — Deriv Connection Manager
 ========================================================
 
-- Public Deriv market data through WebSocket
-- Deriv OAuth through secure backend
-- Account data through secure backend
-- Trading through secure backend
-- No Deriv token is exposed to the browser
+PUBLIC MARKET DATA
+------------------
+Uses Deriv's public WebSocket for live ticks.
+
+AUTHENTICATED ACCOUNT
+---------------------
+Uses the PELItradershub backend for OAuth/session/account
+operations.
+
+IMPORTANT
+---------
+- No Deriv access token is stored in this browser file.
+- No Deriv secret is exposed to the browser.
+- Public market data does NOT require OAuth.
+- Account data/trading uses the secure backend.
 ========================================================
 */
 
 
 /* ======================================================
-   PUBLIC MARKET WEBSOCKET
+   CONFIGURATION
 ====================================================== */
 
 const DERIV_WS =
   "wss://ws.derivws.com/websockets/v3";
 
+const DERIV_OAUTH_START =
+  "/api/deriv/start";
 
-let derivSocket = null;
-let derivReconnectTimer = null;
+const DERIV_SESSION_ENDPOINT =
+  "/api/deriv/session";
 
-let currentSymbol = "R_75";
+const DERIV_ACCOUNT_ENDPOINT =
+  "/api/deriv/account";
 
-let currentTickCallback = null;
-let currentStatusCallback = null;
-
-let intentionalDisconnect = false;
+const DERIV_TRADE_ENDPOINT =
+  "/api/deriv/trade";
 
 
 /* ======================================================
-   STATUS
+   PUBLIC MARKET CONNECTION STATE
 ====================================================== */
 
-function setDerivStatus(status) {
+let marketSocket = null;
+
+let marketReconnectTimer = null;
+
+let marketReconnectEnabled = false;
+
+let marketSymbol = "R_75";
+
+let marketTickCallback = null;
+
+let marketStatusCallback = null;
+
+
+/* ======================================================
+   AUTHENTICATED ACCOUNT STATE
+====================================================== */
+
+let derivAccountConnected = false;
+
+let derivAccountData = null;
+
+
+/* ======================================================
+   MARKET STATUS HELPER
+====================================================== */
+
+function marketStatus(status) {
 
   if (
-    typeof currentStatusCallback === "function"
+    typeof marketStatusCallback ===
+    "function"
   ) {
 
-    currentStatusCallback(status);
+    marketStatusCallback(status);
 
   }
 
@@ -49,7 +87,7 @@ function setDerivStatus(status) {
 
 
 /* ======================================================
-   CONNECT PUBLIC MARKET
+   CONNECT PUBLIC MARKET FEED
 ====================================================== */
 
 function connectDeriv(
@@ -58,58 +96,94 @@ function connectDeriv(
   onStatus
 ) {
 
-  currentSymbol = symbol;
+  /*
+  Save callbacks.
+  */
 
-  currentTickCallback = onTick;
+  marketSymbol =
+    symbol || "R_75";
 
-  currentStatusCallback = onStatus;
+  marketTickCallback =
+    typeof onTick === "function"
+      ? onTick
+      : null;
 
-  intentionalDisconnect = false;
-
-
-  clearTimeout(
-    derivReconnectTimer
-  );
+  marketStatusCallback =
+    typeof onStatus === "function"
+      ? onStatus
+      : null;
 
 
   /*
-  Close old connection.
+  Enable automatic reconnect.
   */
 
-  if (derivSocket) {
+  marketReconnectEnabled =
+    true;
+
+
+  /*
+  Stop any previous reconnect timer.
+  */
+
+  clearTimeout(
+    marketReconnectTimer
+  );
+
+  marketReconnectTimer =
+    null;
+
+
+  /*
+  Close previous market socket.
+  */
+
+  if (marketSocket) {
 
     try {
 
-      derivSocket.onclose = null;
+      marketSocket.onclose =
+        null;
 
-      derivSocket.close();
+      marketSocket.onerror =
+        null;
+
+      marketSocket.onmessage =
+        null;
+
+      marketSocket.close();
 
     } catch (error) {
 
       console.warn(
-        "Previous Deriv socket could not be closed:",
+        "Previous Deriv market socket could not be closed:",
         error
       );
 
     }
 
-    derivSocket = null;
+    marketSocket =
+      null;
 
   }
 
 
-  setDerivStatus(
+  /*
+  Tell UI that market feed is connecting.
+  */
+
+  marketStatus(
     "Connecting..."
   );
 
 
   /*
-  Create WebSocket.
+  Create public WebSocket.
   */
 
   try {
 
-    derivSocket =
+    marketSocket =
       new WebSocket(
         DERIV_WS
       );
@@ -121,9 +195,11 @@ function connectDeriv(
       error
     );
 
-    setDerivStatus(
+    marketStatus(
       "Connection error"
     );
+
+    scheduleMarketReconnect();
 
     return;
 
@@ -131,60 +207,62 @@ function connectDeriv(
 
 
   /* ====================================================
-     OPEN
+     SOCKET OPEN
   ==================================================== */
 
-  derivSocket.onopen =
+  marketSocket.onopen =
     function () {
 
       console.log(
-        "Deriv market WebSocket connected."
+        "Deriv public market feed connected:",
+        marketSymbol
       );
 
 
-      setDerivStatus(
+      marketStatus(
         "Connected"
       );
 
 
       /*
-      Subscribe to the selected market.
+      Subscribe only to the selected market.
       */
 
-      const request = {
+      try {
 
-        ticks:
-          currentSymbol,
+        marketSocket.send(
+          JSON.stringify({
 
-        subscribe:
-          1,
+            ticks:
+              marketSymbol,
 
-        req_id:
-          1
+            subscribe:
+              1
 
-      };
+          })
+        );
 
+      } catch (error) {
 
-      console.log(
-        "Deriv tick subscription:",
-        request
-      );
+        console.error(
+          "Unable to subscribe to Deriv ticks:",
+          error
+        );
 
+        marketStatus(
+          "Subscription error"
+        );
 
-      derivSocket.send(
-        JSON.stringify(
-          request
-        )
-      );
+      }
 
     };
 
 
   /* ====================================================
-     MESSAGE
+     SOCKET MESSAGE
   ==================================================== */
 
-  derivSocket.onmessage =
+  marketSocket.onmessage =
     function (event) {
 
       try {
@@ -195,25 +273,19 @@ function connectDeriv(
           );
 
 
-        console.log(
-          "Deriv:",
-          data
-        );
-
-
         /*
-        API error.
+        Deriv API error.
         */
 
         if (data.error) {
 
           console.error(
-            "Deriv API error:",
+            "Deriv market API error:",
             data.error
           );
 
 
-          setDerivStatus(
+          marketStatus(
             data.error.message ||
             "Deriv API error"
           );
@@ -225,7 +297,7 @@ function connectDeriv(
 
 
         /*
-        Live tick.
+        Live tick received.
         */
 
         if (
@@ -233,29 +305,34 @@ function connectDeriv(
           data.tick
         ) {
 
-          const quote =
-            Number(
-              data.tick.quote
-            );
+          const tick = {
 
+            symbol:
+              data.tick.symbol,
+
+            quote:
+              Number(
+                data.tick.quote
+              ),
+
+            epoch:
+              data.tick.epoch
+
+          };
+
+
+          /*
+          Send tick to the page.
+          */
 
           if (
-            typeof currentTickCallback ===
+            typeof marketTickCallback ===
             "function"
           ) {
 
-            currentTickCallback({
-
-              symbol:
-                data.tick.symbol,
-
-              quote:
-                quote,
-
-              epoch:
-                data.tick.epoch
-
-            });
+            marketTickCallback(
+              tick
+            );
 
           }
 
@@ -264,7 +341,7 @@ function connectDeriv(
       } catch (error) {
 
         console.error(
-          "Invalid Deriv WebSocket message:",
+          "Invalid Deriv market response:",
           error
         );
 
@@ -274,19 +351,19 @@ function connectDeriv(
 
 
   /* ====================================================
-     ERROR
+     SOCKET ERROR
   ==================================================== */
 
-  derivSocket.onerror =
+  marketSocket.onerror =
     function (error) {
 
       console.error(
-        "Deriv WebSocket error:",
+        "Deriv market WebSocket error:",
         error
       );
 
 
-      setDerivStatus(
+      marketStatus(
         "Connection error"
       );
 
@@ -294,69 +371,37 @@ function connectDeriv(
 
 
   /* ====================================================
-     CLOSE
+     SOCKET CLOSED
   ==================================================== */
 
-  derivSocket.onclose =
-    function (event) {
+  marketSocket.onclose =
+    function () {
 
       console.log(
-        "Deriv WebSocket closed:",
-        event.code,
-        event.reason
+        "Deriv public market feed disconnected."
       );
 
 
-      if (
-        intentionalDisconnect
-      ) {
-
-        setDerivStatus(
-          "Disconnected"
-        );
-
-        return;
-
-      }
+      marketSocket =
+        null;
 
 
-      setDerivStatus(
+      marketStatus(
         "Disconnected"
       );
 
 
       /*
-      Automatically reconnect.
+      Reconnect automatically.
       */
 
-      clearTimeout(
-        derivReconnectTimer
-      );
+      if (
+        marketReconnectEnabled
+      ) {
 
+        scheduleMarketReconnect();
 
-      derivReconnectTimer =
-        setTimeout(
-          function () {
-
-            if (
-              !intentionalDisconnect
-            ) {
-
-              connectDeriv(
-
-                currentSymbol,
-
-                currentTickCallback,
-
-                currentStatusCallback
-
-              );
-
-            }
-
-          },
-          3000
-        );
+      }
 
     };
 
@@ -364,7 +409,53 @@ function connectDeriv(
 
 
 /* ======================================================
-   CHANGE MARKET
+   MARKET RECONNECT
+====================================================== */
+
+function scheduleMarketReconnect() {
+
+  clearTimeout(
+    marketReconnectTimer
+  );
+
+
+  if (
+    !marketReconnectEnabled
+  ) {
+
+    return;
+
+  }
+
+
+  marketReconnectTimer =
+    setTimeout(
+      function () {
+
+        if (
+          !marketReconnectEnabled
+        ) {
+
+          return;
+
+        }
+
+
+        connectDeriv(
+          marketSymbol,
+          marketTickCallback,
+          marketStatusCallback
+        );
+
+      },
+      3000
+    );
+
+}
+
+
+/* ======================================================
+   CHANGE PUBLIC MARKET SYMBOL
 ====================================================== */
 
 function changeDerivSymbol(
@@ -372,21 +463,24 @@ function changeDerivSymbol(
 ) {
 
   if (!symbol) {
+
     return;
+
   }
 
 
-  currentSymbol =
+  marketSymbol =
     symbol;
 
 
   /*
-  Existing connection.
+  If already connected, switch subscription
+  without touching OAuth/account state.
   */
 
   if (
-    derivSocket &&
-    derivSocket.readyState ===
+    marketSocket &&
+    marketSocket.readyState ===
       WebSocket.OPEN
   ) {
 
@@ -396,7 +490,7 @@ function changeDerivSymbol(
       Remove existing tick subscriptions.
       */
 
-      derivSocket.send(
+      marketSocket.send(
         JSON.stringify({
 
           forget_all:
@@ -407,34 +501,37 @@ function changeDerivSymbol(
 
 
       /*
-      Subscribe to new market.
+      Subscribe to new symbol.
       */
 
-      derivSocket.send(
+      marketSocket.send(
         JSON.stringify({
 
           ticks:
-            symbol,
+            marketSymbol,
 
           subscribe:
-            1,
-
-          req_id:
             1
 
         })
       );
 
 
-      setDerivStatus(
+      marketStatus(
         "Connected"
       );
+
 
     } catch (error) {
 
       console.error(
         "Unable to change Deriv market:",
         error
+      );
+
+
+      marketStatus(
+        "Subscription error"
       );
 
     }
@@ -446,88 +543,92 @@ function changeDerivSymbol(
 
 
   /*
-  No active connection.
+  No active socket.
   */
 
   connectDeriv(
-
-    symbol,
-
-    currentTickCallback,
-
-    currentStatusCallback
-
+    marketSymbol,
+    marketTickCallback,
+    marketStatusCallback
   );
 
 }
 
 
 /* ======================================================
-   DISCONNECT MARKET
+   DISCONNECT PUBLIC MARKET
 ====================================================== */
 
 function disconnectDeriv() {
 
-  intentionalDisconnect =
-    true;
+  marketReconnectEnabled =
+    false;
 
 
   clearTimeout(
-    derivReconnectTimer
+    marketReconnectTimer
   );
 
 
-  derivReconnectTimer =
+  marketReconnectTimer =
     null;
 
 
-  if (derivSocket) {
+  if (marketSocket) {
 
     try {
 
-      derivSocket.onclose =
+      marketSocket.onclose =
         null;
 
-      derivSocket.close();
+      marketSocket.close();
 
     } catch (error) {
 
       console.warn(
-        "Deriv disconnect error:",
+        "Deriv market disconnect error:",
         error
       );
 
     }
 
-    derivSocket =
-      null;
-
   }
 
 
-  currentTickCallback =
+  marketSocket =
     null;
 
-  currentStatusCallback =
-    null;
+
+  marketStatus(
+    "Disconnected"
+  );
 
 }
 
 
 /* ======================================================
-   DERIV ACCOUNT OAUTH
+   AUTHENTICATED DERIV CONNECTION
+======================================================
+
+   This ONLY starts OAuth.
+
+   It does NOT touch the public market WebSocket.
 ====================================================== */
 
 function connectDerivAccount() {
 
+  /*
+  Redirect to backend OAuth start endpoint.
+  */
+
   window.location.href =
-    "/api/deriv/start";
+    DERIV_OAUTH_START;
 
 }
 
 
 /* ======================================================
-   DERIV SESSION
+   CHECK AUTHENTICATED DERIV SESSION
 ====================================================== */
 
 async function getDerivSession() {
@@ -536,9 +637,8 @@ async function getDerivSession() {
 
     const response =
       await fetch(
-        "/api/deriv/session",
+        DERIV_SESSION_ENDPOINT,
         {
-
           method:
             "GET",
 
@@ -556,7 +656,18 @@ async function getDerivSession() {
       );
 
 
+    /*
+    Backend did not return success.
+    */
+
     if (!response.ok) {
+
+      derivAccountConnected =
+        false;
+
+      derivAccountData =
+        null;
+
 
       return {
 
@@ -575,15 +686,24 @@ async function getDerivSession() {
       await response.json();
 
 
+    derivAccountConnected =
+      data.connected === true;
+
+
+    derivAccountData =
+      data.account || null;
+
+
     return {
 
       connected:
-        data.connected === true,
+        derivAccountConnected,
 
       account:
-        data.account || null
+        derivAccountData
 
     };
+
 
   } catch (error) {
 
@@ -591,6 +711,13 @@ async function getDerivSession() {
       "Deriv session check failed:",
       error
     );
+
+
+    derivAccountConnected =
+      false;
+
+    derivAccountData =
+      null;
 
 
     return {
@@ -609,7 +736,7 @@ async function getDerivSession() {
 
 
 /* ======================================================
-   DERIV ACCOUNT
+   GET AUTHENTICATED ACCOUNT
 ====================================================== */
 
 async function getDerivAccount() {
@@ -618,9 +745,8 @@ async function getDerivAccount() {
 
     const response =
       await fetch(
-        "/api/deriv/account",
+        DERIV_ACCOUNT_ENDPOINT,
         {
-
           method:
             "GET",
 
@@ -645,17 +771,20 @@ async function getDerivAccount() {
     if (!response.ok) {
 
       throw new Error(
-
         data.message ||
         data.error ||
         "Unable to load Deriv account."
-
       );
 
     }
 
 
+    derivAccountData =
+      data;
+
+
     return data;
+
 
   } catch (error) {
 
@@ -673,20 +802,40 @@ async function getDerivAccount() {
 
 
 /* ======================================================
-   DERIV TRADE
+   EXECUTE AUTHENTICATED TRADE
 ====================================================== */
 
 async function executeDerivTrade(
   trade
 ) {
 
+  /*
+  Make sure the browser believes an account
+  session exists before sending a trade.
+  */
+
+  const session =
+    await getDerivSession();
+
+
+  if (
+    !session ||
+    !session.connected
+  ) {
+
+    throw new Error(
+      "Deriv account is not connected."
+    );
+
+  }
+
+
   try {
 
     const response =
       await fetch(
-        "/api/deriv/trade",
+        DERIV_TRADE_ENDPOINT,
         {
-
           method:
             "POST",
 
@@ -719,17 +868,16 @@ async function executeDerivTrade(
     if (!response.ok) {
 
       throw new Error(
-
         data.message ||
         data.error ||
         "Trade request failed."
-
       );
 
     }
 
 
     return data;
+
 
   } catch (error) {
 
@@ -747,10 +895,42 @@ async function executeDerivTrade(
 
 
 /* ======================================================
+   GET MARKET CONNECTION STATE
+====================================================== */
+
+function isDerivMarketConnected() {
+
+  return (
+    marketSocket &&
+    marketSocket.readyState ===
+      WebSocket.OPEN
+  );
+
+}
+
+
+/* ======================================================
+   GET ACCOUNT CONNECTION STATE
+====================================================== */
+
+function isDerivAccountConnected() {
+
+  return (
+    derivAccountConnected === true
+  );
+
+}
+
+
+/* ======================================================
    GLOBAL PELI DERIV API
 ====================================================== */
 
 window.PELI_DERIV = {
+
+  /*
+  PUBLIC MARKET
+  */
 
   connect:
     connectDeriv,
@@ -761,6 +941,14 @@ window.PELI_DERIV = {
   changeSymbol:
     changeDerivSymbol,
 
+  isMarketConnected:
+    isDerivMarketConnected,
+
+
+  /*
+  AUTHENTICATED ACCOUNT
+  */
+
   connectAccount:
     connectDerivAccount,
 
@@ -770,7 +958,15 @@ window.PELI_DERIV = {
   getAccount:
     getDerivAccount,
 
+  isAccountConnected:
+    isDerivAccountConnected,
+
   executeTrade:
     executeDerivTrade
 
 };
+
+
+/* ======================================================
+   END
+====================================================== */
