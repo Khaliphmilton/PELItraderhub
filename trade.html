@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Trading Terminal | PELItradershub</title>
+
+<meta name="description" content="PELItradershub trading terminal.">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+body{
+overflow-x:hidden;
+}
+
+.terminal{
+min-height:calc(100vh - 72px);
+display:grid;
+grid-template-columns:1fr 340px;
+background:#070910;
+}
+
+.chart-area{
+padding:20px;
+min-width:0;
+}
+
+.terminal-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+margin-bottom:15px;
+}
+
+.symbol-box{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.symbol-box h1{
+font-size:22px;
+margin:0;
+}
+
+.symbol-box small{
+color:#69748a;
+}
+
+.price-box{
+text-align:right;
+}
+
+.price{
+font-size:25px;
+font-weight:800;
+}
+
+.status{
+font-size:11px;
+color:#39d4b6;
+}
+
+.chart-container{
+height:calc(100vh - 190px);
+min-height:450px;
+background:#0b1018;
+border:1px solid #202838;
+border-radius:15px;
+position:relative;
+overflow:hidden;
+}
+
+.chart-grid{
+position:absolute;
+inset:0;
+background-image:
+linear-gradient(#202838 1px,transparent 1px),
+linear-gradient(90deg,#202838 1px,transparent 1px);
+background-size:10% 20%;
+opacity:.35;
+}
+
+.chart-line{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+}
+
+.chart-toolbar{
+position:absolute;
+top:12px;
+left:12px;
+right:12px;
+display:flex;
+justify-content:space-between;
+z-index:2;
+}
+
+.chart-tools{
+display:flex;
+gap:5px;
+}
+
+.chart-tool{
+border:1px solid #252e40;
+background:#111722;
+color:#8792a8;
+padding:7px 10px;
+border-radius:7px;
+font-size:11px;
+}
+
+.chart-tool.active,
+.chart-tool:hover{
+background:#786cff;
+color:white;
+}
+
+.chart-message{
+position:absolute;
+inset:0;
+display:grid;
+place-items:center;
+text-align:center;
+pointer-events:none;
+}
+
+.chart-message div{
+background:#0d121cdd;
+border:1px solid #293246;
+border-radius:14px;
+padding:22px;
+max-width:350px;
+}
+
+.chart-message h2{
+font-size:18px;
+margin-bottom:8px;
+}
+
+.chart-message p{
+color:#7d879b;
+font-size:13px;
+}
+
+.trade-panel{
+border-left:1px solid #202838;
+background:#0a0e16;
+padding:20px;
+overflow-y:auto;
+}
+
+.trade-panel h2{
+margin:0 0 20px;
+font-size:20px;
+}
+
+.account-box{
+background:#101622;
+border:1px solid #202838;
+border-radius:12px;
+padding:15px;
+margin-bottom:20px;
+}
+
+.account-label{
+color:#7d879b;
+font-size:11px;
+}
+
+.account-balance{
+font-size:24px;
+font-weight:800;
+margin-top:4px;
+}
+
+.form-group{
+margin-bottom:16px;
+}
+
+.form-group label{
+display:block;
+font-size:12px;
+color:#8a94a8;
+margin-bottom:7px;
+}
+
+.trade-input{
+width:100%;
+padding:13px;
+background:#0b1018;
+border:1px solid #293246;
+border-radius:9px;
+color:white;
+outline:none;
+}
+
+.trade-input:focus{
+border-color:#786cff;
+}
+
+.trade-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+}
+
+.direction-buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+}
+
+.direction{
+padding:13px;
+border:1px solid #293246;
+border-radius:9px;
+background:#111722;
+color:#a8b1c2;
+font-weight:800;
+}
+
+.direction:hover{
+border-color:#786cff;
+}
+
+.direction.up.active{
+background:#12352f;
+border-color:#39d4b6;
+color:#39d4b6;
+}
+
+.direction.down.active{
+background:#351923;
+border-color:#ff7186;
+color:#ff7186;
+}
+
+.trade-summary{
+border-top:1px solid #202838;
+border-bottom:1px solid #202838;
+padding:15px 0;
+margin:20px 0;
+}
+
+.summary-row{
+display:flex;
+justify-content:space-between;
+margin:9px 0;
+font-size:13px;
+}
+
+.summary-row span:first-child{
+color:#7d879b;
+}
+
+.buy-button{
+width:100%;
+padding:15px;
+border:0;
+border-radius:10px;
+background:linear-gradient(135deg,#786cff,#39d4b6);
+color:#061016;
+font-weight:900;
+}
+
+.warning{
+font-size:11px;
+line-height:1.5;
+color:#747f94;
+margin-top:14px;
+}
+
+.mobile-nav{
+display:none;
+}
+
+@media(max-width:900px){
+
+.terminal{
+grid-template-columns:1fr;
+}
+
+.chart-area{
+padding:12px;
+}
+
+.chart-container{
+height:55vh;
+min-height:380px;
+}
+
+.trade-panel{
+border-left:0;
+border-top:1px solid #202838;
+}
+
+}
+
+@media(max-width:600px){
+
+.terminal-header{
+align-items:flex-start;
+}
+
+.symbol-box h1{
+font-size:18px;
+}
+
+.price{
+font-size:20px;
+}
+
+.chart-container{
+height:420px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+<a href="index.html" class="brand">
+
+<span class="brand-icon">P</span>
+
+<span>
+PELI<span>tradershub</span>
+</span>
+
+</a>
+
+<nav>
+
+<a href="dashboard.html">Dashboard</a>
+<a href="markets.html">Markets</a>
+<a href="trade.html">Trade</a>
+<a href="strategies.html">Strategies</a>
+
+</nav>
+
+<div class="nav-actions">
+
+<a href="portfolio.html" class="login-link">
+Portfolio
+</a>
+
+<a href="dashboard.html" class="button primary">
+Dashboard
+</a>
+
+</div>
+
+</header>
+
+
+<main class="terminal">
+
+
+<!-- CHART -->
+
+<section class="chart-area">
+
+
+<div class="terminal-header">
+
+<div class="symbol-box">
+
+<div>
+
+<h1 id="symbolName">
+Volatility 75
+</h1>
+
+<small>
+Synthetic Index
+</small>
+
+</div>
+
+</div>
+
+
+<div class="price-box">
+
+<div class="price" id="price">
+—
+</div>
+
+<div class="status">
+● Waiting for Deriv connection
+</div>
+
+</div>
+
+</div>
+
+
+<div class="chart-container">
+
+<div class="chart-grid"></div>
+
+
+<div class="chart-toolbar">
+
+<div class="chart-tools">
+
+<button class="chart-tool active">
+1m
+</button>
+
+<button class="chart-tool">
+5m
+</button>
+
+<button class="chart-tool">
+15m
+</button>
+
+<button class="chart-tool">
+1h
+</button>
+
+</div>
+
+
+<div class="chart-tools">
+
+<button class="chart-tool">
+Indicators
+</button>
+
+<button class="chart-tool">
+Fullscreen
+</button>
+
+</div>
+
+</div>
+
+
+<svg
+class="chart-line"
+viewBox="0 0 1000 600"
+preserveAspectRatio="none"
+>
+
+<path
+d="
+M0 500
+L45 470
+L90 490
+L135 420
+L180 445
+L225 390
+L270 410
+L315 350
+L360 370
+L405 300
+L450 330
+L495 270
+L540 300
+L585 245
+L630 270
+L675 205
+L720 230
+L765 175
+L810 195
+L855 130
+L900 155
+L950 95
+L1000 120
+"
+fill="none"
+stroke="#786cff"
+stroke-width="5"
+/>
+
+</svg>
+
+
+<div class="chart-message">
+
+<div>
+
+<h2>
+Live Chart
+</h2>
+
+<p>
+Connect your Deriv account to load live market prices and chart data.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- TRADE PANEL -->
+
+<aside class="trade-panel">
+
+
+<h2>
+Order Ticket
+</h2>
+
+
+<div class="account-box">
+
+<div class="account-label">
+ACCOUNT
+</div>
+
+<div class="account-balance">
+$10,000.00
+</div>
+
+<div class="account-label">
+Demo account
+</div>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Market
+</label>
+
+<select
+id="market"
+class="trade-input"
+>
+
+<option value="R_10">
+Volatility 10
+</option>
+
+<option value="R_25">
+Volatility 25
+</option>
+
+<option value="R_50">
+Volatility 50
+</option>
+
+<option value="R_75" selected>
+Volatility 75
+</option>
+
+<option value="R_100">
+Volatility 100
+</option>
+
+<option value="frxEURUSD">
+EUR/USD
+</option>
+
+<option value="frxGBPUSD">
+GBP/USD
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Trade Type
+</label>
+
+<select class="trade-input">
+
+<option>
+Demo / Practice
+</option>
+
+<option>
+Contract
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Direction
+</label>
+
+<div class="direction-buttons">
+
+<button
+class="direction up"
+onclick="selectDirection(this)"
+>
+▲ UP
+</button>
+
+<button
+class="direction down"
+onclick="selectDirection(this)"
+>
+▼ DOWN
+</button>
+
+</div>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Stake
+</label>
+
+<input
+id="stake"
+class="trade-input"
+type="number"
+min="0"
+step="0.01"
+value="10"
+placeholder="Enter stake"
+>
+
+</div>
+
+
+<div class="trade-row">
+
+<div class="form-group">
+
+<label>
+Duration
+</label>
+
+<select class="trade-input">
+
+<option>1 tick</option>
+<option>5 ticks</option>
+<option>10 ticks</option>
+<option>1 minute</option>
+<option>5 minutes</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Currency
+</label>
+
+<select class="trade-input">
+
+<option>USD</option>
+<option>EUR</option>
+<option>GBP</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<div class="trade-summary">
+
+<div class="summary-row">
+
+<span>
+Stake
+</span>
+
+<strong id="summaryStake">
+$10.00
+</strong>
+
+</div>
+
+<div class="summary-row">
+
+<span>
+Potential payout
+</span>
+
+<strong id="payout">
+$19.00
+</strong>
+
+</div>
+
+<div class="summary-row">
+
+<span>
+Potential profit
+</span>
+
+<strong class="positive">
+$9.00
+</strong>
+
+</div>
+
+</div>
+
+
+<button
+class="buy-button"
+onclick="placeDemoTrade()"
+>
+
+CONNECT DERIV TO TRADE
+
+</button>
+
+
+<p class="warning">
+
+Trading functionality is disabled in this public demo.
+The real Deriv API connection will be implemented through
+a secure backend. Never enter a Deriv API token directly
+into this page.
+
+</p>
+
+</aside>
+
+</main>
+
+
+<script>
+
+
+const params =
+new URLSearchParams(window.location.search);
+
+const symbol =
+params.get("symbol");
+
+
+const names = {
+
+R_10:"Volatility 10",
+
+R_25:"Volatility 25",
+
+R_50:"Volatility 50",
+
+R_75:"Volatility 75",
+
+R_100:"Volatility 100",
+
+frxEURUSD:"EUR/USD",
+
+frxGBPUSD:"GBP/USD",
+
+cryBTCUSD:"BTC/USD"
+
+};
+
+
+if(symbol && names[symbol]){
+
+document
+.getElementById("symbolName")
+.textContent =
+names[symbol];
+
+document
+.getElementById("market")
+.value =
+symbol;
+
+}
+
+
+const stake =
+document.getElementById("stake");
+
+const summary =
+document.getElementById("summaryStake");
+
+const payout =
+document.getElementById("payout");
+
+
+stake.addEventListener("input",() => {
+
+let value =
+parseFloat(stake.value) || 0;
+
+summary.textContent =
+"$" + value.toFixed(2);
+
+const potential =
+value * 1.9;
+
+payout.textContent =
+"$" + potential.toFixed(2);
+
+});
+
+
+function selectDirection(button){
+
+document
+.querySelectorAll(".direction")
+.forEach(
+b => b.classList.remove("active")
+);
+
+button.classList.add("active");
+
+}
+
+
+function placeDemoTrade(){
+
+alert(
+"Deriv connection required. Real trading will be enabled after the secure API backend is connected."
+);
+
+}
+
+</script>
+
+</body>
+</html>
