@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Strategies | PELItradershub</title>
+
+<meta name="description" content="Create and manage trading strategies with PELItradershub.">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+.strategies-page{
+max-width:1400px;
+margin:auto;
+padding:35px 5%;
+}
+
+.strategy-header{
+display:flex;
+justify-content:space-between;
+align-items:end;
+gap:20px;
+margin-bottom:30px;
+}
+
+.strategy-header h1{
+font-size:42px;
+margin:8px 0;
+}
+
+.strategy-header p{
+color:#7d879b;
+}
+
+.strategy-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:16px;
+}
+
+.strategy-card{
+background:#0d121c;
+border:1px solid #202838;
+border-radius:17px;
+padding:22px;
+}
+
+.strategy-card:hover{
+border-color:#786cff;
+}
+
+.strategy-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.strategy-icon{
+width:45px;
+height:45px;
+display:grid;
+place-items:center;
+border-radius:12px;
+background:#171b2b;
+font-size:21px;
+}
+
+.status{
+font-size:10px;
+font-weight:800;
+padding:5px 8px;
+border-radius:6px;
+}
+
+.status.ready{
+color:#39d4b6;
+background:#102c28;
+}
+
+.status.paused{
+color:#ffcf6b;
+background:#302817;
+}
+
+.status.new{
+color:#9a91ff;
+background:#211d42;
+}
+
+.strategy-card h2{
+font-size:19px;
+margin:20px 0 8px;
+}
+
+.strategy-card p{
+font-size:13px;
+color:#7d879b;
+min-height:42px;
+}
+
+.strategy-stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin:20px 0;
+}
+
+.strategy-stat{
+background:#101622;
+padding:11px;
+border-radius:9px;
+}
+
+.strategy-stat small{
+display:block;
+color:#68748a;
+font-size:10px;
+}
+
+.strategy-stat strong{
+display:block;
+margin-top:3px;
+}
+
+.strategy-actions{
+display:flex;
+gap:8px;
+}
+
+.strategy-actions a,
+.strategy-actions button{
+flex:1;
+text-align:center;
+}
+
+.builder{
+margin-top:20px;
+background:#0d121c;
+border:1px solid #202838;
+border-radius:17px;
+padding:25px;
+}
+
+.builder h2{
+margin-bottom:8px;
+}
+
+.builder p{
+color:#7d879b;
+font-size:13px;
+}
+
+.builder-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-top:20px;
+}
+
+.builder-item{
+padding:18px;
+border:1px solid #252e40;
+background:#101622;
+border-radius:12px;
+}
+
+.builder-item strong{
+display:block;
+margin-bottom:5px;
+}
+
+.builder-item span{
+font-size:12px;
+color:#7d879b;
+}
+
+@media(max-width:900px){
+
+.strategy-grid{
+grid-template-columns:repeat(2,1fr);
+}
+
+.builder-grid{
+grid-template-columns:1fr 1fr;
+}
+
+}
+
+@media(max-width:600px){
+
+.strategies-page{
+padding:20px 15px 40px;
+}
+
+.strategy-header{
+display:block;
+}
+
+.strategy-header h1{
+font-size:32px;
+}
+
+.strategy-grid,
+.builder-grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+<a href="index.html" class="brand">
+
+<span class="brand-icon">P</span>
+
+<span>
+PELI<span>tradershub</span>
+</span>
+
+</a>
+
+<nav>
+
+<a href="dashboard.html">Dashboard</a>
+<a href="markets.html">Markets</a>
+<a href="trade.html">Trade</a>
+<a href="strategies.html">Strategies</a>
+
+</nav>
+
+<div class="nav-actions">
+
+<a href="portfolio.html" class="login-link">
+Portfolio
+</a>
+
+<a href="dashboard.html" class="button primary">
+Dashboard
+</a>
+
+</div>
+
+</header>
+
+
+<main class="strategies-page">
+
+
+<div class="strategy-header">
+
+<div>
+
+<div class="eyebrow">
+STRATEGY LAB
+</div>
+
+<h1>
+Your Strategies
+</h1>
+
+<p>
+Create, organize and monitor your trading ideas.
+</p>
+
+</div>
+
+<a
+href="#builder"
+class="button primary"
+>
++ New Strategy
+</a>
+
+</div>
+
+
+<div class="strategy-grid">
+
+
+<!-- MOMENTUM -->
+
+<article class="strategy-card">
+
+<div class="strategy-top">
+
+<div class="strategy-icon">
+📈
+</div>
+
+<span class="status ready">
+READY
+</span>
+
+</div>
+
+<h2>
+Momentum
+</h2>
+
+<p>
+Trend-following strategy based on directional market movement.
+</p>
+
+<div class="strategy-stats">
+
+<div class="strategy-stat">
+
+<small>
+Win Rate
+</small>
+
+<strong class="positive">
+68.4%
+</strong>
+
+</div>
+
+<div class="strategy-stat">
+
+<small>
+Trades
+</small>
+
+<strong>
+128
+</strong>
+
+</div>
+
+</div>
+
+<div class="strategy-actions">
+
+<a
+href="trade.html"
+class="button primary"
+>
+Open
+</a>
+
+<button
+class="button secondary"
+onclick="toggleStrategy(this)"
+>
+Pause
+</button>
+
+</div>
+
+</article>
+
+
+<!-- BREAKOUT -->
+
+<article class="strategy-card">
+
+<div class="strategy-top">
+
+<div class="strategy-icon">
+⚡
+</div>
+
+<span class="status ready">
+READY
+</span>
+
+</div>
+
+<h2>
+Breakout
+</h2>
+
+<p>
+Identifies potential price breakouts from defined market ranges.
+</p>
+
+<div class="strategy-stats">
+
+<div class="strategy-stat">
+
+<small>
+Win Rate
+</small>
+
+<strong class="positive">
+61.7%
+</strong>
+
+</div>
+
+<div class="strategy-stat">
+
+<small>
+Trades
+</small>
+
+<strong>
+94
+</strong>
+
+</div>
+
+</div>
+
+<div class="strategy-actions">
+
+<a
+href="trade.html"
+class="button primary"
+>
+Open
+</a>
+
+<button
+class="button secondary"
+onclick="toggleStrategy(this)"
+>
+Pause
+</button>
+
+</div>
+
+</article>
+
+
+<!-- REVERSAL -->
+
+<article class="strategy-card">
+
+<div class="strategy-top">
+
+<div class="strategy-icon">
+🔄
+</div>
+
+<span class="status paused">
+PAUSED
+</span>
+
+</div>
+
+<h2>
+Reversal
+</h2>
+
+<p>
+A template for identifying potential changes in market direction.
+</p>
+
+<div class="strategy-stats">
+
+<div class="strategy-stat">
+
+<small>
+Win Rate
+</small>
+
+<strong>
+54.2%
+</strong>
+
+</div>
+
+<div class="strategy-stat">
+
+<small>
+Trades
+</small>
+
+<strong>
+76
+</strong>
+
+</div>
+
+</div>
+
+<div class="strategy-actions">
+
+<a
+href="trade.html"
+class="button primary"
+>
+Open
+</a>
+
+<button
+class="button secondary"
+onclick="toggleStrategy(this)"
+>
+Resume
+</button>
+
+</div>
+
+</article>
+
+
+<!-- CUSTOM -->
+
+<article class="strategy-card">
+
+<div class="strategy-top">
+
+<div class="strategy-icon">
+🧠
+</div>
+
+<span class="status new">
+BUILD
+</span>
+
+</div>
+
+<h2>
+Custom Strategy
+</h2>
+
+<p>
+Build your own rules and create a personalized strategy.
+</p>
+
+<div class="strategy-stats">
+
+<div class="strategy-stat">
+
+<small>
+Rules
+</small>
+
+<strong>
+0
+</strong>
+
+</div>
+
+<div class="strategy-stat">
+
+<small>
+Status
+</small>
+
+<strong>
+Draft
+</strong>
+
+</div>
+
+</div>
+
+<div class="strategy-actions">
+
+<a
+href="#builder"
+class="button primary"
+>
+Build
+</a>
+
+<button
+class="button secondary"
+onclick="alert('Create your rules below.')"
+>
+Configure
+</button>
+
+</div>
+
+</article>
+
+
+</div>
+
+
+<!-- BUILDER -->
+
+<section
+id="builder"
+class="builder"
+>
+
+<div class="eyebrow">
+STRATEGY BUILDER
+</div>
+
+<h2>
+Build Your Strategy
+</h2>
+
+<p>
+This interface prepares your strategy rules. Automated execution
+will only become available after the secure backend and Deriv API
+connection are configured.
+</p>
+
+
+<div class="builder-grid">
+
+
+<div class="builder-item">
+
+<strong>
+📊 Market
+</strong>
+
+<span>
+Choose the instrument your strategy watches.
+</span>
+
+</div>
+
+
+<div class="builder-item">
+
+<strong>
+📈 Entry Rules
+</strong>
+
+<span>
+Define conditions that generate an entry signal.
+</span>
+
+</div>
+
+
+<div class="builder-item">
+
+<strong>
+📉 Exit Rules
+</strong>
+
+<span>
+Define conditions for closing a position.
+</span>
+
+</div>
+
+
+<div class="builder-item">
+
+<strong>
+🛡 Risk Management
+</strong>
+
+<span>
+Define stake and risk limits.
+</span>
+
+</div>
+
+
+<div class="builder-item">
+
+<strong>
+⏱ Timing
+</strong>
+
+<span>
+Choose when the strategy can operate.
+</span>
+
+</div>
+
+
+<div class="builder-item">
+
+<strong>
+🤖 Automation
+</strong>
+
+<span>
+Connect the finished strategy to the secure execution engine.
+</span>
+
+</div>
+
+
+</div>
+
+
+<div style="margin-top:20px">
+
+<button
+class="button primary"
+onclick="saveStrategy()"
+>
+Save Strategy
+</button>
+
+</div>
+
+</section>
+
+
+<div style="
+margin-top:20px;
+padding:15px;
+border-radius:12px;
+background:#121122;
+border:1px solid #30294e;
+color:#aaa5ff;
+font-size:12px;
+">
+
+<strong>Important:</strong>
+The strategy statistics displayed above are demonstration values.
+They are not verified trading results and should not be interpreted
+as a guarantee of future performance.
+
+</div>
+
+
+</main>
+
+
+<footer>
+
+<div class="brand">
+
+<span class="brand-icon">P</span>
+
+PELItradershub
+
+</div>
+
+<p>
+Trading involves risk. No profits are guaranteed.
+</p>
+
+</footer>
+
+
+<script>
+
+function toggleStrategy(button){
+
+if(button.textContent.trim()==="Pause"){
+
+button.textContent="Resume";
+
+const status =
+button
+.closest(".strategy-card")
+.querySelector(".status");
+
+status.textContent="PAUSED";
+
+status.className="status paused";
+
+}else{
+
+button.textContent="Pause";
+
+const status =
+button
+.closest(".strategy-card")
+.querySelector(".status");
+
+status.textContent="READY";
+
+status.className="status ready";
+
+}
+
+}
+
+
+function saveStrategy(){
+
+alert(
+"Strategy saved as a local demo. Secure database storage and automated Deriv execution will be connected through the backend."
+);
+
+}
+
+</script>
+
+</body>
+</html>
