@@ -848,6 +848,91 @@ alert(
 }
 
 </script>
+<script src="deriv.js"></script>
 
+<script>
+
+const livePrice =
+document.getElementById("price");
+
+const marketSelector =
+document.getElementById("market");
+
+
+function startLiveMarket() {
+
+  const symbol =
+    marketSelector.value || "R_75";
+
+
+  window.PELI_DERIV.connect(
+
+    symbol,
+
+    function(tick) {
+
+      if (!tick || tick.quote === undefined) {
+        return;
+      }
+
+      livePrice.textContent =
+        Number(tick.quote).toLocaleString(
+          undefined,
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 5
+          }
+        );
+
+    },
+
+    function(status) {
+
+      console.log(
+        "Deriv:",
+        status
+      );
+
+      const statusElement =
+        document.querySelector(".status");
+
+      if (!statusElement) {
+        return;
+      }
+
+      if (status === "Connected") {
+
+        statusElement.textContent =
+          "● LIVE";
+
+        statusElement.style.color =
+          "#39d4b6";
+
+      } else {
+
+        statusElement.textContent =
+          "● " + status;
+
+        statusElement.style.color =
+          "#ffcf6b";
+
+      }
+
+    }
+
+  );
+
+}
+
+
+marketSelector.addEventListener(
+  "change",
+  startLiveMarket
+);
+
+
+startLiveMarket();
+
+</script>
 </body>
 </html>
