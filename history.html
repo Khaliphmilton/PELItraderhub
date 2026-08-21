@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Trade History | PELItradershub</title>
+
+<meta name="description" content="View your trading and transaction history on PELItradershub.">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+.history-page{
+max-width:1400px;
+margin:auto;
+padding:35px 5%;
+}
+
+.page-heading{
+margin-bottom:30px;
+}
+
+.page-heading h1{
+font-size:42px;
+margin:8px 0;
+}
+
+.page-heading p{
+color:#7d879b;
+}
+
+.history-toolbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+margin-bottom:15px;
+}
+
+.history-search{
+width:280px;
+padding:12px 14px;
+background:#0d121c;
+border:1px solid #252e40;
+border-radius:9px;
+color:white;
+outline:none;
+}
+
+.history-search:focus{
+border-color:#786cff;
+}
+
+.history-panel{
+background:#0d121c;
+border:1px solid #202838;
+border-radius:16px;
+overflow:hidden;
+}
+
+.history-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.history-table th{
+text-align:left;
+padding:16px;
+font-size:11px;
+color:#68748a;
+border-bottom:1px solid #202838;
+}
+
+.history-table td{
+padding:16px;
+border-bottom:1px solid #202838;
+font-size:13px;
+}
+
+.history-table tr:last-child td{
+border-bottom:0;
+}
+
+.symbol{
+font-weight:800;
+}
+
+.type{
+display:block;
+font-size:10px;
+color:#68748a;
+margin-top:3px;
+}
+
+.badge{
+padding:5px 8px;
+border-radius:6px;
+font-size:10px;
+font-weight:800;
+}
+
+.badge.win{
+background:#102c28;
+color:#39d4b6;
+}
+
+.badge.loss{
+background:#351923;
+color:#ff7186;
+}
+
+.badge.pending{
+background:#302817;
+color:#ffcf6b;
+}
+
+.empty{
+display:none;
+text-align:center;
+padding:50px;
+color:#7d879b;
+}
+
+@media(max-width:800px){
+
+.history-toolbar{
+align-items:stretch;
+flex-direction:column;
+}
+
+.history-search{
+width:100%;
+}
+
+.history-panel{
+overflow-x:auto;
+}
+
+.history-table{
+min-width:700px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+<a href="index.html" class="brand">
+<span class="brand-icon">P</span>
+<span>PELI<span>tradershub</span></span>
+</a>
+
+<nav>
+<a href="dashboard.html">Dashboard</a>
+<a href="markets.html">Markets</a>
+<a href="trade.html">Trade</a>
+<a href="strategies.html">Strategies</a>
+</nav>
+
+<div class="nav-actions">
+
+<a href="portfolio.html" class="login-link">
+Portfolio
+</a>
+
+<a href="dashboard.html" class="button primary">
+Dashboard
+</a>
+
+</div>
+
+</header>
+
+
+<main class="history-page">
+
+
+<div class="page-heading">
+
+<div class="eyebrow">
+ACTIVITY
+</div>
+
+<h1>
+Trade History
+</h1>
+
+<p>
+Review your previous trading activity.
+</p>
+
+</div>
+
+
+<div class="history-toolbar">
+
+<div class="filters">
+
+<button
+class="filter active"
+onclick="filterHistory('all',this)"
+>
+All
+</button>
+
+<button
+class="filter"
+onclick="filterHistory('win',this)"
+>
+Wins
+</button>
+
+<button
+class="filter"
+onclick="filterHistory('loss',this)"
+>
+Losses
+</button>
+
+</div>
+
+
+<input
+id="historySearch"
+class="history-search"
+type="search"
+placeholder="Search history..."
+>
+
+</div>
+
+
+<div class="history-panel">
+
+<table class="history-table">
+
+<thead>
+
+<tr>
+
+<th>
+MARKET
+</th>
+
+<th>
+TYPE
+</th>
+
+<th>
+STAKE
+</th>
+
+<th>
+RESULT
+</th>
+
+<th>
+P/L
+</th>
+
+<th>
+DATE
+</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="historyBody">
+
+
+<tr data-result="win">
+
+<td>
+
+<span class="symbol">
+Volatility 75
+</span>
+
+<span class="type">
+Synthetic
+</span>
+
+</td>
+
+<td>
+UP
+</td>
+
+<td>
+$25.00
+</td>
+
+<td>
+<span class="badge win">
+WON
+</span>
+</td>
+
+<td class="positive">
++$22.50
+</td>
+
+<td>
+Today, 14:32
+</td>
+
+</tr>
+
+
+<tr data-result="win">
+
+<td>
+
+<span class="symbol">
+Volatility 25
+</span>
+
+<span class="type">
+Synthetic
+</span>
+
+</td>
+
+<td>
+DOWN
+</td>
+
+<td>
+$10.00
+</td>
+
+<td>
+<span class="badge win">
+WON
+</span>
+</td>
+
+<td class="positive">
++$9.00
+</td>
+
+<td>
+Today, 13:51
+</td>
+
+</tr>
+
+
+<tr data-result="loss">
+
+<td>
+
+<span class="symbol">
+EUR/USD
+</span>
+
+<span class="type">
+Forex
+</span>
+
+</td>
+
+<td>
+UP
+</td>
+
+<td>
+$30.00
+</td>
+
+<td>
+<span class="badge loss">
+LOST
+</span>
+</td>
+
+<td class="negative">
+-$30.00
+</td>
+
+<td>
+Today, 12:18
+</td>
+
+</tr>
+
+
+<tr data-result="win">
+
+<td>
+
+<span class="symbol">
+Volatility 100
+</span>
+
+<span class="type">
+Synthetic
+</span>
+
+</td>
+
+<td>
+UP
+</td>
+
+<td>
+$15.00
+</td>
+
+<td>
+<span class="badge win">
+WON
+</span>
+</td>
+
+<td class="positive">
++$13.50
+</td>
+
+<td>
+Yesterday, 18:44
+</td>
+
+</tr>
+
+
+<tr data-result="loss">
+
+<td>
+
+<span class="symbol">
+GBP/USD
+</span>
+
+<span class="type">
+Forex
+</span>
+
+</td>
+
+<td>
+DOWN
+</td>
+
+<td>
+$20.00
+</td>
+
+<td>
+<span class="badge loss">
+LOST
+</span>
+</td>
+
+<td class="negative">
+-$20.00
+</td>
+
+<td>
+Yesterday, 16:23
+</td>
+
+</tr>
+
+
+<tr data-result="win">
+
+<td>
+
+<span class="symbol">
+Volatility 50
+</span>
+
+<span class="type">
+Synthetic
+</span>
+
+</td>
+
+<td>
+UP
+</td>
+
+<td>
+$40.00
+</td>
+
+<td>
+<span class="badge win">
+WON
+</span>
+</td>
+
+<td class="positive">
++$36.00
+</td>
+
+<td>
+Yesterday, 11:06
+</td>
+
+</tr>
+
+
+<tr data-result="win">
+
+<td>
+
+<span class="symbol">
+Volatility 10
+</span>
+
+<span class="type">
+Synthetic
+</span>
+
+</td>
+
+<td>
+DOWN
+</td>
+
+<td>
+$12.00
+</td>
+
+<td>
+<span class="badge win">
+WON
+</span>
+</td>
+
+<td class="positive">
++$10.80
+</td>
+
+<td>
+Aug 20, 09:45
+</td>
+
+</tr>
+
+
+<tr data-result="loss">
+
+<td>
+
+<span class="symbol">
+BTC/USD
+</span>
+
+<span class="type">
+Crypto
+</span>
+
+</td>
+
+<td>
+UP
+</td>
+
+<td>
+$50.00
+</td>
+
+<td>
+<span class="badge loss">
+LOST
+</span>
+
+<td class="negative">
+-$50.00
+</td>
+
+<td>
+Aug 20, 08:22
+</td>
+
+</tr>
+
+
+</tbody>
+
+</table>
+
+
+<div
+id="empty"
+class="empty"
+>
+No matching trades found.
+</div>
+
+</div>
+
+
+<div style="
+margin-top:20px;
+padding:15px;
+border-radius:12px;
+background:#121122;
+border:1px solid #30294e;
+color:#aaa5ff;
+font-size:12px;
+">
+
+<strong>Demo history:</strong>
+These transactions are sample interface data.
+Real trading history will be populated from the authenticated
+Deriv account after the secure API integration is completed.
+
+</div>
+
+
+</main>
+
+
+<footer>
+
+<div class="brand">
+<span class="brand-icon">P</span>
+PELItradershub
+</div>
+
+<p>
+Trading involves risk. No profits are guaranteed.
+</p>
+
+</footer>
+
+
+<script>
+
+const search =
+document.getElementById("historySearch");
+
+const rows =
+document.querySelectorAll("#historyBody tr");
+
+const empty =
+document.getElementById("empty");
+
+let activeFilter = "all";
+
+
+function updateHistory(){
+
+const query =
+search.value.toLowerCase();
+
+let visible = 0;
+
+
+rows.forEach(row => {
+
+const text =
+row.textContent.toLowerCase();
+
+const result =
+row.dataset.result;
+
+const matchesSearch =
+text.includes(query);
+
+const matchesFilter =
+activeFilter === "all" ||
+result === activeFilter;
+
+
+if(matchesSearch && matchesFilter){
+
+row.style.display = "";
+visible++;
+
+}else{
+
+row.style.display = "none";
+
+}
+
+});
+
+
+empty.style.display =
+visible === 0 ? "block" : "none";
+
+}
+
+
+search.addEventListener(
+"input",
+updateHistory
+);
+
+
+function filterHistory(type,button){
+
+activeFilter = type;
+
+document
+.querySelectorAll(".filter")
+.forEach(
+b => b.classList.remove("active")
+);
+
+button.classList.add("active");
+
+updateHistory();
+
+}
+
+</script>
+
+</body>
+</html>
