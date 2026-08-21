@@ -721,6 +721,136 @@
 
 </footer>
 
+<!-- PELItradershub Authentication -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
+<script>
+
+(async function () {
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      throw error;
+    }
+
+    const session = data.session;
+
+    /*
+      No logged-in user:
+      send them back to login.
+    */
+
+    if (!session) {
+
+      window.location.replace("login.html");
+
+      return;
+
+    }
+
+    /*
+      Make the current user available
+      to the dashboard.
+    */
+
+    window.PELI_USER = session.user;
+
+    console.log(
+      "Logged in as:",
+      session.user.email
+    );
+
+
+    /*
+      Display user's name/email wherever
+      these optional elements exist.
+    */
+
+    const userName =
+      document.getElementById("userName");
+
+    const userEmail =
+      document.getElementById("userEmail");
+
+
+    const fullName =
+      session.user.user_metadata?.full_name;
+
+
+    if (userName) {
+
+      userName.textContent =
+        fullName ||
+        session.user.email;
+
+    }
+
+
+    if (userEmail) {
+
+      userEmail.textContent =
+        session.user.email;
+
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      "Authentication error:",
+      error
+    );
+
+    window.location.replace("login.html");
+
+  }
+
+})();
+
+
+
+/*
+=========================
+LOGOUT
+=========================
+*/
+
+async function peliLogout() {
+
+  try {
+
+    const {
+      error
+    } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      throw error;
+    }
+
+    window.location.replace("login.html");
+
+  } catch (error) {
+
+    console.error(
+      "Logout error:",
+      error
+    );
+
+    alert(
+      "Unable to log out. Please try again."
+    );
+
+  }
+
+}
+
+</script>
 </body>
 </html>
