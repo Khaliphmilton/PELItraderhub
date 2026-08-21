@@ -418,119 +418,124 @@
 
 <script>
 
-function togglePassword(id, button) {
-
-  const input =
-    document.getElementById(id);
-
-  if(input.type === "password") {
-
-    input.type = "text";
-
-    button.textContent = "Hide";
-
-  } else {
-
-    input.type = "password";
-
-    button.textContent = "Show";
-
-  }
-
-}
-
-
-const password =
-document.getElementById("password");
-
-const strengthBar =
-document.getElementById("strengthBar");
-
-const strengthText =
-document.getElementById("strengthText");
-
-
-password.addEventListener("input", () => {
-
-  const value = password.value;
-
-  let strength = 0;
-
-  if(value.length >= 8)
-    strength++;
-
-  if(/[A-Z]/.test(value))
-    strength++;
-
-  if(/[0-9]/.test(value))
-    strength++;
-
-  if(/[^A-Za-z0-9]/.test(value))
-    strength++;
-
-
-  const widths = [
-    "0%",
-    "25%",
-    "50%",
-    "75%",
-    "100%"
-  ];
-
-  strengthBar.style.width =
-    widths[strength];
-
-
-  if(strength <= 1) {
-
-    strengthText.textContent =
-      "Weak password";
-
-  } else if(strength === 2) {
-
-    strengthText.textContent =
-      "Fair password";
-
-  } else if(strength === 3) {
-
-    strengthText.textContent =
-      "Good password";
-
-  } else {
-
-    strengthText.textContent =
-      "Strong password";
-
-  }
-
-});
-
-
+<script>
 document
   .getElementById("registerForm")
-  .addEventListener("submit", function(event) {
+  .addEventListener("submit", async function(event) {
 
     event.preventDefault();
+
+    const name =
+      document.getElementById("name").value.trim();
+
+    const email =
+      document.getElementById("email").value.trim();
 
     const password =
       document.getElementById("password").value;
 
-    const confirm =
+    const confirmPassword =
       document.getElementById("confirmPassword").value;
 
-    if(password !== confirm) {
+    const terms =
+      document.getElementById("terms").checked;
 
-      alert("Passwords do not match.");
 
+    if (!name) {
+      alert("Please enter your name.");
       return;
+    }
+
+
+    if (password.length < 8) {
+      alert("Password must contain at least 8 characters.");
+      return;
+    }
+
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+
+    if (!terms) {
+      alert("Please accept the terms.");
+      return;
+    }
+
+
+    const button =
+      document.querySelector(".auth-submit");
+
+    button.disabled = true;
+    button.textContent = "Creating account...";
+
+
+    try {
+
+      const result =
+        await supabaseClient.auth.signUp({
+
+          email: email,
+
+          password: password,
+
+          options: {
+            data: {
+              full_name: name
+            },
+
+            emailRedirectTo:
+              window.location.origin +
+              "/dashboard.html"
+          }
+
+        });
+
+
+      if (result.error) {
+        throw result.error;
+      }
+
+
+      if (result.data.session) {
+
+        alert("Account created successfully!");
+
+        window.location.href =
+          "dashboard.html";
+
+        return;
+      }
+
+
+      alert(
+        "Account created! Check your email to confirm your account."
+      );
+
+      window.location.href =
+        "login.html";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        error.message ||
+        "Registration failed. Please try again."
+      );
+
+    } finally {
+
+      button.disabled = false;
+      button.textContent = "Create Account";
 
     }
 
-    alert(
-      "The secure registration backend is not connected yet."
-    );
-
   });
+</script>
 
 </script>
 
