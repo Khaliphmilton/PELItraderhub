@@ -1,8 +1,9 @@
 // api/deriv/start.js
 
-const CLIENT_ID = process.env.DERIV_CLIENT_ID;
-const REDIRECT_URI = process.env.DERIV_REDIRECT_URI;
+const CLIENT_ID = "34aZNrTmY1AZc7hjuxyLv";
 
+const REDIRECT_URI =
+  "https://pelitradershub.vercel.app/api/deriv/callback";
 export default async function handler(req, res) {
   try {
     if (!CLIENT_ID || !REDIRECT_URI) {
