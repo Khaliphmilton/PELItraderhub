@@ -4,277 +4,357 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>PELItradershub — Smart Trading Platform</title>
+  <title>PELItradershub | Smart Trading Platform</title>
 
   <meta
     name="description"
-    content="PELItradershub is a modern trading platform for markets, analytics, automated strategies and trading education."
+    content="PELItradershub is a modern trading platform for markets, analytics, strategies and portfolio management."
   >
 
   <meta name="robots" content="index, follow">
 
-  <meta property="og:title" content="PELItradershub">
-  <meta
-    property="og:description"
-    content="Trade smarter with PELItradershub."
-  >
-  <meta property="og:type" content="website">
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #070910;
-      color: #ffffff;
-      min-height: 100vh;
-    }
-
-    nav {
-      height: 75px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 7%;
-      border-bottom: 1px solid #1c2130;
-      background: rgba(7,9,16,.9);
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .logo-box {
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      border-radius: 11px;
-      background: linear-gradient(135deg,#756bff,#38d9ca);
-    }
-
-    nav button,
-    .hero button {
-      border: 0;
-      padding: 12px 18px;
-      border-radius: 9px;
-      color: white;
-      background: linear-gradient(135deg,#756bff,#6259e9);
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .hero {
-      max-width: 1050px;
-      margin: auto;
-      padding: 100px 25px 70px;
-      text-align: center;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 8px 13px;
-      border-radius: 30px;
-      background: #171933;
-      color: #948dff;
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    h1 {
-      font-size: clamp(45px, 8vw, 82px);
-      line-height: 1;
-      margin: 28px 0;
-    }
-
-    h1 span {
-      background: linear-gradient(90deg,#8178ff,#45dccd);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .hero p {
-      max-width: 650px;
-      margin: auto;
-      color: #7d879b;
-      line-height: 1.8;
-      font-size: 17px;
-    }
-
-    .buttons {
-      margin-top: 30px;
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .secondary {
-      background: #101522 !important;
-      border: 1px solid #293043 !important;
-    }
-
-    .features {
-      max-width: 1050px;
-      margin: auto;
-      padding: 20px 25px 80px;
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 18px;
-    }
-
-    .card {
-      padding: 25px;
-      border: 1px solid #1d2433;
-      background: #0e121c;
-      border-radius: 16px;
-    }
-
-    .icon {
-      width: 45px;
-      height: 45px;
-      display: grid;
-      place-items: center;
-      border-radius: 12px;
-      background: #1b1a3c;
-      color: #8178ff;
-      font-size: 21px;
-      margin-bottom: 18px;
-    }
-
-    .card h2 {
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-
-    .card p {
-      color: #687287;
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    footer {
-      border-top: 1px solid #1b2130;
-      padding: 25px;
-      text-align: center;
-      color: #596276;
-      font-size: 11px;
-    }
-
-    @media(max-width:700px) {
-      .features {
-        grid-template-columns: 1fr;
-      }
-
-      nav {
-        padding: 0 20px;
-      }
-
-      .hero {
-        padding-top: 70px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<nav>
-  <div class="logo">
-    <div class="logo-box">P</div>
-    <span>PELItradershub</span>
+<header class="navbar">
+
+  <a href="index.html" class="brand">
+    <span class="brand-icon">P</span>
+    <span>PELI<span>tradershub</span></span>
+  </a>
+
+  <nav>
+    <a href="#features">Features</a>
+    <a href="#markets">Markets</a>
+    <a href="#strategies">Strategies</a>
+    <a href="#about">About</a>
+  </nav>
+
+  <div class="nav-actions">
+    <a href="login.html" class="login-link">Log in</a>
+    <a href="register.html" class="button primary">Get Started</a>
   </div>
 
-  <button onclick="openPlatform()">Enter Platform</button>
-</nav>
+</header>
+
+
+<main>
 
 <section class="hero">
 
-  <div class="badge">
-    NEXT GENERATION TRADING PLATFORM
-  </div>
+  <div class="hero-content">
 
-  <h1>
-    Trade smarter.<br>
-    <span>Move with confidence.</span>
-  </h1>
+    <div class="badge">
+      ● NEXT-GENERATION TRADING WORKSPACE
+    </div>
 
-  <p>
-    PELItradershub brings markets, analytics, trading tools,
-    automated strategies and education together in one modern
-    trading experience.
-  </p>
+    <h1>
+      Trade smarter.
+      <span>Build better.</span>
+    </h1>
 
-  <div class="buttons">
-    <button onclick="openPlatform()">
-      Start Exploring
-    </button>
+    <p>
+      PELItradershub brings markets, analytics, strategies,
+      portfolio tools and trading technology together in one
+      powerful workspace.
+    </p>
 
-    <button class="secondary" onclick="showMarkets()">
-      Explore Markets
-    </button>
+    <div class="hero-actions">
+
+      <a href="register.html" class="button primary large">
+        Create Free Account
+      </a>
+
+      <a href="markets.html" class="button secondary large">
+        Explore Markets
+      </a>
+
+    </div>
+
+    <div class="hero-note">
+      Demo environment available · Trading involves risk
+    </div>
+
   </div>
 
 </section>
 
-<section class="features">
 
-  <div class="card">
-    <div class="icon">📊</div>
-    <h2>Live Markets</h2>
+<section id="features" class="section">
+
+  <div class="section-heading">
+
+    <div class="eyebrow">
+      ONE PLATFORM
+    </div>
+
+    <h2>
+      Everything in one workspace.
+    </h2>
+
     <p>
-      Monitor markets and discover trading opportunities
-      through a clean, modern interface.
+      Designed for traders who want a cleaner and more powerful
+      way to interact with markets.
     </p>
+
   </div>
 
-  <div class="card">
-    <div class="icon">🤖</div>
-    <h2>Smart Strategies</h2>
-    <p>
-      Build and monitor automated strategies from one
-      centralized trading workspace.
-    </p>
-  </div>
 
-  <div class="card">
-    <div class="icon">🛡️</div>
-    <h2>Secure Platform</h2>
-    <p>
-      Designed for secure account connections and
-      responsible trading workflows.
-    </p>
+  <div class="feature-grid">
+
+    <article class="feature-card">
+
+      <div class="feature-icon">📊</div>
+
+      <h3>Live Markets</h3>
+
+      <p>
+        Monitor supported markets and keep your favourite
+        instruments in one watchlist.
+      </p>
+
+      <a href="markets.html">Explore markets →</a>
+
+    </article>
+
+
+    <article class="feature-card">
+
+      <div class="feature-icon">📈</div>
+
+      <h3>Advanced Charts</h3>
+
+      <p>
+        Analyze price movement with a dedicated trading
+        workspace.
+      </p>
+
+      <a href="trade.html">Open terminal →</a>
+
+    </article>
+
+
+    <article class="feature-card">
+
+      <div class="feature-icon">🤖</div>
+
+      <h3>Strategies</h3>
+
+      <p>
+        Create, organize and monitor automated trading
+        strategies.
+      </p>
+
+      <a href="strategies.html">View strategies →</a>
+
+    </article>
+
+
+    <article class="feature-card">
+
+      <div class="feature-icon">💼</div>
+
+      <h3>Portfolio</h3>
+
+      <p>
+        Track account performance, positions and trading
+        statistics.
+      </p>
+
+      <a href="portfolio.html">View portfolio →</a>
+
+    </article>
+
+
+    <article class="feature-card">
+
+      <div class="feature-icon">🔐</div>
+
+      <h3>Secure Connections</h3>
+
+      <p>
+        Account connections are designed around secure
+        authentication and protected credentials.
+      </p>
+
+      <a href="login.html">Sign in →</a>
+
+    </article>
+
+
+    <article class="feature-card">
+
+      <div class="feature-icon">📱</div>
+
+      <h3>Mobile First</h3>
+
+      <p>
+        Built to work comfortably on phones, tablets and
+        desktop screens.
+      </p>
+
+      <a href="register.html">Get started →</a>
+
+    </article>
+
   </div>
 
 </section>
+
+
+<section id="markets" class="market-section">
+
+  <div class="section-heading">
+
+    <div class="eyebrow">
+      MARKETS
+    </div>
+
+    <h2>
+      Your market dashboard.
+    </h2>
+
+  </div>
+
+
+  <div class="market-grid">
+
+    <div class="market-card">
+
+      <span>Volatility 10</span>
+      <strong>—</strong>
+      <small>Deriv Synthetic</small>
+
+    </div>
+
+
+    <div class="market-card">
+
+      <span>Volatility 25</span>
+      <strong>—</strong>
+      <small>Deriv Synthetic</small>
+
+    </div>
+
+
+    <div class="market-card">
+
+      <span>Volatility 75</span>
+      <strong>—</strong>
+      <small>Deriv Synthetic</small>
+
+    </div>
+
+
+    <div class="market-card">
+
+      <span>Volatility 100</span>
+      <strong>—</strong>
+      <small>Deriv Synthetic</small>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="strategies" class="section">
+
+  <div class="section-heading">
+
+    <div class="eyebrow">
+      STRATEGY LAB
+    </div>
+
+    <h2>
+      Turn ideas into strategies.
+    </h2>
+
+    <p>
+      Build a workspace for your trading rules, testing and
+      strategy management.
+    </p>
+
+  </div>
+
+
+  <div class="strategy-preview">
+
+    <div>
+      <span class="strategy-status">READY</span>
+      <h3>Momentum Strategy</h3>
+      <p>
+        Trend-following strategy workspace.
+      </p>
+    </div>
+
+    <div>
+      <span class="strategy-status">READY</span>
+      <h3>Breakout Strategy</h3>
+      <p>
+        Range and breakout strategy workspace.
+      </p>
+    </div>
+
+    <div>
+      <span class="strategy-status">BUILD</span>
+      <h3>Your Strategy</h3>
+      <p>
+        Create your own trading rules.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="about" class="cta">
+
+  <div>
+
+    <div class="eyebrow">
+      PELITRADERSHUB
+    </div>
+
+    <h2>
+      Your trading workspace starts here.
+    </h2>
+
+    <p>
+      Create your account and explore the platform.
+    </p>
+
+  </div>
+
+  <a href="register.html" class="button primary large">
+    Get Started
+  </a>
+
+</section>
+
+</main>
+
 
 <footer>
-  © 2026 PELItradershub · Trading involves risk. No profits are guaranteed.
+
+  <div class="brand">
+    <span class="brand-icon">P</span>
+    PELItradershub
+  </div>
+
+  <p>
+    © 2026 PELItradershub. Trading involves risk.
+    No profits are guaranteed.
+  </p>
+
 </footer>
 
-<script>
-  function openPlatform() {
-    alert(
-      "PELItradershub platform is being prepared. " +
-      "The next version will include the trading dashboard, markets, bots, portfolio, wallet and more."
-    );
-  }
 
-  function showMarkets() {
-    alert(
-      "Markets module coming next: Volatility indices, forex and other supported Deriv markets."
-    );
-  }
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
