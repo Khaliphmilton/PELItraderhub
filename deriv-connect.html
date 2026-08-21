@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Connect Deriv | PELItradershub</title>
+
+  <meta
+    name="description"
+    content="Securely connect your Deriv trading account to PELItradershub."
+  >
 
   <link rel="stylesheet" href="styles.css">
 
@@ -13,7 +21,13 @@
       min-height: calc(100vh - 72px);
       display: grid;
       place-items: center;
-      padding: 30px 20px;
+      padding: 40px 20px;
+      background:
+        radial-gradient(
+          circle at 50% 20%,
+          #24204b 0,
+          transparent 45%
+        );
     }
 
     .connect-card {
@@ -24,17 +38,49 @@
       border-radius: 20px;
       padding: 35px;
       text-align: center;
-      box-shadow: 0 25px 80px rgba(0,0,0,.35);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, .35);
+    }
+
+    .connect-logo {
+      margin-bottom: 25px;
+    }
+
+    .connect-logo .brand {
+      justify-content: center;
     }
 
     .connect-card h1 {
+      font-size: 30px;
       margin-bottom: 10px;
     }
 
-    .connect-card p {
+    .connect-description {
       color: #7d879b;
       line-height: 1.6;
+      font-size: 14px;
       margin-bottom: 25px;
+    }
+
+    .connect-info {
+      text-align: left;
+      background: #101722;
+      border: 1px solid #202838;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .connect-info strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .connect-info p {
+      color: #7d879b;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 0;
     }
 
     .deriv-button {
@@ -42,7 +88,11 @@
       padding: 15px;
       border: 0;
       border-radius: 10px;
-      background: linear-gradient(135deg, #786cff, #39d4b6);
+      background: linear-gradient(
+        135deg,
+        #786cff,
+        #39d4b6
+      );
       color: #061016;
       font-weight: 900;
       cursor: pointer;
@@ -53,10 +103,39 @@
       opacity: .9;
     }
 
+    .deriv-button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
     .status {
-      margin-top: 20px;
+      margin-top: 18px;
       color: #7d879b;
+      font-size: 12px;
+      line-height: 1.5;
+      min-height: 18px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #9a91ff;
       font-size: 13px;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 500px) {
+      .connect-card {
+        padding: 25px 20px;
+      }
+
+      .connect-card h1 {
+        font-size: 26px;
+      }
     }
   </style>
 </head>
@@ -66,13 +145,21 @@
 <header class="navbar">
 
   <a href="index.html" class="brand">
+
     <span class="brand-icon">P</span>
-    <span>PELI<span>tradershub</span></span>
+
+    <span>
+      PELI<span>tradershub</span>
+    </span>
+
   </a>
 
   <div class="nav-actions">
 
-    <a href="dashboard.html" class="button secondary">
+    <a
+      href="dashboard.html"
+      class="button secondary"
+    >
       Dashboard
     </a>
 
@@ -85,13 +172,47 @@
 
   <section class="connect-card">
 
-    <h1>Connect Deriv</h1>
+    <div class="connect-logo">
 
-    <p>
-      Connect your Deriv account securely to PELItradershub.
-      You will be redirected to Deriv to sign in and authorize
-      the connection.
+      <a href="index.html" class="brand">
+
+        <span class="brand-icon">P</span>
+
+        <span>
+          PELI<span>tradershub</span>
+        </span>
+
+      </a>
+
+    </div>
+
+
+    <h1>
+      Connect Deriv
+    </h1>
+
+
+    <p class="connect-description">
+      Connect your Deriv account securely to
+      PELItradershub. You will be redirected to
+      Deriv to authorize the connection.
     </p>
+
+
+    <div class="connect-info">
+
+      <strong>
+        🔐 Secure connection
+      </strong>
+
+      <p>
+        Your Deriv password is entered only on
+        Deriv's website. PELItradershub does not
+        ask for or store your Deriv password.
+      </p>
+
+    </div>
+
 
     <button
       type="button"
@@ -101,12 +222,22 @@
       Connect Deriv Account
     </button>
 
+
     <div
       id="status"
       class="status"
+      aria-live="polite"
     >
-      Your Deriv password will never be entered into PELItradershub.
+      Ready to connect your Deriv account.
     </div>
+
+
+    <a
+      href="dashboard.html"
+      class="back-link"
+    >
+      ← Back to Dashboard
+    </a>
 
   </section>
 
@@ -115,216 +246,38 @@
 
 <script>
 
-const CLIENT_ID =
-  "34aZNrTmY1AZc7hjuxyLv";
+  const connectButton =
+    document.getElementById("connectDeriv");
 
-const REDIRECT_URI =
-  "https://pelitradershub.vercel.app/api/deriv/callback";
-
-
-function generateCodeVerifier() {
-
-  const array =
-    new Uint8Array(64);
-
-  crypto.getRandomValues(array);
-
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-
-  let result = "";
-
-  for (let i = 0; i < array.length; i++) {
-
-    result +=
-      characters[
-        array[i] % characters.length
-      ];
-
-  }
-
-  return result;
-}
+  const status =
+    document.getElementById("status");
 
 
-async function generateCodeChallenge(
-  verifier
-) {
-
-  const data =
-    new TextEncoder().encode(
-      verifier
-    );
-
-  const digest =
-    await crypto.subtle.digest(
-      "SHA-256",
-      data
-    );
-
-  return btoa(
-    String.fromCharCode(
-      ...new Uint8Array(digest)
-    )
-  )
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-
-}
-
-
-function generateState() {
-
-  const array =
-    new Uint8Array(32);
-
-  crypto.getRandomValues(array);
-
-  return Array
-    .from(array)
-    .map(
-      byte =>
-        byte
-          .toString(16)
-          .padStart(2, "0")
-    )
-    .join("");
-
-}
-
-
-document
-  .getElementById("connectDeriv")
-  .addEventListener(
+  connectButton.addEventListener(
     "click",
-    async function () {
+    function () {
 
-      const button =
-        document.getElementById(
-          "connectDeriv"
-        );
+      connectButton.disabled = true;
 
-      const status =
-        document.getElementById(
-          "status"
-        );
+      connectButton.textContent =
+        "Connecting to Deriv...";
+
+      status.textContent =
+        "Opening secure Deriv authorization...";
 
 
-      try {
+      /*
+       * The backend creates the PKCE verifier,
+       * PKCE challenge and OAuth state.
+       *
+       * It then redirects the user to Deriv.
+       *
+       * Do NOT generate or store the Deriv
+       * authorization code or access token here.
+       */
 
-        button.disabled = true;
-
-        button.textContent =
-          "Preparing secure connection...";
-
-
-        const codeVerifier =
-          generateCodeVerifier();
-
-
-        const codeChallenge =
-          await generateCodeChallenge(
-            codeVerifier
-          );
-
-
-        const state =
-          generateState();
-
-
-        /*
-          Save PKCE information before
-          leaving PELItradershub.
-        */
-
-        sessionStorage.setItem(
-          "deriv_code_verifier",
-          codeVerifier
-        );
-
-
-        sessionStorage.setItem(
-          "deriv_oauth_state",
-          state
-        );
-
-
-        /*
-          Build Deriv OAuth URL.
-        */
-
-        const authUrl =
-          new URL(
-            "https://auth.deriv.com/oauth2/auth"
-          );
-
-
-        authUrl.searchParams.set(
-          "response_type",
-          "code"
-        );
-
-
-        authUrl.searchParams.set(
-          "client_id",
-          CLIENT_ID
-        );
-
-
-        authUrl.searchParams.set(
-          "redirect_uri",
-          REDIRECT_URI
-        );
-
-
-        authUrl.searchParams.set(
-          "scope",
-          "trade"
-        );
-
-
-        authUrl.searchParams.set(
-          "state",
-          state
-        );
-
-
-        authUrl.searchParams.set(
-          "code_challenge",
-          codeChallenge
-        );
-
-
-        authUrl.searchParams.set(
-          "code_challenge_method",
-          "S256"
-        );
-
-
-        status.textContent =
-          "Redirecting to Deriv...";
-
-
-        window.location.href =
-          authUrl.toString();
-
-
-      } catch (error) {
-
-        console.error(error);
-
-
-        status.textContent =
-          "Unable to start the Deriv connection.";
-
-
-        button.disabled = false;
-
-        button.textContent =
-          "Connect Deriv Account";
-
-      }
+      window.location.href =
+        "/api/deriv/start";
 
     }
   );
