@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Portfolio | PELItradershub</title>
+
+<meta name="description" content="Track your trading portfolio and performance on PELItradershub.">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+.portfolio-page{
+max-width:1400px;
+margin:auto;
+padding:35px 5%;
+}
+
+.page-heading{
+margin-bottom:30px;
+}
+
+.page-heading h1{
+font-size:42px;
+margin:8px 0;
+}
+
+.page-heading p{
+color:#7d879b;
+}
+
+.portfolio-stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+margin-bottom:20px;
+}
+
+.portfolio-card{
+background:#0d121c;
+border:1px solid #202838;
+border-radius:16px;
+padding:20px;
+}
+
+.portfolio-card small{
+display:block;
+color:#7d879b;
+font-size:12px;
+}
+
+.portfolio-card strong{
+display:block;
+font-size:27px;
+margin:7px 0;
+}
+
+.portfolio-layout{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:15px;
+}
+
+.panel{
+background:#0d121c;
+border:1px solid #202838;
+border-radius:16px;
+padding:20px;
+}
+
+.panel h2{
+font-size:18px;
+margin-bottom:20px;
+}
+
+.performance-chart{
+height:300px;
+background:
+linear-gradient(180deg,rgba(120,108,255,.08),transparent);
+border-radius:12px;
+}
+
+.performance-chart svg{
+width:100%;
+height:100%;
+}
+
+.allocation{
+display:flex;
+height:20px;
+border-radius:20px;
+overflow:hidden;
+margin:20px 0;
+}
+
+.allocation div:nth-child(1){
+width:45%;
+background:#786cff;
+}
+
+.allocation div:nth-child(2){
+width:30%;
+background:#39d4b6;
+}
+
+.allocation div:nth-child(3){
+width:15%;
+background:#f6cf58;
+}
+
+.allocation div:nth-child(4){
+width:10%;
+background:#ff7186;
+}
+
+.allocation-row{
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid #202838;
+font-size:13px;
+}
+
+.allocation-row:last-child{
+border-bottom:0;
+}
+
+.dot{
+display:inline-block;
+width:8px;
+height:8px;
+border-radius:50%;
+margin-right:7px;
+}
+
+.dot-one{background:#786cff}
+.dot-two{background:#39d4b6}
+.dot-three{background:#f6cf58}
+.dot-four{background:#ff7186}
+
+.position-row{
+display:grid;
+grid-template-columns:1.5fr 1fr 1fr 1fr;
+gap:10px;
+align-items:center;
+padding:15px 0;
+border-bottom:1px solid #202838;
+font-size:13px;
+}
+
+.position-row:last-child{
+border-bottom:0;
+}
+
+.position-symbol{
+font-weight:800;
+}
+
+.position-type{
+display:block;
+color:#68748a;
+font-size:10px;
+margin-top:3px;
+}
+
+@media(max-width:1000px){
+
+.portfolio-stats{
+grid-template-columns:repeat(2,1fr);
+}
+
+.portfolio-layout{
+grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:600px){
+
+.portfolio-page{
+padding:20px 15px 40px;
+}
+
+.page-heading h1{
+font-size:32px;
+}
+
+.portfolio-stats{
+grid-template-columns:1fr 1fr;
+}
+
+.position-row{
+grid-template-columns:1.5fr 1fr 1fr;
+}
+
+.position-row > div:nth-child(3){
+display:none;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+<a href="index.html" class="brand">
+<span class="brand-icon">P</span>
+<span>PELI<span>tradershub</span></span>
+</a>
+
+<nav>
+<a href="dashboard.html">Dashboard</a>
+<a href="markets.html">Markets</a>
+<a href="trade.html">Trade</a>
+<a href="strategies.html">Strategies</a>
+</nav>
+
+<div class="nav-actions">
+<a href="history.html" class="login-link">History</a>
+<a href="dashboard.html" class="button primary">Dashboard</a>
+</div>
+
+</header>
+
+
+<main class="portfolio-page">
+
+
+<div class="page-heading">
+
+<div class="eyebrow">
+PORTFOLIO
+</div>
+
+<h1>
+Your Portfolio
+</h1>
+
+<p>
+Monitor your account performance and open positions.
+</p>
+
+</div>
+
+
+<section class="portfolio-stats">
+
+
+<div class="portfolio-card">
+
+<small>
+Portfolio Value
+</small>
+
+<strong>
+$10,284.20
+</strong>
+
+<span class="positive">
++2.84%
+</span>
+
+</div>
+
+
+<div class="portfolio-card">
+
+<small>
+Total Profit
+</small>
+
+<strong class="positive">
++$1,284.20
+</strong>
+
+<span>
+Since start
+</span>
+
+</div>
+
+
+<div class="portfolio-card">
+
+<small>
+Today's P/L
+</small>
+
+<strong class="positive">
++$284.20
+</strong>
+
+<span>
++2.84%
+</span>
+
+</div>
+
+
+<div class="portfolio-card">
+
+<small>
+Win Rate
+</small>
+
+<strong>
+68.4%
+</strong>
+
+<span>
+128 trades
+</span>
+
+</div>
+
+</section>
+
+
+<section class="portfolio-layout">
+
+
+<div class="panel">
+
+<h2>
+Performance
+</h2>
+
+<div class="performance-chart">
+
+<svg
+viewBox="0 0 900 350"
+preserveAspectRatio="none"
+>
+
+<defs>
+
+<linearGradient
+id="portfolioArea"
+x1="0"
+y1="0"
+x2="0"
+y2="1"
+>
+
+<stop
+offset="0%"
+stop-color="#786cff"
+stop-opacity=".35"
+/>
+
+<stop
+offset="100%"
+stop-color="#786cff"
+stop-opacity="0"
+/>
+
+</linearGradient>
+
+</defs>
+
+
+<path
+d="
+M0 290
+C80 280 100 250 160 260
+S250 220 300 230
+S390 180 440 200
+S520 150 570 170
+S650 115 700 130
+S800 90 900 45
+L900 350
+L0 350 Z
+"
+fill="url(#portfolioArea)"
+/>
+
+
+<path
+d="
+M0 290
+C80 280 100 250 160 260
+S250 220 300 230
+S390 180 440 200
+S520 150 570 170
+S650 115 700 130
+S800 90 900 45
+"
+fill="none"
+stroke="#786cff"
+stroke-width="4"
+/>
+
+</svg>
+
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h2>
+Allocation
+</h2>
+
+
+<div class="allocation">
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+</div>
+
+
+<div class="allocation-row">
+
+<span>
+<span class="dot dot-one"></span>
+Synthetic
+</span>
+
+<strong>
+45%
+</strong>
+
+</div>
+
+
+<div class="allocation-row">
+
+<span>
+<span class="dot dot-two"></span>
+Forex
+</span>
+
+<strong>
+30%
+</strong>
+
+</div>
+
+
+<div class="allocation-row">
+
+<span>
+<span class="dot dot-three"></span>
+Crypto
+</span>
+
+<strong>
+15%
+</strong>
+
+</div>
+
+
+<div class="allocation-row">
+
+<span>
+<span class="dot dot-four"></span>
+Cash
+</span>
+
+<strong>
+10%
+</strong>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="panel" style="margin-top:15px;">
+
+<h2>
+Open Positions
+</h2>
+
+
+<div class="position-row">
+
+<div>
+<span class="position-symbol">
+Volatility 75
+</span>
+
+<span class="position-type">
+Synthetic
+</span>
+</div>
+
+<strong>
+$50.00
+</strong>
+
+<span>
+Entry
+</span>
+
+<strong class="positive">
++$42.00
+</strong>
+
+</div>
+
+
+<div class="position-row">
+
+<div>
+<span class="position-symbol">
+EUR/USD
+</span>
+
+<span class="position-type">
+Forex
+</span>
+</div>
+
+<strong>
+$25.00
+</strong>
+
+<span>
+Entry
+</span>
+
+<strong class="positive">
++$18.40
+</strong>
+
+</div>
+
+
+<div class="position-row">
+
+<div>
+<span class="position-symbol">
+Volatility 100
+</span>
+
+<span class="position-type">
+Synthetic
+</span>
+</div>
+
+<strong>
+$30.00
+</strong>
+
+<span>
+Entry
+</span>
+
+<strong class="negative">
+-$12.00
+</strong>
+
+</div>
+
+
+<div class="position-row">
+
+<div>
+<span class="position-symbol">
+Volatility 25
+</span>
+
+<span class="position-type">
+Synthetic
+</span>
+</div>
+
+<strong>
+$40.00
+</strong>
+
+<span>
+Entry
+</span>
+
+<strong class="positive">
++$31.60
+</strong>
+
+</div>
+
+
+<div style="margin-top:20px;">
+
+<a
+href="trade.html"
+class="button primary"
+>
+Open Trading Terminal
+</a>
+
+<a
+href="history.html"
+class="button secondary"
+>
+View History
+</a>
+
+</div>
+
+</section>
+
+
+<div style="
+margin-top:20px;
+padding:15px;
+border-radius:12px;
+background:#121122;
+border:1px solid #30294e;
+color:#aaa5ff;
+font-size:12px;
+">
+
+<strong>Demo data:</strong>
+The portfolio values and performance shown here are sample
+values. Real account information will come from the secure
+Deriv API connection.
+
+</div>
+
+
+</main>
+
+
+<footer>
+
+<div class="brand">
+<span class="brand-icon">P</span>
+PELItradershub
+</div>
+
+<p>
+Trading involves risk. No profits are guaranteed.
+</p>
+
+</footer>
+
+</body>
+</html>
