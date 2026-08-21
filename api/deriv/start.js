@@ -4,23 +4,18 @@ const CLIENT_ID = "34aZNrTmY1AZc7hjuxyLv";
 
 const REDIRECT_URI =
   "https://pelitradershub.vercel.app/api/deriv/callback";
+
 export default async function handler(req, res) {
   try {
-    if (!CLIENT_ID || !REDIRECT_URI) {
-      return res.status(500).json({
-        error: "Deriv OAuth is not configured."
-      });
-    }
-
-    // Generate secure PKCE verifier
+    // Generate PKCE verifier
     const verifierBytes = new Uint8Array(32);
     crypto.getRandomValues(verifierBytes);
 
     const codeVerifier = Array.from(verifierBytes)
-      .map(byte => byte.toString(16).padStart(2, "0"))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
       .join("");
 
-    // Create SHA-256 challenge
+    // Generate SHA-256 challenge
     const data = new TextEncoder().encode(codeVerifier);
 
     const digest = await crypto.subtle.digest(
@@ -34,19 +29,25 @@ export default async function handler(req, res) {
 
     // Generate OAuth state
     const stateBytes = new Uint8Array(32);
+
     crypto.getRandomValues(stateBytes);
 
     const state = Array.from(stateBytes)
-      .map(byte => byte.toString(16).padStart(2, "0"))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
       .join("");
 
-    // Store PKCE verifier and state securely in cookies
+    // Store PKCE values in secure HTTP-only cookies
     res.setHeader("Set-Cookie", [
-      `deriv_code_verifier=${encodeURIComponent(codeVerifier)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
-      `deriv_oauth_state=${encodeURIComponent(state)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`
+      `deriv_code_verifier=${encodeURIComponent(
+        codeVerifier
+      )}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`,
+
+      `deriv_oauth_state=${encodeURIComponent(
+        state
+      )}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600`
     ]);
 
-    // Build Deriv OAuth authorization URL
+    // Build Deriv OAuth URL
     const authUrl = new URL(
       "https://auth.deriv.com/oauth2/auth"
     );
@@ -86,20 +87,25 @@ export default async function handler(req, res) {
       "S256"
     );
 
+    console.log(
+      "Starting Deriv OAuth:",
+      authUrl.origin + authUrl.pathname
+    );
+
     return res.redirect(
       302,
       authUrl.toString()
     );
 
   } catch (error) {
-
     console.error(
       "Deriv OAuth start error:",
       error
     );
 
     return res.status(500).json({
-      error: "Unable to start Deriv connection."
+      error:
+        "Unable to start Deriv connection."
     });
   }
 }
@@ -107,7 +113,6 @@ export default async function handler(req, res) {
 
 // Convert bytes to Base64URL
 function base64UrlEncode(bytes) {
-
   let binary = "";
 
   for (const byte of bytes) {
