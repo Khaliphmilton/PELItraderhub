@@ -1,22 +1,13 @@
 // api/deriv/callback.js
 
-const CLIENT_ID = process.env.DERIV_CLIENT_ID;
-const REDIRECT_URI = process.env.DERIV_REDIRECT_URI;
+const CLIENT_ID = "34aZNrTmY1AZc7hjuxyLv";
+
+const REDIRECT_URI =
+  "https://pelitradershub.vercel.app/api/deriv/callback";
 
 export default async function handler(req, res) {
   try {
-    // --------------------------------------------------
-    // 1. Check required environment variables
-    // --------------------------------------------------
 
-    if (!CLIENT_ID || !REDIRECT_URI) {
-      console.error("Missing Deriv environment variables.");
-
-      return res.status(500).send(`
-        <h1>Server configuration error</h1>
-        <p>Deriv OAuth is not configured correctly.</p>
-      `);
-    }
 
     // --------------------------------------------------
     // 2. Read OAuth response
