@@ -7,12 +7,6 @@ const REDIRECT_URI =
 
 export default async function handler(req, res) {
   try {
-
-
-    // --------------------------------------------------
-    // 2. Read OAuth response
-    // --------------------------------------------------
-
     const {
       code,
       state,
@@ -20,90 +14,45 @@ export default async function handler(req, res) {
       error_description
     } = req.query;
 
-    // User cancelled or Deriv returned an OAuth error
+    // --------------------------------------------------
+    // DERIV RETURNED AN ERROR
+    // --------------------------------------------------
+
     if (error) {
-      return res.status(400).send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Deriv Connection Cancelled</title>
-          <style>
-            body {
-              margin: 0;
-              min-height: 100vh;
-              display: grid;
-              place-items: center;
-              background: #080c13;
-              color: white;
-              font-family: Arial, sans-serif;
-            }
-
-            .card {
-              max-width: 450px;
-              padding: 30px;
-              border-radius: 18px;
-              border: 1px solid #202838;
-              background: #0d121c;
-              text-align: center;
-            }
-
-            a {
-              display: inline-block;
-              margin-top: 20px;
-              padding: 12px 18px;
-              border-radius: 9px;
-              background: #786cff;
-              color: white;
-              text-decoration: none;
-              font-weight: bold;
-            }
-          </style>
-        </head>
-
-        <body>
-          <div class="card">
-            <h1>Deriv connection cancelled</h1>
-
-            <p>
-              ${
-                escapeHtml(
-                  error_description ||
-                  "The Deriv authorization was cancelled."
-                )
-              }
-            </p>
-
-            <a href="/deriv-connect.html">
-              Try Again
-            </a>
-          </div>
-        </body>
-        </html>
-      `);
+      return res.status(400).send(
+        page(
+          "Deriv Connection Cancelled",
+          escapeHtml(
+            error_description ||
+            "The Deriv authorization was cancelled."
+          ),
+          "Try Again"
+        )
+      );
     }
 
     // --------------------------------------------------
-    // 3. Require authorization code
+    // AUTHORIZATION CODE REQUIRED
     // --------------------------------------------------
 
     if (!code) {
-      return res.status(400).send(`
-        <h1>Deriv OAuth Error</h1>
-        <p>No authorization code was received.</p>
-      `);
+      return res.status(400).send(
+        page(
+          "Deriv OAuth Error",
+          "No authorization code was received from Deriv.",
+          "Try Again"
+        )
+      );
     }
 
     // --------------------------------------------------
-    // 4. Read secure OAuth cookies
-    //
-    // These must be created by /api/deriv/start.
+    // READ PKCE COOKIES
     // --------------------------------------------------
 
-    const cookies = parseCookies(
-      req.headers.cookie || ""
-    );
+    const cookies =
+      parseCookies(
+        req.headers.cookie || ""
+      );
 
     const savedState =
       cookies.deriv_oauth_state;
@@ -111,85 +60,40 @@ export default async function handler(req, res) {
     const codeVerifier =
       cookies.deriv_code_verifier;
 
-    // --------------------------------------------------
-    // 5. Make sure PKCE information exists
-    // --------------------------------------------------
-
     if (!savedState || !codeVerifier) {
-
       console.error(
         "Missing OAuth state or PKCE verifier."
       );
 
-      return res.status(400).send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Connection Error</title>
-        </head>
-
-        <body style="
-          background:#080c13;
-          color:white;
-          font-family:Arial,sans-serif;
-          text-align:center;
-          padding:60px 20px;
-        ">
-
-          <h1>Connection could not be completed</h1>
-
-          <p>
-            The secure OAuth session has expired or is missing.
-          </p>
-
-          <p>
-            Please start the Deriv connection again.
-          </p>
-
-          <a
-            href="/deriv-connect.html"
-            style="
-              display:inline-block;
-              margin-top:20px;
-              padding:12px 20px;
-              background:#786cff;
-              color:white;
-              text-decoration:none;
-              border-radius:9px;
-              font-weight:bold;
-            "
-          >
-            Connect Deriv
-          </a>
-
-        </body>
-        </html>
-      `);
+      return res.status(400).send(
+        page(
+          "Connection Could Not Be Completed",
+          "The secure OAuth session is missing or expired. Start the Deriv connection again.",
+          "Connect Deriv"
+        )
+      );
     }
 
     // --------------------------------------------------
-    // 6. Verify OAuth state
+    // VERIFY STATE
     // --------------------------------------------------
 
     if (!state || state !== savedState) {
-
       console.error(
         "OAuth state mismatch."
       );
 
-      return res.status(403).send(`
-        <h1>Security verification failed</h1>
-        <p>The OAuth state could not be verified.</p>
-      `);
+      return res.status(403).send(
+        page(
+          "Security Verification Failed",
+          "The OAuth security check failed. Please start the connection again.",
+          "Try Again"
+        )
+      );
     }
 
     // --------------------------------------------------
-    // 7. Exchange authorization code for token
-    //
-    // IMPORTANT:
-    // This happens on the server.
+    // EXCHANGE CODE FOR ACCESS TOKEN
     // --------------------------------------------------
 
     const tokenResponse =
@@ -200,12 +104,13 @@ export default async function handler(req, res) {
 
           headers: {
             "Content-Type":
-              "application/x-www-form-urlencoded"
+              "application/x-www-form-urlencoded",
+            "Accept":
+              "application/json"
           },
 
           body:
             new URLSearchParams({
-
               grant_type:
                 "authorization_code",
 
@@ -229,69 +134,44 @@ export default async function handler(req, res) {
       await tokenResponse.json();
 
     // --------------------------------------------------
-    // 8. Check token exchange result
+    // TOKEN EXCHANGE FAILED
     // --------------------------------------------------
 
-    if (!tokenResponse.ok || !tokenData.access_token) {
+    if (
+      !tokenResponse.ok ||
+      !tokenData.access_token
+    ) {
 
       console.error(
         "Deriv token exchange failed:",
-        tokenData
+        {
+          status:
+            tokenResponse.status,
+
+          error:
+            tokenData.error,
+
+          message:
+            tokenData.message
+        }
       );
 
-      return res.status(400).send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Deriv Connection Failed</title>
-        </head>
-
-        <body style="
-          background:#080c13;
-          color:white;
-          font-family:Arial,sans-serif;
-          text-align:center;
-          padding:60px 20px;
-        ">
-
-          <h1>Deriv connection failed</h1>
-
-          <p>
-            We could not complete the secure connection.
-          </p>
-
-          <a
-            href="/deriv-connect.html"
-            style="
-              display:inline-block;
-              margin-top:20px;
-              padding:12px 20px;
-              background:#786cff;
-              color:white;
-              text-decoration:none;
-              border-radius:9px;
-              font-weight:bold;
-            "
-          >
-            Try Again
-          </a>
-
-        </body>
-        </html>
-      `);
+      return res.status(400).send(
+        page(
+          "Deriv Connection Failed",
+          "Deriv authorization was not completed successfully. Please try again.",
+          "Try Again"
+        )
+      );
     }
 
     // --------------------------------------------------
-    // 9. We received the Deriv access token.
+    // SUCCESS
     //
-    // DO NOT send the token to the browser.
-    // DO NOT put it in the URL.
-    // DO NOT log it.
-    //
-    // The next stage will securely associate it
-    // with the logged-in PELItradershub user.
+    // IMPORTANT:
+    // The access token stays on the server.
+    // It is NOT placed in the URL.
+    // It is NOT sent to the browser.
     // --------------------------------------------------
 
     const accessToken =
@@ -300,28 +180,23 @@ export default async function handler(req, res) {
     const expiresIn =
       tokenData.expires_in || 3600;
 
-    // --------------------------------------------------
-    // TEMPORARY DEVELOPMENT STORAGE
-    //
-    // IMPORTANT:
-    // This is intentionally NOT storing the token yet.
-    //
-    // The next backend step will connect this OAuth
-    // result to the authenticated Supabase user and
-    // securely persist the Deriv credentials.
-    // --------------------------------------------------
-
     console.log(
-      "Deriv OAuth completed successfully."
+      "Deriv OAuth authorization succeeded."
     );
 
-    // Prevent unused-variable warnings without
-    // exposing the token.
+    /*
+     * We deliberately do NOT log accessToken.
+     *
+     * The next backend stage should securely associate
+     * this token with the authenticated PELItradershub
+     * user and store it server-side.
+     */
+
     void accessToken;
     void expiresIn;
 
     // --------------------------------------------------
-    // 10. Clear temporary OAuth cookies
+    // CLEAR TEMPORARY OAUTH COOKIES
     // --------------------------------------------------
 
     res.setHeader(
@@ -338,13 +213,133 @@ export default async function handler(req, res) {
     );
 
     // --------------------------------------------------
-    // 11. Continue to connection-success page
+    // SUCCESS PAGE
     // --------------------------------------------------
 
-    return res.redirect(
-      302,
-      "/dashboard.html?deriv=connected"
-    );
+    return res.status(200).send(`
+      <!DOCTYPE html>
+
+      <html lang="en">
+
+      <head>
+
+        <meta charset="UTF-8">
+
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0"
+        >
+
+        <title>Deriv Connected</title>
+
+        <style>
+
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: #080c13;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+          }
+
+          .card {
+            width: 100%;
+            max-width: 460px;
+            padding: 35px;
+            border-radius: 18px;
+            border: 1px solid #202838;
+            background: #0d121c;
+            text-align: center;
+          }
+
+          .icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #12352f;
+            color: #39d4b6;
+            font-size: 30px;
+            font-weight: bold;
+          }
+
+          h1 {
+            margin: 0 0 10px;
+            font-size: 26px;
+          }
+
+          p {
+            color: #8a94a8;
+            line-height: 1.6;
+          }
+
+          .note {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 10px;
+            background: #111722;
+            border: 1px solid #252e40;
+            color: #a8b1c2;
+            font-size: 13px;
+          }
+
+          a {
+            display: inline-block;
+            margin-top: 22px;
+            padding: 13px 20px;
+            border-radius: 9px;
+            background: #786cff;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <div class="card">
+
+          <div class="icon">
+            ✓
+          </div>
+
+          <h1>
+            Deriv Connected
+          </h1>
+
+          <p>
+            Your Deriv authorization was completed successfully.
+          </p>
+
+          <div class="note">
+            Your authorization was received securely.
+            Trading will remain disabled until the
+            authenticated Deriv account is securely
+            associated with your PELItradershub account.
+          </div>
+
+          <a href="/dashboard.html?deriv=connected">
+            Return to Dashboard
+          </a>
+
+        </div>
+
+      </body>
+
+      </html>
+    `);
 
   } catch (error) {
 
@@ -353,49 +348,108 @@ export default async function handler(req, res) {
       error
     );
 
-    return res.status(500).send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Connection Error</title>
-      </head>
+    return res.status(500).send(
+      page(
+        "Connection Error",
+        "We could not complete the Deriv connection. Please try again.",
+        "Try Again"
+      )
+    );
+  }
+}
 
-      <body style="
-        background:#080c13;
-        color:white;
-        font-family:Arial,sans-serif;
-        text-align:center;
-        padding:60px 20px;
-      ">
 
-        <h1>Something went wrong</h1>
+// ==================================================
+// SIMPLE RESULT PAGE
+// ==================================================
+
+function page(
+  title,
+  message,
+  button
+) {
+
+  return `
+    <!DOCTYPE html>
+
+    <html lang="en">
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+      >
+
+      <title>${escapeHtml(title)}</title>
+
+      <style>
+
+        body {
+          margin: 0;
+          min-height: 100vh;
+          display: grid;
+          place-items: center;
+          background: #080c13;
+          color: white;
+          font-family: Arial, sans-serif;
+          padding: 20px;
+        }
+
+        .card {
+          width: 100%;
+          max-width: 450px;
+          padding: 30px;
+          border-radius: 18px;
+          border: 1px solid #202838;
+          background: #0d121c;
+          text-align: center;
+        }
+
+        p {
+          color: #8a94a8;
+          line-height: 1.6;
+        }
+
+        a {
+          display: inline-block;
+          margin-top: 20px;
+          padding: 12px 18px;
+          border-radius: 9px;
+          background: #786cff;
+          color: white;
+          text-decoration: none;
+          font-weight: bold;
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <div class="card">
+
+        <h1>
+          ${escapeHtml(title)}
+        </h1>
 
         <p>
-          We could not complete the Deriv connection.
+          ${escapeHtml(message)}
         </p>
 
-        <a
-          href="/deriv-connect.html"
-          style="
-            display:inline-block;
-            margin-top:20px;
-            padding:12px 20px;
-            background:#786cff;
-            color:white;
-            text-decoration:none;
-            border-radius:9px;
-            font-weight:bold;
-          "
-        >
-          Try Again
+        <a href="/deriv-connect.html">
+          ${escapeHtml(button)}
         </a>
 
-      </body>
-      </html>
-    `);
-  }
+      </div>
+
+    </body>
+
+    </html>
+  `;
 }
 
 
@@ -403,37 +457,48 @@ export default async function handler(req, res) {
 // COOKIE PARSER
 // ==================================================
 
-function parseCookies(cookieHeader) {
+function parseCookies(
+  cookieHeader
+) {
 
   const cookies = {};
 
   cookieHeader
     .split(";")
-    .forEach(cookie => {
+    .forEach(
+      (cookie) => {
 
-      const separator =
-        cookie.indexOf("=");
+        const separator =
+          cookie.indexOf("=");
 
-      if (separator === -1) {
-        return;
+        if (separator === -1) {
+          return;
+        }
+
+        const name =
+          cookie
+            .slice(
+              0,
+              separator
+            )
+            .trim();
+
+        const value =
+          cookie
+            .slice(
+              separator + 1
+            )
+            .trim();
+
+        if (name) {
+          cookies[name] =
+            decodeURIComponent(
+              value
+            );
+        }
+
       }
-
-      const name =
-        cookie
-          .slice(0, separator)
-          .trim();
-
-      const value =
-        cookie
-          .slice(separator + 1)
-          .trim();
-
-      if (name) {
-        cookies[name] =
-          decodeURIComponent(value);
-      }
-
-    });
+    );
 
   return cookies;
 }
@@ -443,9 +508,18 @@ function parseCookies(cookieHeader) {
 // CLEAR COOKIE
 // ==================================================
 
-function clearCookie(name) {
+function clearCookie(
+  name
+) {
 
-  return `${name}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+  return (
+    `${name}=; ` +
+    `Path=/; ` +
+    `HttpOnly; ` +
+    `Secure; ` +
+    `SameSite=Lax; ` +
+    `Max-Age=0`
+  );
 }
 
 
@@ -453,12 +527,29 @@ function clearCookie(name) {
 // HTML ESCAPING
 // ==================================================
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
 
   return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 }
