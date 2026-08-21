@@ -4,8 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>NovaTrade — Modern Deriv Trading Platform</title>
-  <meta name="description" content="NovaTrade is a modern trading platform powered by Deriv. Explore markets, trading tools and strategies.">
+  <title>PELItradershub — Smart Trading Platform</title>
+
+  <meta
+    name="description"
+    content="PELItradershub is a modern trading platform for markets, analytics, automated strategies and trading education."
+  >
+
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="PELItradershub">
+  <meta
+    property="og:description"
+    content="Trade smarter with PELItradershub."
+  >
+  <meta property="og:type" content="website">
 
   <style>
     * {
@@ -16,136 +29,114 @@
 
     body {
       font-family: Arial, sans-serif;
-      background: #080b14;
-      color: white;
-      line-height: 1.6;
+      background: #070910;
+      color: #ffffff;
+      min-height: 100vh;
     }
 
     nav {
+      height: 75px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 20px 6%;
-      border-bottom: 1px solid #1c2233;
-      background: #080b14;
+      justify-content: space-between;
+      padding: 0 7%;
+      border-bottom: 1px solid #1c2130;
+      background: rgba(7,9,16,.9);
     }
 
     .logo {
-      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
       font-weight: 800;
     }
 
-    .logo span {
-      color: #6c63ff;
+    .logo-box {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: linear-gradient(135deg,#756bff,#38d9ca);
     }
 
-    .nav-links {
-      display: none;
-      gap: 25px;
-    }
-
-    .nav-links a {
-      color: #aeb5c7;
-      text-decoration: none;
+    nav button,
+    .hero button {
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 9px;
+      color: white;
+      background: linear-gradient(135deg,#756bff,#6259e9);
+      font-weight: bold;
+      cursor: pointer;
     }
 
     .hero {
+      max-width: 1050px;
+      margin: auto;
+      padding: 100px 25px 70px;
       text-align: center;
-      padding: 90px 6% 70px;
-      background:
-        radial-gradient(circle at top, #24205c 0%, #080b14 55%);
     }
 
     .badge {
       display: inline-block;
-      padding: 8px 15px;
+      padding: 8px 13px;
       border-radius: 30px;
-      background: #171b2b;
-      color: #9d96ff;
-      font-size: 13px;
-      margin-bottom: 25px;
+      background: #171933;
+      color: #948dff;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
 
     h1 {
-      font-size: clamp(42px, 10vw, 78px);
-      line-height: 1.05;
-      max-width: 900px;
-      margin: auto;
+      font-size: clamp(45px, 8vw, 82px);
+      line-height: 1;
+      margin: 28px 0;
     }
 
-    .gradient {
-      background: linear-gradient(90deg, #7c73ff, #36d1dc);
+    h1 span {
+      background: linear-gradient(90deg,#8178ff,#45dccd);
       -webkit-background-clip: text;
       color: transparent;
     }
 
     .hero p {
       max-width: 650px;
-      margin: 25px auto;
-      color: #9ca5bb;
-      font-size: 18px;
+      margin: auto;
+      color: #7d879b;
+      line-height: 1.8;
+      font-size: 17px;
     }
 
     .buttons {
+      margin-top: 30px;
       display: flex;
       justify-content: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-top: 30px;
-    }
-
-    button,
-    .button {
-      border: 0;
-      padding: 14px 24px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .primary {
-      background: #6c63ff;
-      color: white;
     }
 
     .secondary {
-      background: #171b2b;
-      color: white;
-      border: 1px solid #2a3045;
+      background: #101522 !important;
+      border: 1px solid #293043 !important;
     }
 
     .features {
-      padding: 70px 6%;
-      max-width: 1200px;
+      max-width: 1050px;
       margin: auto;
-    }
-
-    .section-title {
-      text-align: center;
-      margin-bottom: 45px;
-    }
-
-    .section-title h2 {
-      font-size: 38px;
-      margin-bottom: 10px;
-    }
-
-    .section-title p {
-      color: #8f98ad;
-    }
-
-    .cards {
+      padding: 20px 25px 80px;
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(3,1fr);
       gap: 18px;
     }
 
     .card {
-      background: #101522;
-      border: 1px solid #1d2537;
-      border-radius: 18px;
-      padding: 28px;
+      padding: 25px;
+      border: 1px solid #1d2433;
+      background: #0e121c;
+      border-radius: 16px;
     }
 
     .icon {
@@ -154,53 +145,42 @@
       display: grid;
       place-items: center;
       border-radius: 12px;
-      background: #1b1b3c;
-      color: #8d85ff;
-      font-size: 22px;
+      background: #1b1a3c;
+      color: #8178ff;
+      font-size: 21px;
       margin-bottom: 18px;
     }
 
-    .card h3 {
+    .card h2 {
       margin-bottom: 10px;
+      font-size: 18px;
     }
 
     .card p {
-      color: #8f98ad;
-    }
-
-    .cta {
-      margin: 30px 6% 80px;
-      padding: 60px 25px;
-      text-align: center;
-      border-radius: 25px;
-      background: linear-gradient(135deg, #171a38, #101522);
-      border: 1px solid #292e4b;
-    }
-
-    .cta h2 {
-      font-size: 38px;
-      margin-bottom: 15px;
-    }
-
-    .cta p {
-      color: #929bb0;
-      margin-bottom: 25px;
+      color: #687287;
+      font-size: 13px;
+      line-height: 1.7;
     }
 
     footer {
+      border-top: 1px solid #1b2130;
+      padding: 25px;
       text-align: center;
-      padding: 30px;
-      color: #697287;
-      border-top: 1px solid #1c2233;
+      color: #596276;
+      font-size: 11px;
     }
 
-    @media (min-width: 700px) {
-      .nav-links {
-        display: flex;
+    @media(max-width:700px) {
+      .features {
+        grid-template-columns: 1fr;
       }
 
-      .cards {
-        grid-template-columns: repeat(3, 1fr);
+      nav {
+        padding: 0 20px;
+      }
+
+      .hero {
+        padding-top: 70px;
       }
     }
   </style>
@@ -208,90 +188,93 @@
 
 <body>
 
-  <nav>
-    <div class="logo">Nova<span>Trade</span></div>
+<nav>
+  <div class="logo">
+    <div class="logo-box">P</div>
+    <span>PELItradershub</span>
+  </div>
 
-    <div class="nav-links">
-      <a href="#markets">Markets</a>
-      <a href="#features">Features</a>
-      <a href="#strategies">Strategies</a>
-      <a href="#learn">Learn</a>
-    </div>
+  <button onclick="openPlatform()">Enter Platform</button>
+</nav>
 
-    <a class="button primary" href="#">Get Started</a>
-  </nav>
+<section class="hero">
 
-  <section class="hero">
-    <div class="badge">NEXT-GENERATION TRADING PLATFORM</div>
+  <div class="badge">
+    NEXT GENERATION TRADING PLATFORM
+  </div>
 
-    <h1>
-      Trade smarter.
-      <span class="gradient">Move faster.</span>
-    </h1>
+  <h1>
+    Trade smarter.<br>
+    <span>Move with confidence.</span>
+  </h1>
 
+  <p>
+    PELItradershub brings markets, analytics, trading tools,
+    automated strategies and education together in one modern
+    trading experience.
+  </p>
+
+  <div class="buttons">
+    <button onclick="openPlatform()">
+      Start Exploring
+    </button>
+
+    <button class="secondary" onclick="showMarkets()">
+      Explore Markets
+    </button>
+  </div>
+
+</section>
+
+<section class="features">
+
+  <div class="card">
+    <div class="icon">📊</div>
+    <h2>Live Markets</h2>
     <p>
-      A modern trading experience built for traders who want powerful
-      tools, real-time markets and a cleaner way to trade.
+      Monitor markets and discover trading opportunities
+      through a clean, modern interface.
     </p>
+  </div>
 
-    <div class="buttons">
-      <a class="button primary" href="#">Start Trading</a>
-      <a class="button secondary" href="#features">Explore Platform</a>
-    </div>
-  </section>
-
-  <section class="features" id="features">
-
-    <div class="section-title">
-      <h2>Everything you need</h2>
-      <p>Built around a fast, simple and modern trading experience.</p>
-    </div>
-
-    <div class="cards">
-
-      <div class="card">
-        <div class="icon">📈</div>
-        <h3>Live Markets</h3>
-        <p>
-          Follow real-time market movements and access trading opportunities
-          from one dashboard.
-        </p>
-      </div>
-
-      <div class="card">
-        <div class="icon">⚡</div>
-        <h3>Fast Trading</h3>
-        <p>
-          Designed for a smooth trading experience with fast access to
-          your markets and contracts.
-        </p>
-      </div>
-
-      <div class="card">
-        <div class="icon">🤖</div>
-        <h3>Smart Strategies</h3>
-        <p>
-          Explore automated strategies and trading tools as the platform
-          develops.
-        </p>
-      </div>
-
-    </div>
-  </section>
-
-  <section class="cta">
-    <h2>Ready to trade differently?</h2>
-
+  <div class="card">
+    <div class="icon">🤖</div>
+    <h2>Smart Strategies</h2>
     <p>
-      Join the next generation of modern trading tools.
+      Build and monitor automated strategies from one
+      centralized trading workspace.
     </p>
+  </div>
 
-    <a class="button primary" href="#">Create Account</a>
-  </section>
+  <div class="card">
+    <div class="icon">🛡️</div>
+    <h2>Secure Platform</h2>
+    <p>
+      Designed for secure account connections and
+      responsible trading workflows.
+    </p>
+  </div>
 
-  <footer>
-    © 2026 NovaTrade. All rights reserved.
-  </footer>
+</section>
+
+<footer>
+  © 2026 PELItradershub · Trading involves risk. No profits are guaranteed.
+</footer>
+
+<script>
+  function openPlatform() {
+    alert(
+      "PELItradershub platform is being prepared. " +
+      "The next version will include the trading dashboard, markets, bots, portfolio, wallet and more."
+    );
+  }
+
+  function showMarkets() {
+    alert(
+      "Markets module coming next: Volatility indices, forex and other supported Deriv markets."
+    );
+  }
+</script>
 
 </body>
 </html>
