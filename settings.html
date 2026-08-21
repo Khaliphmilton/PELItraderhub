@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Settings | PELItradershub</title>
+
+<meta name="description" content="Manage your PELItradershub account settings.">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+.settings-page{
+max-width:1100px;
+margin:auto;
+padding:35px 5%;
+}
+
+.page-heading{
+margin-bottom:30px;
+}
+
+.page-heading h1{
+font-size:42px;
+margin:8px 0;
+}
+
+.page-heading p{
+color:#7d879b;
+}
+
+.settings-layout{
+display:grid;
+grid-template-columns:220px 1fr;
+gap:18px;
+}
+
+.settings-menu{
+background:#0d121c;
+border:1px solid #202838;
+border-radius:15px;
+padding:10px;
+height:max-content;
+}
+
+.settings-menu button{
+width:100%;
+padding:12px;
+border:0;
+background:transparent;
+color:#7d879b;
+text-align:left;
+border-radius:8px;
+cursor:pointer;
+margin-bottom:4px;
+}
+
+.settings-menu button:hover,
+.settings-menu button.active{
+background:#171d2b;
+color:white;
+}
+
+.settings-panel{
+background:#0d121c;
+border:1px solid #202838;
+border-radius:15px;
+padding:25px;
+}
+
+.settings-section{
+display:none;
+}
+
+.settings-section.active{
+display:block;
+}
+
+.settings-section h2{
+margin-bottom:7px;
+}
+
+.settings-description{
+color:#7d879b;
+font-size:13px;
+margin-bottom:25px;
+}
+
+.setting-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+padding:18px 0;
+border-bottom:1px solid #202838;
+}
+
+.setting-row:last-child{
+border-bottom:0;
+}
+
+.setting-info strong{
+display:block;
+margin-bottom:4px;
+}
+
+.setting-info span{
+font-size:12px;
+color:#68748a;
+}
+
+.setting-input{
+width:100%;
+padding:12px;
+background:#0a0e16;
+border:1px solid #293246;
+border-radius:9px;
+color:white;
+outline:none;
+}
+
+.setting-input:focus{
+border-color:#786cff;
+}
+
+.setting-form{
+max-width:600px;
+}
+
+.form-group{
+margin-bottom:18px;
+}
+
+.form-group label{
+display:block;
+font-size:12px;
+color:#8b95a8;
+margin-bottom:7px;
+}
+
+.toggle{
+width:45px;
+height:24px;
+border-radius:20px;
+background:#293246;
+border:0;
+position:relative;
+cursor:pointer;
+flex-shrink:0;
+}
+
+.toggle::after{
+content:"";
+position:absolute;
+width:18px;
+height:18px;
+background:#8a94a8;
+border-radius:50%;
+top:3px;
+left:3px;
+transition:.2s;
+}
+
+.toggle.active{
+background:#786cff;
+}
+
+.toggle.active::after{
+left:24px;
+background:white;
+}
+
+.danger{
+margin-top:25px;
+padding:18px;
+border:1px solid #49252f;
+border-radius:12px;
+background:#1b1015;
+}
+
+.danger h3{
+color:#ff7186;
+margin-bottom:6px;
+}
+
+.danger p{
+font-size:12px;
+color:#8f7880;
+margin-bottom:15px;
+}
+
+.danger button{
+border:1px solid #703341;
+background:#2a141b;
+color:#ff7186;
+padding:10px 14px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.save-button{
+padding:12px 18px;
+border:0;
+border-radius:9px;
+background:linear-gradient(135deg,#786cff,#39d4b6);
+color:#061016;
+font-weight:900;
+cursor:pointer;
+}
+
+@media(max-width:750px){
+
+.settings-layout{
+grid-template-columns:1fr;
+}
+
+.settings-menu{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:5px;
+}
+
+.settings-menu button{
+margin:0;
+}
+
+.page-heading h1{
+font-size:32px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+<a href="index.html" class="brand">
+<span class="brand-icon">P</span>
+<span>PELI<span>tradershub</span></span>
+</a>
+
+<nav>
+<a href="dashboard.html">Dashboard</a>
+<a href="markets.html">Markets</a>
+<a href="trade.html">Trade</a>
+<a href="strategies.html">Strategies</a>
+</nav>
+
+<div class="nav-actions">
+
+<a href="portfolio.html" class="login-link">
+Portfolio
+</a>
+
+<a href="dashboard.html" class="button primary">
+Dashboard
+</a>
+
+</div>
+
+</header>
+
+
+<main class="settings-page">
+
+
+<div class="page-heading">
+
+<div class="eyebrow">
+ACCOUNT
+</div>
+
+<h1>
+Settings
+</h1>
+
+<p>
+Manage your profile, preferences and trading controls.
+</p>
+
+</div>
+
+
+<div class="settings-layout">
+
+
+<aside class="settings-menu">
+
+<button
+class="active"
+onclick="showSection('profile',this)"
+>
+Profile
+</button>
+
+<button
+onclick="showSection('preferences',this)"
+>
+Preferences
+</button>
+
+<button
+onclick="showSection('security',this)"
+>
+Security
+</button>
+
+<button
+onclick="showSection('notifications',this)"
+>
+Notifications
+</button>
+
+<button
+onclick="showSection('risk',this)"
+>
+Risk Controls
+</button>
+
+</aside>
+
+
+<section class="settings-panel">
+
+
+<!-- PROFILE -->
+
+<div
+id="profile"
+class="settings-section active"
+>
+
+<h2>
+Profile
+</h2>
+
+<p class="settings-description">
+Update your account information.
+</p>
+
+
+<form
+class="setting-form"
+onsubmit="saveSettings(event)"
+>
+
+<div class="form-group">
+
+<label>
+Full name
+</label>
+
+<input
+class="setting-input"
+type="text"
+value="PELI Trader"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Email
+</label>
+
+<input
+class="setting-input"
+type="email"
+value="demo@example.com"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Country
+</label>
+
+<select class="setting-input">
+
+<option>Kenya</option>
+<option>Uganda</option>
+<option>Tanzania</option>
+<option>United Kingdom</option>
+<option>United States</option>
+
+</select>
+
+</div>
+
+
+<button
+class="save-button"
+type="submit"
+>
+Save Changes
+</button>
+
+</form>
+
+</div>
+
+
+<!-- PREFERENCES -->
+
+<div
+id="preferences"
+class="settings-section"
+>
+
+<h2>
+Preferences
+</h2>
+
+<p class="settings-description">
+Customize how PELItradershub works for you.
+</p>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Dark interface
+</strong>
+
+<span>
+Use the dark trading interface.
+</span>
+
+</div>
+
+<button
+class="toggle active"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Compact charts
+</strong>
+
+<span>
+Use a denser chart layout.
+</span>
+
+</div>
+
+<button
+class="toggle"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Confirm trades
+</strong>
+
+<span>
+Ask for confirmation before placing an order.
+</span>
+
+</div>
+
+<button
+class="toggle active"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+</div>
+
+
+<!-- SECURITY -->
+
+<div
+id="security"
+class="settings-section"
+>
+
+<h2>
+Security
+</h2>
+
+<p class="settings-description">
+Manage your password and account security.
+</p>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Two-factor authentication
+</strong>
+
+<span>
+Add another layer of protection to your account.
+</span>
+
+</div>
+
+<button
+class="toggle"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Login notifications
+</strong>
+
+<span>
+Receive notifications when a new login occurs.
+</span>
+
+</div>
+
+<button
+class="toggle active"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+
+<div style="margin-top:20px;">
+
+<button
+class="button secondary"
+onclick="changePassword()"
+>
+Change Password
+</button>
+
+</div>
+
+</div>
+
+
+<!-- NOTIFICATIONS -->
+
+<div
+id="notifications"
+class="settings-section"
+>
+
+<h2>
+Notifications
+</h2>
+
+<p class="settings-description">
+Choose which alerts you receive.
+</p>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Trade notifications
+</strong>
+
+<span>
+Notify when a trade opens or closes.
+</span>
+
+</div>
+
+<button
+class="toggle active"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Price alerts
+</strong>
+
+<span>
+Receive alerts when markets reach your levels.
+</span>
+
+</div>
+
+<button
+class="toggle active"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Strategy alerts
+</strong>
+
+<span>
+Notify when a strategy generates a signal.
+</span>
+
+</div>
+
+<button
+class="toggle"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+</div>
+
+
+<!-- RISK -->
+
+<div
+id="risk"
+class="settings-section"
+>
+
+<h2>
+Risk Controls
+</h2>
+
+<p class="settings-description">
+Set limits designed to help control your trading activity.
+</p>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Daily loss limit
+</strong>
+
+<span>
+Maximum amount allowed for daily losses.
+</span>
+
+</div>
+
+<input
+class="setting-input"
+style="max-width:130px;"
+type="number"
+value="100"
+>
+
+</div>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Maximum stake
+</strong>
+
+<span>
+Maximum stake allowed per trade.
+</span>
+
+</div>
+
+<input
+class="setting-input"
+style="max-width:130px;"
+type="number"
+value="50"
+>
+
+</div>
+
+
+<div class="setting-row">
+
+<div class="setting-info">
+
+<strong>
+Trading pause after loss limit
+</strong>
+
+<span>
+Temporarily stop trading after reaching the daily limit.
+</span>
+
+</div>
+
+<button
+class="toggle active"
+onclick="toggleSetting(this)"
+></button>
+
+</div>
+
+
+<div class="danger">
+
+<h3>
+Responsible Trading
+</h3>
+
+<p>
+Trading can result in financial loss. These controls are
+not a guarantee against losses. Only trade money you can
+afford to lose.
+</p>
+
+<button
+onclick="pauseTrading()"
+>
+Pause Trading
+</button>
+
+</div>
+
+</div>
+
+
+</section>
+
+</div>
+
+
+<div style="
+margin-top:20px;
+padding:15px;
+border-radius:12px;
+background:#121122;
+border:1px solid #30294e;
+color:#aaa5ff;
+font-size:12px;
+">
+
+<strong>Demo settings:</strong>
+Your settings are currently stored only in this page.
+Persistent account settings will be connected to the backend.
+
+</div>
+
+
+</main>
+
+
+<footer>
+
+<div class="brand">
+<span class="brand-icon">P</span>
+PELItradershub
+</div>
+
+<p>
+Trading involves risk. No profits are guaranteed.
+</p>
+
+</footer>
+
+
+<script>
+
+function showSection(id,button){
+
+document
+.querySelectorAll(".settings-section")
+.forEach(section =>
+section.classList.remove("active")
+);
+
+document
+.getElementById(id)
+.classList.add("active");
+
+document
+.querySelectorAll(".settings-menu button")
+.forEach(btn =>
+btn.classList.remove("active")
+);
+
+button.classList.add("active");
+
+}
+
+
+function toggleSetting(button){
+
+button.classList.toggle("active");
+
+}
+
+
+function saveSettings(event){
+
+event.preventDefault();
+
+alert(
+"Settings saved in this demo interface."
+);
+
+}
+
+
+function changePassword(){
+
+alert(
+"Password management will be connected to the secure authentication backend."
+);
+
+}
+
+
+function pauseTrading(){
+
+const confirmed =
+confirm(
+"Pause trading for this account?"
+);
+
+if(confirmed){
+
+alert(
+"Trading pause is a demo action. The real account control will be connected to the backend."
+);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
