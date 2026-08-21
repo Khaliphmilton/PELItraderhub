@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Dashboard | PELItradershub</title>
 
@@ -14,6 +19,7 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
+
     .dashboard {
       max-width: 1400px;
       margin: auto;
@@ -40,6 +46,21 @@
     .dashboard-actions {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .logout-button {
+      padding: 11px 16px;
+      border-radius: 9px;
+      border: 1px solid #713345;
+      background: #351923;
+      color: #ff7186;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .logout-button:hover {
+      opacity: .85;
     }
 
     .dash-grid {
@@ -165,10 +186,21 @@
       color: white;
       text-align: left;
       cursor: pointer;
+      text-decoration: none;
     }
 
     .quick-action:hover {
       border-color: #786cff;
+    }
+
+    .user-box {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #667187;
+    }
+
+    .user-box span {
+      color: #39d4b6;
     }
 
     @media(max-width:900px) {
@@ -180,6 +212,7 @@
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
+
     }
 
     @media(max-width:600px) {
@@ -209,42 +242,70 @@
         width: 100%;
       }
 
-      .dashboard-actions a {
+      .dashboard-actions a,
+      .dashboard-actions button {
         flex: 1;
       }
+
     }
+
   </style>
+
 </head>
 
+
 <body>
+
 
 <header class="navbar">
 
   <a href="index.html" class="brand">
-    <span class="brand-icon">P</span>
-    <span>PELI<span>tradershub</span></span>
+
+    <span class="brand-icon">
+      P
+    </span>
+
+    <span>
+      PELI<span>tradershub</span>
+    </span>
+
   </a>
+
 
   <div class="nav-actions">
 
-    <a href="markets.html" class="login-link">
+    <a
+      href="markets.html"
+      class="login-link"
+    >
       Markets
     </a>
 
-    <a href="settings.html" class="button secondary">
+
+    <a
+      href="settings.html"
+      class="button secondary"
+    >
       ⚙
     </a>
 
-    <a href="index.html" class="button primary">
-      Home
-    </a>
+
+    <button
+      type="button"
+      onclick="peliLogout()"
+      class="logout-button"
+    >
+      Log out
+    </button>
 
   </div>
 
 </header>
 
 
+
 <main class="dashboard">
+
 
   <div class="dashboard-header">
 
@@ -254,23 +315,41 @@
         TRADING DASHBOARD
       </div>
 
-      <h1>
+
+      <h1 id="welcomeTitle">
         Good day, Trader.
       </h1>
+
 
       <p>
         Here's what's happening with your workspace.
       </p>
 
+
+      <div class="user-box">
+        Signed in as:
+        <span id="userEmail">
+          Loading...
+        </span>
+      </div>
+
     </div>
+
 
     <div class="dashboard-actions">
 
-      <a href="trade.html" class="button primary">
+      <a
+        href="trade.html"
+        class="button primary"
+      >
         Open Terminal
       </a>
 
-      <a href="markets.html" class="button secondary">
+
+      <a
+        href="markets.html"
+        class="button secondary"
+      >
         Markets
       </a>
 
@@ -279,9 +358,11 @@
   </div>
 
 
+
   <!-- STATISTICS -->
 
   <section class="dash-grid">
+
 
     <div class="dash-card">
 
@@ -298,6 +379,7 @@
       </span>
 
     </div>
+
 
 
     <div class="dash-card">
@@ -317,6 +399,7 @@
     </div>
 
 
+
     <div class="dash-card">
 
       <div class="dash-label">
@@ -332,6 +415,7 @@
       </span>
 
     </div>
+
 
 
     <div class="dash-card">
@@ -353,15 +437,18 @@
   </section>
 
 
+
   <!-- CHART + WATCHLIST -->
 
   <section class="dashboard-grid">
+
 
     <div class="panel">
 
       <h2>
         Portfolio Performance
       </h2>
+
 
       <div class="chart-box">
 
@@ -396,6 +483,7 @@
 
           </defs>
 
+
           <path
             d="M0 290
                C70 260 100 275 150 245
@@ -408,6 +496,7 @@
                L0 350 Z"
             fill="url(#area)"
           />
+
 
           <path
             d="M0 290
@@ -427,6 +516,7 @@
       </div>
 
     </div>
+
 
 
     <div class="panel">
@@ -533,6 +623,7 @@
   </section>
 
 
+
   <!-- LOWER PANELS -->
 
   <section class="dashboard-bottom">
@@ -606,6 +697,7 @@
       </a>
 
     </div>
+
 
 
     <div class="panel">
@@ -688,6 +780,7 @@
   </section>
 
 
+
   <div style="
     margin-top:20px;
     padding:15px;
@@ -699,21 +792,30 @@
   ">
 
     <strong>Demo mode:</strong>
+
     The values shown on this dashboard are demonstration data.
     Real Deriv account data will only appear after the secure API
     connection is implemented.
 
   </div>
 
+
 </main>
+
 
 
 <footer>
 
   <div class="brand">
-    <span class="brand-icon">P</span>
+
+    <span class="brand-icon">
+      P
+    </span>
+
     PELItradershub
+
   </div>
+
 
   <p>
     Trading involves risk. No profits are guaranteed.
@@ -721,9 +823,17 @@
 
 </footer>
 
-<!-- PELItradershub Authentication -->
+
+
+<!-- SUPABASE -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="supabase.js"></script>
+
+
+
+<!-- AUTHENTICATION -->
 
 <script>
 
@@ -734,33 +844,37 @@
     const {
       data,
       error
-    } = await supabaseClient.auth.getSession();
+    } =
+      await supabaseClient.auth.getSession();
+
 
     if (error) {
       throw error;
     }
 
-    const session = data.session;
 
-    /*
-      No logged-in user:
-      send them back to login.
-    */
+    const session =
+      data.session;
+
+
+    /* No session = no dashboard */
 
     if (!session) {
 
-      window.location.replace("login.html");
+      window.location.replace(
+        "login.html"
+      );
 
       return;
 
     }
 
-    /*
-      Make the current user available
-      to the dashboard.
-    */
 
-    window.PELI_USER = session.user;
+    /* Current user */
+
+    window.PELI_USER =
+      session.user;
+
 
     console.log(
       "Logged in as:",
@@ -768,35 +882,51 @@
     );
 
 
-    /*
-      Display user's name/email wherever
-      these optional elements exist.
-    */
-
-    const userName =
-      document.getElementById("userName");
+    /* User email */
 
     const userEmail =
-      document.getElementById("userEmail");
-
-
-    const fullName =
-      session.user.user_metadata?.full_name;
-
-
-    if (userName) {
-
-      userName.textContent =
-        fullName ||
-        session.user.email;
-
-    }
+      document.getElementById(
+        "userEmail"
+      );
 
 
     if (userEmail) {
 
       userEmail.textContent =
         session.user.email;
+
+    }
+
+
+    /* User name */
+
+    const fullName =
+      session.user
+        .user_metadata
+        ?.full_name;
+
+
+    const welcomeTitle =
+      document.getElementById(
+        "welcomeTitle"
+      );
+
+
+    if (
+      welcomeTitle &&
+      fullName
+    ) {
+
+      const firstName =
+        fullName
+          .trim()
+          .split(/\s+/)[0];
+
+
+      welcomeTitle.textContent =
+        "Good day, " +
+        firstName +
+        ".";
 
     }
 
@@ -808,7 +938,10 @@
       error
     );
 
-    window.location.replace("login.html");
+
+    window.location.replace(
+      "login.html"
+    );
 
   }
 
@@ -816,11 +949,9 @@
 
 
 
-/*
-=========================
-LOGOUT
-=========================
-*/
+/* =========================
+   LOGOUT
+========================= */
 
 async function peliLogout() {
 
@@ -828,13 +959,19 @@ async function peliLogout() {
 
     const {
       error
-    } = await supabaseClient.auth.signOut();
+    } =
+      await supabaseClient.auth.signOut();
+
 
     if (error) {
       throw error;
     }
 
-    window.location.replace("login.html");
+
+    window.location.replace(
+      "login.html"
+    );
+
 
   } catch (error) {
 
@@ -842,6 +979,7 @@ async function peliLogout() {
       "Logout error:",
       error
     );
+
 
     alert(
       "Unable to log out. Please try again."
@@ -852,5 +990,8 @@ async function peliLogout() {
 }
 
 </script>
+
+
 </body>
+
 </html>
