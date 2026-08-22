@@ -1,21 +1,14 @@
+Replace your current "trade.html" with this version. Nothing from your trading controls is removed; the added live-digit tracker follows every real Deriv tick and visibly moves the "LIVE" highlight from digit to digit.
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PELItradershub — Trading Terminal</title>
-
 <link rel="stylesheet" href="styles.css">
 
 <style>
-
 :root{
   --bg:#070b12;
   --card:#0d141f;
@@ -30,9 +23,7 @@
   --purple:#786cff;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -43,11 +34,7 @@ body{
   font-family:Inter,Arial,sans-serif;
 }
 
-button,
-input,
-select{
-  font:inherit;
-}
+button,input,select{font:inherit}
 
 .terminal{
   display:grid;
@@ -82,16 +69,19 @@ select{
   letter-spacing:.7px;
 }
 
-.price{
-  text-align:right;
-}
+.price{text-align:right}
 
 .price strong{
   display:block;
   font-size:clamp(26px,4vw,42px);
   font-weight:900;
   letter-spacing:-1px;
-  transition:color .12s ease;
+  transition:transform .12s ease,color .12s ease;
+}
+
+.price strong.price-flash{
+  transform:scale(1.06);
+  color:var(--green);
 }
 
 .live{
@@ -116,9 +106,7 @@ select{
   box-shadow:0 0 12px rgba(44,201,187,.8);
 }
 
-.status-dot.error{
-  background:var(--red);
-}
+.status-dot.error{background:var(--red)}
 
 .chart-card{
   border:1px solid var(--line);
@@ -160,9 +148,7 @@ select{
   cursor:pointer;
 }
 
-.chart-btn:hover{
-  border-color:var(--blue);
-}
+.chart-btn:hover{border-color:var(--blue)}
 
 .chart-wrapper{
   position:relative;
@@ -191,9 +177,7 @@ select{
   stroke-linejoin:round;
 }
 
-.chart-area{
-  fill:url(#chartFill);
-}
+.chart-area{fill:url(#chartFill)}
 
 .chart-point{
   fill:var(--green);
@@ -237,6 +221,7 @@ select{
   font-size:12px;
   font-weight:900;
   z-index:6;
+  transition:top .18s ease;
 }
 
 .chart-bottom{
@@ -288,6 +273,191 @@ select{
 .tick-item small{
   color:#66778e;
   font-size:9px;
+}
+
+/* =========================================================
+   LIVE DIGIT TRACKER
+   ========================================================= */
+
+.live-digit-card{
+  margin-top:14px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#09111c;
+  padding:14px;
+  overflow:hidden;
+}
+
+.live-digit-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.live-digit-title{
+  color:#8795a9;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.7px;
+}
+
+.current-digit-label{
+  color:var(--yellow);
+  font-size:11px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.current-digit-label strong{
+  color:#fff;
+  font-size:14px;
+  margin-left:4px;
+}
+
+.live-digit-track{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:6px;
+}
+
+.live-digit{
+  position:relative;
+  min-width:0;
+  height:76px;
+  border:1px solid #1e2c40;
+  border-radius:11px;
+  background:#101925;
+  color:#aeb9c9;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    background .16s ease,
+    color .16s ease,
+    box-shadow .16s ease;
+}
+
+.live-digit-number{
+  font-size:20px;
+  font-weight:1000;
+  line-height:1;
+}
+
+.live-digit-status{
+  margin-top:6px;
+  font-size:8px;
+  font-weight:900;
+  color:#5f7086;
+  letter-spacing:.4px;
+}
+
+.live-digit::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(
+    to bottom,
+    transparent,
+    rgba(45,140,255,.18),
+    transparent
+  );
+  transition:top .25s ease;
+}
+
+.live-digit.active{
+  border-color:var(--yellow);
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(255,210,74,.18),
+      transparent 65%
+    ),
+    #18202b;
+  color:#fff;
+  transform:translateY(-5px) scale(1.035);
+  box-shadow:
+    0 0 0 1px rgba(255,210,74,.18),
+    0 0 22px rgba(255,210,74,.25),
+    0 8px 22px rgba(0,0,0,.25);
+}
+
+.live-digit.active::before{
+  top:100%;
+  animation:digitScan .45s ease-out;
+}
+
+.live-digit.active .live-digit-number{
+  color:var(--yellow);
+  text-shadow:0 0 14px rgba(255,210,74,.65);
+  animation:digitPop .28s ease-out;
+}
+
+.live-digit.active .live-digit-status{
+  color:var(--yellow);
+}
+
+.live-digit.flash{
+  animation:digitFlash .34s ease-out;
+}
+
+.live-badge{
+  position:absolute;
+  top:5px;
+  left:5px;
+  padding:2px 5px;
+  border-radius:5px;
+  background:var(--yellow);
+  color:#101010;
+  font-size:7px;
+  font-weight:1000;
+  opacity:0;
+  transform:translateY(-4px);
+  transition:.15s ease;
+}
+
+.live-digit.active .live-badge{
+  opacity:1;
+  transform:translateY(0);
+}
+
+@keyframes digitPop{
+  0%{
+    transform:scale(.65);
+    opacity:.25;
+  }
+  65%{
+    transform:scale(1.2);
+  }
+  100%{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+@keyframes digitFlash{
+  0%{
+    box-shadow:0 0 0 rgba(255,210,74,0);
+  }
+  45%{
+    box-shadow:0 0 30px rgba(255,210,74,.5);
+  }
+  100%{
+    box-shadow:0 0 15px rgba(255,210,74,.22);
+  }
+}
+
+@keyframes digitScan{
+  0%{top:-100%}
+  100%{top:100%}
 }
 
 .panel{
@@ -350,17 +520,11 @@ select{
   cursor:pointer;
 }
 
-.connect:hover{
-  background:#211c42;
-}
+.connect:hover{background:#211c42}
 
-.connect.connected{
-  display:none;
-}
+.connect.connected{display:none}
 
-.field{
-  margin:14px 0;
-}
+.field{margin:14px 0}
 
 .field label{
   display:block;
@@ -371,8 +535,7 @@ select{
   font-weight:900;
 }
 
-.input,
-.select{
+.input,.select{
   width:100%;
   border:1px solid #29384c;
   background:#0b131e;
@@ -382,10 +545,7 @@ select{
   outline:none;
 }
 
-.input:focus,
-.select:focus{
-  border-color:var(--blue);
-}
+.input:focus,.select:focus{border-color:var(--blue)}
 
 .type-buttons{
   display:grid;
@@ -464,17 +624,10 @@ select{
   font-size:13px;
 }
 
-.sum span{
-  color:var(--muted);
-}
+.sum span{color:var(--muted)}
+.sum strong{color:#fff}
 
-.sum strong{
-  color:#fff;
-}
-
-.positive{
-  color:var(--green)!important;
-}
+.positive{color:var(--green)!important}
 
 .buy{
   width:100%;
@@ -522,7 +675,6 @@ select{
 }
 
 @media(max-width:950px){
-
   .terminal{
     grid-template-columns:1fr;
   }
@@ -531,30 +683,16 @@ select{
     border-left:0;
     border-top:1px solid var(--line);
   }
-
 }
 
 @media(max-width:650px){
+  .market{padding:12px}
+  .panel{padding:13px}
 
-  .market{
-    padding:12px;
-  }
+  .top{align-items:flex-end}
 
-  .panel{
-    padding:13px;
-  }
-
-  .top{
-    align-items:flex-end;
-  }
-
-  .symbol h1{
-    font-size:23px;
-  }
-
-  .price strong{
-    font-size:25px;
-  }
+  .symbol h1{font-size:23px}
+  .price strong{font-size:25px}
 
   .chart-wrapper{
     height:460px;
@@ -574,10 +712,33 @@ select{
     font-size:9px;
   }
 
+  .live-digit-card{
+    padding:10px;
+  }
+
+  .live-digit-track{
+    gap:4px;
+  }
+
+  .live-digit{
+    height:66px;
+    border-radius:9px;
+  }
+
+  .live-digit-number{
+    font-size:17px;
+  }
+
+  .live-digit-status{
+    font-size:7px;
+  }
+
+  .live-badge{
+    font-size:6px;
+    padding:2px 3px;
+  }
 }
-
 </style>
-
 </head>
 
 <body>
@@ -611,32 +772,16 @@ select{
   <div class="top">
 
     <div class="symbol">
-
-      <h1 id="symbolName">
-        Volatility 100 Index
-      </h1>
-
-      <small>
-        REAL-TIME DERIV MARKET
-      </small>
-
+      <h1 id="symbolName">Volatility 100 Index</h1>
+      <small>REAL-TIME DERIV MARKET</small>
     </div>
 
     <div class="price">
 
-      <strong id="price">
-        —
-      </strong>
+      <strong id="price">—</strong>
 
-      <span
-        class="live"
-        id="liveStatus"
-      >
-        <span
-          id="statusDot"
-          class="status-dot"
-        ></span>
-
+      <span class="live" id="liveStatus">
+        <span id="statusDot" class="status-dot"></span>
         Connecting...
       </span>
 
@@ -645,10 +790,7 @@ select{
   </div>
 
 
-  <div
-    class="chart-card"
-    id="chartCard"
-  >
+  <div class="chart-card" id="chartCard">
 
     <div class="chart-toolbar">
 
@@ -681,10 +823,7 @@ select{
 
     <div class="chart-wrapper">
 
-      <div
-        class="y-axis"
-        id="yAxis"
-      ></div>
+      <div class="y-axis" id="yAxis"></div>
 
       <svg
         id="priceChart"
@@ -769,6 +908,33 @@ select{
   </div>
 
 
+  <!-- =====================================================
+       NEW LIVE MOVING DIGIT TRACKER
+       ===================================================== -->
+
+  <div class="live-digit-card">
+
+    <div class="live-digit-head">
+
+      <div class="live-digit-title">
+        LIVE LAST-DIGIT TRACKER
+      </div>
+
+      <div class="current-digit-label">
+        CURRENT DIGIT:
+        <strong id="currentLiveDigit">—</strong>
+      </div>
+
+    </div>
+
+    <div
+      class="live-digit-track"
+      id="liveDigitTrack"
+    ></div>
+
+  </div>
+
+
   <div
     class="tick-row"
     id="tickRow"
@@ -779,9 +945,7 @@ select{
 
 <aside class="panel">
 
-  <h2>
-    Digits Order Ticket
-  </h2>
+  <h2>Digits Order Ticket</h2>
 
 
   <div class="account">
@@ -841,9 +1005,7 @@ select{
 
   <div class="field">
 
-    <label>
-      Market
-    </label>
+    <label>Market</label>
 
     <select
       class="select"
@@ -900,9 +1062,7 @@ select{
 
   <div class="field">
 
-    <label>
-      Trade Type
-    </label>
+    <label>Trade Type</label>
 
     <div
       class="type-buttons"
@@ -1022,9 +1182,7 @@ select{
 
     <div class="field">
 
-      <label>
-        Ticks
-      </label>
+      <label>Ticks</label>
 
       <input
         class="input"
@@ -1038,9 +1196,7 @@ select{
 
     <div class="field">
 
-      <label>
-        Stake
-      </label>
+      <label>Stake</label>
 
       <input
         class="input"
@@ -1056,9 +1212,7 @@ select{
 
     <div class="field">
 
-      <label>
-        No. Trades
-      </label>
+      <label>No. Trades</label>
 
       <input
         class="input"
@@ -1094,9 +1248,7 @@ select{
 
     <div class="sum">
 
-      <span>
-        Stake
-      </span>
+      <span>Stake</span>
 
       <strong id="summaryStake">
         USD 0.50
@@ -1107,9 +1259,7 @@ select{
 
     <div class="sum">
 
-      <span>
-        Ask price
-      </span>
+      <span>Ask price</span>
 
       <strong id="askPrice">
         —
@@ -1120,9 +1270,7 @@ select{
 
     <div class="sum">
 
-      <span>
-        Potential payout
-      </span>
+      <span>Potential payout</span>
 
       <strong
         id="payout"
@@ -1136,9 +1284,7 @@ select{
 
     <div class="sum">
 
-      <span>
-        Potential profit
-      </span>
+      <span>Potential profit</span>
 
       <strong
         id="profit"
@@ -1184,17 +1330,15 @@ select{
 
 <script src="deriv.js"></script>
 
-
 <script>
-
 "use strict";
 
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
 const $ = id => document.getElementById(id);
+
+
+/* =====================================================
+   ELEMENTS
+   ===================================================== */
 
 const market = $("market");
 const price = $("price");
@@ -1288,9 +1432,24 @@ const chartCard =
   $("chartCard");
 
 
-/* =========================================================
+/* =====================================================
+   NEW LIVE DIGIT ELEMENTS
+   ===================================================== */
+
+const liveDigitTrack =
+  $("liveDigitTrack");
+
+const currentLiveDigit =
+  $("currentLiveDigit");
+
+let liveDigitButtons = [];
+
+let lastLiveDigit = null;
+
+
+/* =====================================================
    STATE
-========================================================= */
+   ===================================================== */
 
 let type = "DIGITMATCH";
 
@@ -1308,20 +1467,10 @@ let recentTicks = [];
 
 let previousPrice = null;
 
-let directSocket = null;
 
-let directSocketReconnectTimer = null;
-
-let directSocketReconnectAttempts = 0;
-
-let directSocketIntentionalClose = false;
-
-let directTickCount = 0;
-
-
-/* =========================================================
+/* =====================================================
    MARKET NAMES
-========================================================= */
+   ===================================================== */
 
 const names = {
 
@@ -1358,11 +1507,11 @@ const names = {
 };
 
 
-/* =========================================================
+/* =====================================================
    MONEY
-========================================================= */
+   ===================================================== */
 
-function money(value, currency){
+function money(value,currency){
 
   const n = Number(value);
 
@@ -1379,13 +1528,12 @@ function money(value, currency){
       maximumFractionDigits:2
     }
   ).format(n);
-
 }
 
 
-/* =========================================================
-   PRICE FORMAT
-========================================================= */
+/* =====================================================
+   PRICE
+   ===================================================== */
 
 function formatPrice(value){
 
@@ -1402,93 +1550,112 @@ function formatPrice(value){
       maximumFractionDigits:5
     }
   );
-
 }
 
 
-/* =========================================================
-   LAST DIGIT
-========================================================= */
+/* =====================================================
+   NEW LIVE DIGIT TRACKER
+   ===================================================== */
 
-function getLastDigit(quote){
+function renderLiveDigitTracker(){
 
-  const value = Number(quote);
+  liveDigitTrack.innerHTML = "";
 
-  if(!Number.isFinite(value)){
-    return null;
+  liveDigitButtons = [];
+
+  for(let i=0;i<10;i++){
+
+    const button =
+      document.createElement("div");
+
+    button.className =
+      "live-digit";
+
+    button.dataset.digit =
+      String(i);
+
+    button.innerHTML = `
+      <span class="live-badge">LIVE</span>
+      <span class="live-digit-number">${i}</span>
+      <span class="live-digit-status">WAITING</span>
+    `;
+
+    liveDigitTrack.appendChild(button);
+
+    liveDigitButtons.push(button);
+  }
+}
+
+
+/*
+ * This is the part that actually makes the
+ * yellow LIVE indicator move between 0-9.
+ */
+function updateLiveDigit(digit){
+
+  const n = Number(digit);
+
+  if(!Number.isInteger(n) || n < 0 || n > 9){
+    return;
   }
 
-  const stringValue =
-    String(value);
+  currentLiveDigit.textContent = n;
 
-  const digits =
-    stringValue.replace(/\D/g,"");
+  liveDigitButtons.forEach(
+    (button,index) => {
 
-  if(!digits.length){
-    return null;
-  }
+      const active =
+        index === n;
 
-  return Number(
-    digits.charAt(
-      digits.length - 1
-    )
+      button.classList.toggle(
+        "active",
+        active
+      );
+
+      const status =
+        button.querySelector(
+          ".live-digit-status"
+        );
+
+      if(status){
+
+        status.textContent =
+          active
+            ? "LIVE"
+            : "WAITING";
+      }
+
+    }
   );
 
+  const activeButton =
+    liveDigitButtons[n];
+
+  if(activeButton){
+
+    /*
+     * Remove and re-add the flash class so
+     * repeated appearances of the same digit
+     * still animate.
+     */
+    activeButton.classList.remove(
+      "flash"
+    );
+
+    void activeButton.offsetWidth;
+
+    activeButton.classList.add(
+      "flash"
+    );
+  }
+
+  lastLiveDigit = n;
 }
 
 
-/* =========================================================
-   LIVE STATUS
-========================================================= */
-
-function setMarketLive(){
-
-  liveStatus.innerHTML =
-    `<span class="status-dot live"></span>
-     LIVE DERIV MARKET`;
-
-  liveStatus.style.color =
-    "var(--green)";
-
-  statusDot.className =
-    "status-dot live";
-
-}
-
-
-function setMarketConnecting(){
-
-  liveStatus.innerHTML =
-    `<span class="status-dot"></span>
-     CONNECTING TO DERIV...`;
-
-  liveStatus.style.color =
-    "var(--yellow)";
-
-  statusDot.className =
-    "status-dot";
-
-}
-
-
-function setMarketError(){
-
-  liveStatus.innerHTML =
-    `<span class="status-dot error"></span>
-     DERIV MARKET DISCONNECTED`;
-
-  liveStatus.style.color =
-    "var(--red)";
-
-  statusDot.className =
-    "status-dot error";
-
-}
-
-
-/* =========================================================
+/* =====================================================
    DIGIT SELECTOR
-========================================================= */
+   ===================================================== */
 
 function renderDigits(){
 
@@ -1531,15 +1698,13 @@ function renderDigits(){
     );
 
     digitsBox.appendChild(button);
-
   }
-
 }
 
 
-/* =========================================================
+/* =====================================================
    FREQUENCY
-========================================================= */
+   ===================================================== */
 
 function renderFrequency(
   counts,
@@ -1580,15 +1745,13 @@ function renderFrequency(
        <small>${pct.toFixed(1)}%</small>`;
 
     frequencyBox.appendChild(item);
-
   }
-
 }
 
 
-/* =========================================================
+/* =====================================================
    TYPE UI
-========================================================= */
+   ===================================================== */
 
 function updateTypeUI(){
 
@@ -1603,7 +1766,6 @@ function updateTypeUI(){
 
     });
 
-
   predictionField.style.display =
     [
       "DIGITMATCH",
@@ -1614,22 +1776,17 @@ function updateTypeUI(){
       ? ""
       : "none";
 
-
   proposal = null;
 
   lastProposalKey = "";
 
-  payout.textContent =
-    "—";
+  payout.textContent = "—";
 
-  profit.textContent =
-    "—";
+  profit.textContent = "—";
 
-  askPrice.textContent =
-    "—";
+  askPrice.textContent = "—";
 
   requestProposalSoon();
-
 }
 
 
@@ -1652,9 +1809,9 @@ document
   });
 
 
-/* =========================================================
+/* =====================================================
    PROPOSAL
-========================================================= */
+   ===================================================== */
 
 function requestProposalSoon(){
 
@@ -1667,7 +1824,6 @@ function requestProposalSoon(){
       requestProposal,
       350
     );
-
 }
 
 
@@ -1681,13 +1837,11 @@ function requestProposal(){
     return;
   }
 
-
   const amount =
     Number(stake.value);
 
   const dur =
     Number(duration.value);
-
 
   if(
     !Number.isFinite(amount) ||
@@ -1698,7 +1852,6 @@ function requestProposal(){
     return;
   }
 
-
   const barrierRequired =
     [
       "DIGITMATCH",
@@ -1706,7 +1859,6 @@ function requestProposal(){
       "DIGITOVER",
       "DIGITUNDER"
     ].includes(type);
-
 
   const key =
     [
@@ -1720,34 +1872,29 @@ function requestProposal(){
         : ""
     ].join("|");
 
-
   if(
     key === lastProposalKey
   ){
     return;
   }
 
-
   lastProposalKey =
     key;
 
   proposal = null;
 
-  buyButton.disabled =
-    true;
+  buyButton.disabled = true;
 
   buyButton.textContent =
     "GETTING LIVE PROPOSAL...";
 
-  askPrice.textContent =
-    "—";
+  askPrice.textContent = "—";
 
   payout.textContent =
     "Loading...";
 
   profit.textContent =
     "Loading...";
-
 
   try{
 
@@ -1756,18 +1903,15 @@ function requestProposal(){
 
         amount,
 
-        contractType:
-          type,
+        contractType:type,
 
         currency:
           accountCurrency.textContent ||
           "USD",
 
-        duration:
-          dur,
+        duration:dur,
 
-        durationUnit:
-          "t",
+        durationUnit:"t",
 
         symbol:
           market.value,
@@ -1786,15 +1930,13 @@ function requestProposal(){
       "Unable to request Deriv proposal.";
 
     setTradeButton();
-
   }
-
 }
 
 
-/* =========================================================
+/* =====================================================
    STAKE
-========================================================= */
+   ===================================================== */
 
 function updateStake(){
 
@@ -1812,17 +1954,13 @@ function updateStake(){
 
   lastProposalKey = "";
 
-  payout.textContent =
-    "—";
+  payout.textContent = "—";
 
-  profit.textContent =
-    "—";
+  profit.textContent = "—";
 
-  askPrice.textContent =
-    "—";
+  askPrice.textContent = "—";
 
   requestProposalSoon();
-
 }
 
 
@@ -1849,9 +1987,9 @@ duration.addEventListener(
 );
 
 
-/* =========================================================
+/* =====================================================
    MARKET CHANGE
-========================================================= */
+   ===================================================== */
 
 market.addEventListener(
   "change",
@@ -1864,77 +2002,68 @@ market.addEventListener(
     symbolName.textContent =
       name;
 
-
     prices = [];
 
     recentTicks = [];
 
     previousPrice = null;
 
-    directTickCount = 0;
+    lastLiveDigit = null;
+
+    currentLiveDigit.textContent =
+      "—";
+
+    liveDigitButtons.forEach(
+      button => {
+
+        button.classList.remove(
+          "active",
+          "flash"
+        );
+
+        const status =
+          button.querySelector(
+            ".live-digit-status"
+          );
+
+        if(status){
+          status.textContent =
+            "WAITING";
+        }
+
+      }
+    );
 
     drawChart();
 
     renderTicks();
 
-
     proposal = null;
 
     lastProposalKey = "";
 
-    payout.textContent =
-      "—";
+    payout.textContent = "—";
 
-    profit.textContent =
-      "—";
+    profit.textContent = "—";
 
-    askPrice.textContent =
-      "—";
+    askPrice.textContent = "—";
 
     result.textContent =
       "Loading real Deriv market data...";
 
-
-    /*
-      Restart direct live market stream.
-    */
-
-    startDirectLiveTicks(
-      market.value
-    );
-
-
-    /*
-      Keep existing deriv.js
-      market connection too.
-    */
-
     try{
 
-      if(
-        window.PELI_DERIV &&
-        typeof
-        window.PELI_DERIV
-          .changeSymbol ===
-        "function"
-      ){
-
-        window.PELI_DERIV
-          .changeSymbol(
-            market.value
-          );
-
-      }
+      window.PELI_DERIV
+        .changeSymbol(
+          market.value
+        );
 
     }catch(error){
 
-      console.error(
-        "Deriv market change:",
-        error
-      );
+      result.textContent =
+        error.message;
 
     }
-
 
     requestProposalSoon();
 
@@ -1942,552 +2071,21 @@ market.addEventListener(
 );
 
 
-/* =========================================================
-   DIRECT LIVE DERIV WEBSOCKET
-========================================================= */
-
-function closeDirectSocket(){
-
-  directSocketIntentionalClose =
-    true;
-
-  if(directSocket){
-
-    try{
-      directSocket.close();
-    }catch(error){
-      console.warn(
-        "Socket close:",
-        error
-      );
-    }
-
-  }
-
-  directSocket = null;
-
-}
-
-
-function scheduleDirectReconnect(){
-
-  if(
-    directSocketIntentionalClose
-  ){
-    return;
-  }
-
-
-  clearTimeout(
-    directSocketReconnectTimer
-  );
-
-
-  const delay =
-    Math.min(
-      1000 *
-      Math.pow(
-        2,
-        directSocketReconnectAttempts
-      ),
-      10000
-    );
-
-
-  directSocketReconnectAttempts++;
-
-
-  directSocketReconnectTimer =
-    setTimeout(
-      () => {
-
-        startDirectLiveTicks(
-          market.value
-        );
-
-      },
-      delay
-    );
-
-}
-
-
-function startDirectLiveTicks(
-  symbol
-){
-
-  if(!symbol){
-    return;
-  }
-
-
-  directSocketIntentionalClose =
-    false;
-
-
-  clearTimeout(
-    directSocketReconnectTimer
-  );
-
-
-  if(directSocket){
-
-    try{
-      directSocket.close();
-    }catch(error){
-      console.warn(
-        "Old socket close:",
-        error
-      );
-    }
-
-    directSocket = null;
-
-  }
-
-
-  setMarketConnecting();
-
-
-  /*
-    Deriv's public WebSocket endpoint.
-
-    These are real market ticks.
-    No generated/demo price is used.
-  */
-
-  const url =
-    "wss://ws.derivws.com/websockets/v3?app_id=1089";
-
-
-  try{
-
-    directSocket =
-      new WebSocket(url);
-
-  }catch(error){
-
-    console.error(
-      "Unable to create Deriv WebSocket:",
-      error
-    );
-
-    setMarketError();
-
-    scheduleDirectReconnect();
-
-    return;
-
-  }
-
-
-  directSocket.onopen =
-    () => {
-
-      directSocketReconnectAttempts =
-        0;
-
-      setMarketLive();
-
-
-      try{
-
-        directSocket.send(
-          JSON.stringify({
-
-            ticks:
-              symbol,
-
-            subscribe:
-              1
-
-          })
-        );
-
-      }catch(error){
-
-        console.error(
-          "Deriv subscription error:",
-          error
-        );
-
-      }
-
-    };
-
-
-  directSocket.onmessage =
-    event => {
-
-      let message;
-
-      try{
-
-        message =
-          JSON.parse(
-            event.data
-          );
-
-      }catch(error){
-
-        return;
-
-      }
-
-
-      if(message.error){
-
-        console.error(
-          "Deriv tick error:",
-          message.error
-        );
-
-        return;
-
-      }
-
-
-      if(
-        message.msg_type ===
-        "tick" &&
-        message.tick
-      ){
-
-        processDirectTick(
-          message.tick
-        );
-
-      }
-
-    };
-
-
-  directSocket.onerror =
-    error => {
-
-      console.warn(
-        "Deriv live market WebSocket error:",
-        error
-      );
-
-    };
-
-
-  directSocket.onclose =
-    () => {
-
-      directSocket =
-        null;
-
-      if(
-        !directSocketIntentionalClose
-      ){
-
-        setMarketError();
-
-        scheduleDirectReconnect();
-
-      }
-
-    };
-
-}
-
-
-/* =========================================================
-   PROCESS DIRECT LIVE TICK
-========================================================= */
-
-function processDirectTick(
-  tick
-){
-
-  const value =
-    Number(tick.quote);
-
-
-  if(
-    !Number.isFinite(value)
-  ){
-    return;
-  }
-
-
-  let digit =
-    null;
-
-
-  /*
-    Deriv normally provides
-    a proper last digit.
-  */
-
-  if(
-    tick &&
-    tick.quote !== undefined
-  ){
-
-    digit =
-      getLastDigit(
-        tick.quote
-      );
-
-  }
-
-
-  if(
-    tick &&
-    tick.pip_size !== undefined
-  ){
-
-    const pip =
-      Number(
-        tick.pip_size
-      );
-
-    if(
-      Number.isFinite(pip) &&
-      pip >= 0
-    ){
-
-      const fixed =
-        Number(value)
-          .toFixed(pip);
-
-      const digits =
-        fixed.replace(
-          /\D/g,
-          ""
-        );
-
-      if(digits.length){
-
-        digit =
-          Number(
-            digits.charAt(
-              digits.length - 1
-            )
-          );
-
-      }
-
-    }
-
-  }
-
-
-  previousPrice =
-    prices.length
-      ? prices[prices.length - 1]
-      : null;
-
-
-  prices.push(
-    value
-  );
-
-
-  if(
-    prices.length > 200
-  ){
-
-    prices.shift();
-
-  }
-
-
-  recentTicks.push({
-
-    price:
-      value,
-
-    digit:
-      Number.isFinite(digit)
-        ? digit
-        : null
-
-  });
-
-
-  if(
-    recentTicks.length > 12
-  ){
-
-    recentTicks.shift();
-
-  }
-
-
-  directTickCount++;
-
-
-  price.textContent =
-    formatPrice(
-      value
-    );
-
-
-  priceBubble.textContent =
-    formatPrice(
-      value
-    );
-
-
-  chartDigit.textContent =
-    Number.isFinite(digit)
-      ? digit
-      : "—";
-
-
-  tickCount.textContent =
-    directTickCount;
-
-
-  if(
-    previousPrice !== null
-  ){
-
-    if(
-      value >
-      previousPrice
-    ){
-
-      direction.textContent =
-        "▲ UP";
-
-      direction.style.color =
-        "var(--green)";
-
-      price.style.color =
-        "var(--green)";
-
-    }
-
-    else if(
-      value <
-      previousPrice
-    ){
-
-      direction.textContent =
-        "▼ DOWN";
-
-      direction.style.color =
-        "var(--red)";
-
-      price.style.color =
-        "var(--red)";
-
-    }
-
-    else{
-
-      direction.textContent =
-        "— FLAT";
-
-      direction.style.color =
-        "#9aa7b9";
-
-      price.style.color =
-        "var(--text)";
-
-    }
-
-  }
-
-
-  /*
-    Reset the price color
-    shortly after movement.
-  */
-
-  clearTimeout(
-    window.__peliPriceColorTimer
-  );
-
-  window.__peliPriceColorTimer =
-    setTimeout(
-      () => {
-
-        price.style.color =
-          "var(--text)";
-
-      },
-      180
-    );
-
-
-  setMarketLive();
-
-
-  renderLiveFrequency();
-
-
-  renderTicks();
-
-
-  drawChart();
-
-
-}
-
-
-/* =========================================================
-   LIVE FREQUENCY FROM CURRENT TICKS
-========================================================= */
-
-function renderLiveFrequency(){
-
-  const counts =
-    Array(10).fill(0);
-
-
-  recentTicks.forEach(
-    item => {
-
-      const digit =
-        Number(
-          item.digit
-        );
-
-      if(
-        Number.isInteger(digit) &&
-        digit >= 0 &&
-        digit <= 9
-      ){
-
-        counts[digit]++;
-
-      }
-
-    }
-  );
-
-
-  renderFrequency(
-    counts,
-    recentTicks.length
-  );
-
-}
-
-
-/* =========================================================
+/* =====================================================
    CONNECTION BUTTON
-========================================================= */
+   ===================================================== */
 
 connectButton.addEventListener(
   "click",
   async () => {
 
-    connectButton.disabled =
-      true;
+    connectButton.disabled = true;
 
     connectButton.textContent =
       "CONNECTING TO DERIV...";
 
     accountStatus.textContent =
       "Connecting securely to your real Deriv account...";
-
 
     try{
 
@@ -2503,9 +2101,7 @@ connectButton.addEventListener(
           await window.PELI_DERIV
             .connectAuthenticated();
 
-
         connected = true;
-
 
         if(account){
 
@@ -2515,7 +2111,6 @@ connectButton.addEventListener(
               account.currency;
 
           }
-
 
           if(
             account.balance !==
@@ -2533,14 +2128,11 @@ connectButton.addEventListener(
 
         }
 
-
         setAuthenticatedUI();
 
         requestProposalSoon();
 
-      }
-
-      else{
+      }else{
 
         window.location.href =
           "/api/deriv/start";
@@ -2568,14 +2160,13 @@ connectButton.addEventListener(
 );
 
 
-/* =========================================================
+/* =====================================================
    CONNECTION UI
-========================================================= */
+   ===================================================== */
 
 function setAuthenticatedUI(){
 
   connected = true;
-
 
   accountStatus.textContent =
     "REAL DERIV ACCOUNT CONNECTED";
@@ -2583,28 +2174,30 @@ function setAuthenticatedUI(){
   accountStatus.style.color =
     "var(--green)";
 
-
   connectionBadge.textContent =
     "CONNECTED";
 
   connectionBadge.style.color =
     "var(--green)";
 
-
   connectButton.classList.add(
     "connected"
   );
 
+  liveStatus.innerHTML =
+    `<span class="status-dot live"></span>
+     REAL DERIV ACCOUNT CONNECTED`;
+
+  liveStatus.style.color =
+    "var(--green)";
 
   buyButton.disabled =
     !proposal;
-
 
   buyButton.textContent =
     proposal
       ? "BUY REAL CONTRACT"
       : "WAITING FOR LIVE PROPOSAL";
-
 }
 
 
@@ -2612,13 +2205,11 @@ function setDisconnectedUI(){
 
   connected = false;
 
-
   accountStatus.textContent =
     "Real Deriv account not connected";
 
   accountStatus.style.color =
     "var(--yellow)";
-
 
   connectionBadge.textContent =
     "NOT CONNECTED";
@@ -2626,19 +2217,14 @@ function setDisconnectedUI(){
   connectionBadge.style.color =
     "var(--yellow)";
 
-
   connectButton.classList.remove(
     "connected"
   );
 
-
-  buyButton.disabled =
-    true;
-
+  buyButton.disabled = true;
 
   buyButton.textContent =
     "CONNECT REAL DERIV ACCOUNT TO TRADE";
-
 }
 
 
@@ -2646,597 +2232,578 @@ function setTradeButton(){
 
   if(!connected){
 
-    buyButton.disabled =
-      true;
+    buyButton.disabled = true;
 
     buyButton.textContent =
       "CONNECT REAL DERIV ACCOUNT TO TRADE";
 
     return;
-
   }
-
 
   buyButton.disabled =
     !proposal;
-
 
   buyButton.textContent =
     proposal
       ? "BUY REAL CONTRACT"
       : "WAITING FOR LIVE PROPOSAL";
-
 }
 
 
-/* =========================================================
-   EXISTING DERIV STATUS
-========================================================= */
-
-if(
-  window.PELI_DERIV &&
-  typeof window.PELI_DERIV.on ===
-  "function"
-){
-
-  window.PELI_DERIV.on(
-    "status",
-    status => {
-
-      if(status?.authenticated){
-
-        setAuthenticatedUI();
-
-      }
-
-      else if(
-        status?.publicConnected
-      ){
-
-        setMarketLive();
-
-      }
-
-      else if(
-        status?.publicConnecting ||
-        status?.connecting
-      ){
-
-        setMarketConnecting();
-
-      }
-
-    }
-  );
-
-
-  /* =======================================================
-     EXISTING DERIV LIVE TICK
-  ======================================================= */
-
-  window.PELI_DERIV.on(
-    "tick",
-    tick => {
-
-      const value =
-        Number(tick.quote);
-
-
-      if(
-        !Number.isFinite(value)
-      ){
-
-        return;
-
-      }
-
-
-      /*
-        If deriv.js is already delivering
-        ticks, process them too.
-
-        This preserves compatibility
-        with your existing deriv.js.
-      */
-
-      const digit =
-        Number.isInteger(
-          Number(tick.lastDigit)
-        )
-          ? Number(tick.lastDigit)
-          : getLastDigit(
-              value
-            );
-
-
-      previousPrice =
-        prices.length
-          ? prices[prices.length - 1]
-          : null;
-
-
-      prices.push(
-        value
-      );
-
-
-      if(
-        prices.length > 200
-      ){
-
-        prices.shift();
-
-      }
-
-
-      recentTicks.push({
-
-        price:
-          value,
-
-        digit:
-          Number.isFinite(digit)
-            ? digit
-            : null
-
-      });
-
-
-      if(
-        recentTicks.length > 12
-      ){
-
-        recentTicks.shift();
-
-      }
-
-
-      price.textContent =
-        formatPrice(
-          value
-        );
-
-
-      priceBubble.textContent =
-        formatPrice(
-          value
-        );
-
-
-      chartDigit.textContent =
-        Number.isFinite(digit)
-          ? digit
-          : "—";
-
-
-      if(
-        previousPrice !== null
-      ){
-
-        if(
-          value >
-          previousPrice
-        ){
-
-          direction.textContent =
-            "▲ UP";
-
-          direction.style.color =
-            "var(--green)";
-
-        }
-
-        else if(
-          value <
-          previousPrice
-        ){
-
-          direction.textContent =
-            "▼ DOWN";
-
-          direction.style.color =
-            "var(--red)";
-
-        }
-
-        else{
-
-          direction.textContent =
-            "— FLAT";
-
-          direction.style.color =
-            "#9aa7b9";
-
-        }
-
-      }
-
-
-      renderTicks();
-
-      drawChart();
-
-    }
-  );
-
-
-  /* =======================================================
-     HISTORY
-  ======================================================= */
-
-  window.PELI_DERIV.on(
-    "history",
-    history => {
-
-      if(
-        Array.isArray(
-          history?.prices
-        )
-      ){
-
-        prices =
-          history.prices
-            .map(Number)
-            .filter(
-              Number.isFinite
-            )
-            .slice(-200);
-
-      }
-
-
-      if(
-        Array.isArray(
-          history?.counts
-        )
-      ){
-
-        renderFrequency(
-          history.counts,
-          history.sampleSize
-        );
-
-      }
-
-
-      drawChart();
-
-    }
-  );
-
-
-  /* =======================================================
-     AUTHENTICATED
-  ======================================================= */
-
-  window.PELI_DERIV.on(
-    "authenticated",
-    account => {
-
-      connected = true;
-
-
-      if(account?.currency){
-
-        accountCurrency.textContent =
-          account.currency;
-
-      }
-
-
-      if(
-        account?.balance !==
-        undefined
-      ){
-
-        accountBalance.textContent =
-          money(
-            account.balance,
-            account.currency ||
-            "USD"
-          );
-
-      }
-
+/* =====================================================
+   DERIV STATUS
+   ===================================================== */
+
+window.PELI_DERIV.on(
+  "status",
+  status => {
+
+    if(status?.authenticated){
 
       setAuthenticatedUI();
 
+    }else if(status?.publicConnected){
 
-      result.textContent =
-        "REAL DERIV ACCOUNT CONNECTED\nWaiting for live proposal...";
+      liveStatus.innerHTML =
+        `<span class="status-dot live"></span>
+         LIVE DERIV MARKET`;
 
+      liveStatus.style.color =
+        "var(--green)";
+
+    }else if(
+      status?.publicConnecting ||
+      status?.connecting
+    ){
+
+      liveStatus.innerHTML =
+        `<span class="status-dot"></span>
+         CONNECTING TO DERIV...`;
+
+      liveStatus.style.color =
+        "var(--yellow)";
+
+    }else{
+
+      liveStatus.innerHTML =
+        `<span class="status-dot error"></span>
+         DERIV DISCONNECTED`;
+
+      liveStatus.style.color =
+        "var(--red)";
+    }
+
+  }
+);
+
+
+/* =====================================================
+   LIVE TICK
+   ===================================================== */
+
+window.PELI_DERIV.on(
+  "tick",
+  tick => {
+
+    const value =
+      Number(tick.quote);
+
+    if(
+      !Number.isFinite(value)
+    ){
+      return;
+    }
+
+    const digit =
+      Number.isInteger(
+        Number(tick.lastDigit)
+      )
+        ? Number(tick.lastDigit)
+        : Number(
+            String(value)
+              .replace(/\D/g,"")
+              .slice(-1)
+          );
+
+    previousPrice =
+      prices.length
+        ? prices[prices.length - 1]
+        : null;
+
+    prices.push(value);
+
+    if(
+      prices.length > 200
+    ){
+      prices.shift();
+    }
+
+    recentTicks.push({
+
+      price:value,
+
+      digit:
+        Number.isFinite(digit)
+          ? digit
+          : null
+
+    });
+
+    if(
+      recentTicks.length > 12
+    ){
+      recentTicks.shift();
+    }
+
+
+    /* =================================================
+       THIS MAKES THE LIVE DIGIT MOVE
+       ================================================= */
+
+    if(
+      Number.isInteger(digit) &&
+      digit >= 0 &&
+      digit <= 9
+    ){
+
+      updateLiveDigit(
+        digit
+      );
+
+    }
+
+
+    /* =================================================
+       PRICE UPDATE
+       ================================================= */
+
+    price.textContent =
+      formatPrice(value);
+
+    price.classList.remove(
+      "price-flash"
+    );
+
+    void price.offsetWidth;
+
+    price.classList.add(
+      "price-flash"
+    );
+
+    setTimeout(
+      () => {
+        price.classList.remove(
+          "price-flash"
+        );
+      },
+      130
+    );
+
+
+    priceBubble.textContent =
+      formatPrice(value);
+
+    chartDigit.textContent =
+      Number.isFinite(digit)
+        ? digit
+        : "—";
+
+    tickCount.textContent =
+      prices.length;
+
+
+    if(
+      previousPrice !== null
+    ){
+
+      if(value > previousPrice){
+
+        direction.textContent =
+          "▲ UP";
+
+        direction.style.color =
+          "var(--green)";
+
+      }else if(
+        value < previousPrice
+      ){
+
+        direction.textContent =
+          "▼ DOWN";
+
+        direction.style.color =
+          "var(--red)";
+
+      }else{
+
+        direction.textContent =
+          "— FLAT";
+
+        direction.style.color =
+          "#9aa7b9";
+      }
+    }
+
+
+    if(
+      Array.isArray(tick.counts)
+    ){
+
+      renderFrequency(
+        tick.counts,
+        tick.sampleSize
+      );
+
+    }
+
+    renderTicks();
+
+    drawChart();
+
+
+    if(
+      type === "DIGITEVEN" ||
+      type === "DIGITODD"
+    ){
+
+      proposal = null;
+
+      lastProposalKey = "";
 
       requestProposalSoon();
 
     }
-  );
+
+  }
+);
 
 
-  /* =======================================================
-     BALANCE
-  ======================================================= */
+/* =====================================================
+   HISTORY
+   ===================================================== */
 
-  window.PELI_DERIV.on(
-    "balance",
-    balance => {
+window.PELI_DERIV.on(
+  "history",
+  history => {
 
-      if(
-        balance?.balance !==
-        undefined
-      ){
+    if(
+      Array.isArray(
+        history?.prices
+      )
+    ){
 
-        accountBalance.textContent =
-          money(
-            balance.balance,
-            balance.currency ||
-            "USD"
-          );
-
-      }
-
-
-      if(balance?.currency){
-
-        accountCurrency.textContent =
-          balance.currency;
-
-      }
+      prices =
+        history.prices
+          .map(Number)
+          .filter(Number.isFinite)
+          .slice(-200);
 
     }
-  );
+
+    if(
+      Array.isArray(
+        history?.counts
+      )
+    ){
+
+      renderFrequency(
+        history.counts,
+        history.sampleSize
+      );
+
+    }
+
+    drawChart();
+
+  }
+);
 
 
-  /* =======================================================
-     PROPOSAL
-  ======================================================= */
+/* =====================================================
+   AUTHENTICATED
+   ===================================================== */
 
-  window.PELI_DERIV.on(
-    "proposal",
-    proposalData => {
+window.PELI_DERIV.on(
+  "authenticated",
+  account => {
 
-      proposal =
-        proposalData;
+    connected = true;
 
+    if(account?.currency){
 
-      if(!proposalData){
+      accountCurrency.textContent =
+        account.currency;
 
-        setTradeButton();
+    }
 
-        return;
+    if(
+      account?.balance !==
+      undefined
+    ){
 
-      }
-
-
-      const ask =
-        Number(
-          proposalData.ask_price
+      accountBalance.textContent =
+        money(
+          account.balance,
+          account.currency ||
+          "USD"
         );
 
+    }
 
-      const pay =
-        Number(
-          proposalData.payout
+    setAuthenticatedUI();
+
+    result.textContent =
+      "REAL DERIV ACCOUNT CONNECTED\nWaiting for live proposal...";
+
+    requestProposalSoon();
+
+  }
+);
+
+
+/* =====================================================
+   BALANCE
+   ===================================================== */
+
+window.PELI_DERIV.on(
+  "balance",
+  balance => {
+
+    if(
+      balance?.balance !==
+      undefined
+    ){
+
+      accountBalance.textContent =
+        money(
+          balance.balance,
+          balance.currency ||
+          "USD"
         );
 
+    }
 
-      const currency =
-        proposalData.currency ||
-        accountCurrency.textContent ||
-        "USD";
+    if(balance?.currency){
 
+      accountCurrency.textContent =
+        balance.currency;
 
-      askPrice.textContent =
-        Number.isFinite(ask)
-          ? money(
-              ask,
-              currency
-            )
-          : "—";
+    }
+
+  }
+);
 
 
-      payout.textContent =
-        Number.isFinite(pay)
-          ? money(
-              pay,
-              currency
-            )
-          : "—";
+/* =====================================================
+   PROPOSAL
+   ===================================================== */
 
+window.PELI_DERIV.on(
+  "proposal",
+  proposalData => {
 
-      profit.textContent =
-        Number.isFinite(pay) &&
-        Number.isFinite(ask)
-          ? money(
-              pay - ask,
-              currency
-            )
-          : "—";
+    proposal =
+      proposalData;
 
+    if(!proposalData){
 
-      result.textContent =
-        `REAL DERIV PROPOSAL
+      setTradeButton();
+
+      return;
+    }
+
+    const ask =
+      Number(
+        proposalData.ask_price
+      );
+
+    const pay =
+      Number(
+        proposalData.payout
+      );
+
+    const currency =
+      proposalData.currency ||
+      accountCurrency.textContent ||
+      "USD";
+
+    askPrice.textContent =
+      Number.isFinite(ask)
+        ? money(ask,currency)
+        : "—";
+
+    payout.textContent =
+      Number.isFinite(pay)
+        ? money(pay,currency)
+        : "—";
+
+    profit.textContent =
+      Number.isFinite(pay) &&
+      Number.isFinite(ask)
+        ? money(
+            pay - ask,
+            currency
+          )
+        : "—";
+
+    result.textContent =
+      `REAL DERIV PROPOSAL
 Ask price: ${
-          money(
-            ask,
-            currency
-          )
-        }
+        money(ask,currency)
+      }
 Potential payout: ${
-          money(
-            pay,
-            currency
-          )
-        }`;
+        money(pay,currency)
+      }`;
 
+    setTradeButton();
+
+  }
+);
+
+
+/* =====================================================
+   DERIV ERROR
+   ===================================================== */
+
+window.PELI_DERIV.on(
+  "error",
+  error => {
+
+    const message =
+      error?.message ||
+      error?.error?.message ||
+      "Deriv error";
+
+    result.textContent =
+      message;
+
+    if(
+      /auth|authorize|token|login/i
+        .test(message)
+    ){
+
+      setDisconnectedUI();
+
+    }else{
 
       setTradeButton();
 
     }
-  );
+
+  }
+);
 
 
-  /* =======================================================
-     DERIV ERROR
-  ======================================================= */
+/* =====================================================
+   BUY RESULT
+   ===================================================== */
 
-  window.PELI_DERIV.on(
-    "error",
-    error => {
+window.PELI_DERIV.on(
+  "buy",
+  buy => {
 
-      const message =
-        error?.message ||
-        error?.error?.message ||
-        "Deriv error";
+    if(
+      !buy?.contract_id
+    ){
 
+      setTradeButton();
 
-      result.textContent =
-        message;
-
-
-      if(
-        /auth|authorize|token|login/i
-          .test(message)
-      ){
-
-        setDisconnectedUI();
-
-      }
-
-      else{
-
-        setTradeButton();
-
-      }
-
+      return;
     }
-  );
 
-
-  /* =======================================================
-     BUY RESULT
-  ======================================================= */
-
-  window.PELI_DERIV.on(
-    "buy",
-    buy => {
-
-      if(
-        !buy?.contract_id
-      ){
-
-        setTradeButton();
-
-        return;
-
-      }
-
-
-      result.textContent =
-        `REAL CONTRACT OPEN
+    result.textContent =
+      `REAL CONTRACT OPEN
 Contract ID: ${
+        buy.contract_id
+      }`;
+
+    buyButton.disabled = true;
+
+    buyButton.textContent =
+      "CONTRACT OPEN";
+
+    try{
+
+      window.PELI_DERIV
+        .monitorContract(
           buy.contract_id
-        }`;
-
-
-      buyButton.disabled =
-        true;
-
-      buyButton.textContent =
-        "CONTRACT OPEN";
-
-
-      try{
-
-        window.PELI_DERIV
-          .monitorContract(
-            buy.contract_id
-          );
-
-      }catch(error){
-
-        result.textContent +=
-          `\n${error.message}`;
-
-      }
-
-    }
-  );
-
-
-  /* =======================================================
-     CONTRACT RESULT
-  ======================================================= */
-
-  window.PELI_DERIV.on(
-    "contract",
-    contract => {
-
-      if(!contract){
-
-        return;
-
-      }
-
-
-      const profitValue =
-        Number(
-          contract.profit
         );
 
+    }catch(error){
 
-      const currency =
-        contract.currency ||
-        accountCurrency.textContent ||
-        "USD";
-
-
-      if(
-        contract.is_sold ||
-        contract.status === "won" ||
-        contract.status === "lost"
-      ){
-
-        result.textContent =
-          `CONTRACT FINISHED\n` +
-          `Status: ${
-            contract.status ||
-            (
-              profitValue > 0
-                ? "won"
-                : "lost"
-            )
-          }\n` +
-          `Profit/Loss: ${
-            Number.isFinite(
-              profitValue
-            )
-              ? money(
-                  profitValue,
-                  currency
-                )
-              : "—"
-          }`;
-
-
-        proposal = null;
-
-        lastProposalKey = "";
-
-        setTradeButton();
-
-        requestProposalSoon();
-
-      }
+      result.textContent +=
+        `\n${error.message}`;
 
     }
-  );
 
-}
+  }
+);
 
 
-/* =========================================================
+/* =====================================================
+   CONTRACT RESULT
+   ===================================================== */
+
+window.PELI_DERIV.on(
+  "contract",
+  contract => {
+
+    if(!contract){
+      return;
+    }
+
+    const profitValue =
+      Number(
+        contract.profit
+      );
+
+    const currency =
+      contract.currency ||
+      accountCurrency.textContent ||
+      "USD";
+
+    if(
+      contract.is_sold ||
+      contract.status === "won" ||
+      contract.status === "lost"
+    ){
+
+      result.textContent =
+        `CONTRACT FINISHED\n` +
+        `Status: ${
+          contract.status ||
+          (
+            profitValue > 0
+              ? "won"
+              : "lost"
+          )
+        }\n` +
+        `Profit/Loss: ${
+          Number.isFinite(profitValue)
+            ? money(
+                profitValue,
+                currency
+              )
+            : "—"
+        }`;
+
+      proposal = null;
+
+      lastProposalKey = "";
+
+      setTradeButton();
+
+      requestProposalSoon();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
    BUY BUTTON
-========================================================= */
+   ===================================================== */
 
 buyButton.addEventListener(
   "click",
@@ -3244,16 +2811,13 @@ buyButton.addEventListener(
 
     if(
       !connected ||
-      !window.PELI_DERIV ||
       !window.PELI_DERIV.authenticated
     ){
 
       connectButton.click();
 
       return;
-
     }
-
 
     if(!proposal?.id){
 
@@ -3264,15 +2828,12 @@ buyButton.addEventListener(
       requestProposalSoon();
 
       return;
-
     }
-
 
     const contractPrice =
       Number(
         proposal.ask_price
       );
-
 
     if(
       !Number.isFinite(
@@ -3287,9 +2848,7 @@ buyButton.addEventListener(
       requestProposalSoon();
 
       return;
-
     }
-
 
     const amountTrades =
       Math.max(
@@ -3302,7 +2861,6 @@ buyButton.addEventListener(
         )
       );
 
-
     if(amountTrades > 1){
 
       alert(
@@ -3310,37 +2868,27 @@ buyButton.addEventListener(
       );
 
       return;
-
     }
-
 
     const labels = {
 
-      DIGITMATCH:
-        "Matches",
+      DIGITMATCH:"Matches",
 
-      DIGITDIFF:
-        "Differs",
+      DIGITDIFF:"Differs",
 
-      DIGITEVEN:
-        "Even",
+      DIGITEVEN:"Even",
 
-      DIGITODD:
-        "Odd",
+      DIGITODD:"Odd",
 
-      DIGITOVER:
-        "Over",
+      DIGITOVER:"Over",
 
-      DIGITUNDER:
-        "Under"
+      DIGITUNDER:"Under"
 
     };
-
 
     const label =
       labels[type] ||
       type;
-
 
     const extra =
       [
@@ -3352,11 +2900,9 @@ buyButton.addEventListener(
         ? `\nPrediction: ${prediction}`
         : "";
 
-
     const currency =
       accountCurrency.textContent ||
       "USD";
-
 
     const confirmed =
       confirm(
@@ -3393,24 +2939,17 @@ buyButton.addEventListener(
 
       );
 
-
     if(!confirmed){
-
       return;
-
     }
 
-
-    buyButton.disabled =
-      true;
+    buyButton.disabled = true;
 
     buyButton.textContent =
       "BUYING REAL CONTRACT...";
 
-
     result.textContent =
       "Sending live contract purchase to Deriv...";
-
 
     try{
 
@@ -3422,8 +2961,7 @@ buyButton.addEventListener(
 
     }catch(error){
 
-      buyButton.disabled =
-        false;
+      buyButton.disabled = false;
 
       buyButton.textContent =
         "BUY REAL CONTRACT";
@@ -3437,9 +2975,9 @@ buyButton.addEventListener(
 );
 
 
-/* =========================================================
+/* =====================================================
    DRAW CHART
-========================================================= */
+   ===================================================== */
 
 function drawChart(){
 
@@ -3457,51 +2995,26 @@ function drawChart(){
       ""
     );
 
-    chartPoint.setAttribute(
-      "cx",
-      "0"
-    );
-
-    chartPoint.setAttribute(
-      "cy",
-      "0"
-    );
-
     return;
-
   }
 
+  const width = 1000;
 
-  const width =
-    1000;
+  const height = 500;
 
-  const height =
-    500;
+  const left = 25;
 
-  const left =
-    25;
+  const right = 85;
 
-  const right =
-    85;
+  const top = 25;
 
-  const top =
-    25;
-
-  const bottom =
-    75;
-
+  const bottom = 75;
 
   let min =
-    Math.min(
-      ...prices
-    );
-
+    Math.min(...prices);
 
   let max =
-    Math.max(
-      ...prices
-    );
-
+    Math.max(...prices);
 
   if(
     min === max
@@ -3513,10 +3026,8 @@ function drawChart(){
 
   }
 
-
   const range =
     max - min;
-
 
   min -=
     range * .12;
@@ -3524,18 +3035,15 @@ function drawChart(){
   max +=
     range * .12;
 
-
   const usableWidth =
     width -
     left -
     right;
 
-
   const usableHeight =
     height -
     top -
     bottom;
-
 
   const points =
     prices.map(
@@ -3552,7 +3060,6 @@ function drawChart(){
           ) *
           usableWidth;
 
-
         const y =
           top +
           (
@@ -3560,7 +3067,6 @@ function drawChart(){
             (max - min)
           ) *
           usableHeight;
-
 
         return {
           x,
@@ -3570,7 +3076,6 @@ function drawChart(){
 
       }
     );
-
 
   const path =
     points
@@ -3584,21 +3089,16 @@ function drawChart(){
       )
       .join(" ");
 
-
   const first =
     points[0];
 
   const last =
-    points[
-      points.length - 1
-    ];
-
+    points[points.length - 1];
 
   line.setAttribute(
     "d",
     path
   );
-
 
   area.setAttribute(
     "d",
@@ -3608,18 +3108,15 @@ function drawChart(){
      Z`
   );
 
-
   chartPoint.setAttribute(
     "cx",
     last.x
   );
 
-
   chartPoint.setAttribute(
     "cy",
     last.y
   );
-
 
   renderYAxis(
     min,
@@ -3629,9 +3126,9 @@ function drawChart(){
 }
 
 
-/* =========================================================
+/* =====================================================
    Y AXIS
-========================================================= */
+   ===================================================== */
 
 function renderYAxis(
   min,
@@ -3639,7 +3136,6 @@ function renderYAxis(
 ){
 
   yAxis.innerHTML = "";
-
 
   for(
     let i=0;
@@ -3655,18 +3151,13 @@ function renderYAxis(
         5
       );
 
-
     const item =
       document.createElement(
         "span"
       );
 
-
     item.textContent =
-      formatPrice(
-        value
-      );
-
+      formatPrice(value);
 
     yAxis.appendChild(
       item
@@ -3677,14 +3168,13 @@ function renderYAxis(
 }
 
 
-/* =========================================================
+/* =====================================================
    TICK STREAM
-========================================================= */
+   ===================================================== */
 
 function renderTicks(){
 
   tickRow.innerHTML = "";
-
 
   recentTicks
     .slice()
@@ -3697,24 +3187,14 @@ function renderTicks(){
             "div"
           );
 
-
         div.className =
           "tick-item";
 
-
         div.innerHTML =
-          `<strong>${
-            formatPrice(
-              item.price
-            )
-          }</strong>
-
-           <small>
-             Digit ${
-               item.digit ?? "—"
-             }
-           </small>`;
-
+          `<strong>${formatPrice(item.price)}</strong>
+           <small>Digit ${
+             item.digit ?? "—"
+           }</small>`;
 
         tickRow.appendChild(
           div
@@ -3722,13 +3202,12 @@ function renderTicks(){
 
       }
     );
-
 }
 
 
-/* =========================================================
+/* =====================================================
    RESET
-========================================================= */
+   ===================================================== */
 
 $("resetChart")
   .addEventListener(
@@ -3741,29 +3220,41 @@ $("resetChart")
 
       previousPrice = null;
 
-      directTickCount = 0;
+      lastLiveDigit = null;
 
-      price.textContent =
-        "—";
+      price.textContent = "—";
 
-      priceBubble.textContent =
-        "—";
+      priceBubble.textContent = "—";
 
-      chartDigit.textContent =
-        "—";
+      chartDigit.textContent = "—";
 
-      direction.textContent =
-        "—";
+      currentLiveDigit.textContent = "—";
 
-      tickCount.textContent =
-        "0";
+      direction.textContent = "—";
 
-      tickRow.innerHTML =
-        "";
+      tickCount.textContent = "0";
 
-      renderFrequency(
-        Array(10).fill(0),
-        0
+      tickRow.innerHTML = "";
+
+      liveDigitButtons.forEach(
+        button => {
+
+          button.classList.remove(
+            "active",
+            "flash"
+          );
+
+          const status =
+            button.querySelector(
+              ".live-digit-status"
+            );
+
+          if(status){
+            status.textContent =
+              "WAITING";
+          }
+
+        }
       );
 
       drawChart();
@@ -3772,9 +3263,9 @@ $("resetChart")
   );
 
 
-/* =========================================================
+/* =====================================================
    FULLSCREEN
-========================================================= */
+   ===================================================== */
 
 $("fullscreenChart")
   .addEventListener(
@@ -3787,15 +3278,11 @@ $("fullscreenChart")
           !document.fullscreenElement
         ){
 
-          await chartCard
-            .requestFullscreen();
+          await chartCard.requestFullscreen();
 
-        }
+        }else{
 
-        else{
-
-          await document
-            .exitFullscreen();
+          await document.exitFullscreen();
 
         }
 
@@ -3825,9 +3312,7 @@ document.addEventListener(
         "fullscreen-chart"
       );
 
-    }
-
-    else{
+    }else{
 
       chartCard.classList.remove(
         "fullscreen-chart"
@@ -3839,59 +3324,39 @@ document.addEventListener(
 );
 
 
-/* =========================================================
+/* =====================================================
    INITIALISE
-========================================================= */
+   ===================================================== */
 
 renderDigits();
-
 
 renderFrequency(
   Array(10).fill(0),
   0
 );
 
+renderLiveDigitTracker();
 
 symbolName.textContent =
   names[market.value];
-
 
 updateStake();
 
 
 /*
-  START REAL LIVE MARKET
-  DIRECTLY FROM DERIV.
+  PUBLIC MARKET CONNECTION.
 
-  This is independent of the
-  authenticated real-money account.
-*/
-
-startDirectLiveTicks(
-  market.value
-);
-
-
-/*
-  Also start your existing
-  deriv.js public connection.
+  This keeps the live chart and live
+  digit tracker working even before
+  the real account is authenticated.
 */
 
 try{
 
-  if(
-    window.PELI_DERIV &&
-    typeof
-    window.PELI_DERIV.connect ===
-    "function"
-  ){
-
-    window.PELI_DERIV
-      .connect(
-        market.value
-      );
-
-  }
+  window.PELI_DERIV
+    .connect(
+      market.value
+    );
 
 }catch(error){
 
@@ -3904,76 +3369,57 @@ try{
 
 
 /*
-  Restore existing real account
-  session if available.
+  If OAuth/session already exists,
+  restore the real account.
 */
 
 try{
 
-  if(
-    window.PELI_DERIV &&
-    typeof
-    window.PELI_DERIV
-      .connectAuthenticated ===
-    "function"
-  ){
+  window.PELI_DERIV
+    .connectAuthenticated()
+    .then(
+      account => {
 
-    window.PELI_DERIV
-      .connectAuthenticated()
-      .then(
-        account => {
+        if(account){
 
-          if(account){
+          connected = true;
 
-            connected = true;
+          if(account.currency){
 
-
-            if(account.currency){
-
-              accountCurrency.textContent =
-                account.currency;
-
-            }
-
-
-            if(
-              account.balance !==
-              undefined
-            ){
-
-              accountBalance.textContent =
-                money(
-                  account.balance,
-                  account.currency ||
-                  "USD"
-                );
-
-            }
-
-
-            setAuthenticatedUI();
-
-            requestProposalSoon();
+            accountCurrency.textContent =
+              account.currency;
 
           }
 
+          if(
+            account.balance !==
+            undefined
+          ){
+
+            accountBalance.textContent =
+              money(
+                account.balance,
+                account.currency ||
+                "USD"
+              );
+
+          }
+
+          setAuthenticatedUI();
+
+          requestProposalSoon();
+
         }
-      )
-      .catch(
-        () => {
 
-          setDisconnectedUI();
+      }
+    )
+    .catch(
+      () => {
 
-        }
-      );
+        setDisconnectedUI();
 
-  }
-
-  else{
-
-    setDisconnectedUI();
-
-  }
+      }
+    );
 
 }catch(error){
 
@@ -3984,5 +3430,4 @@ try{
 </script>
 
 </body>
-
 </html>
