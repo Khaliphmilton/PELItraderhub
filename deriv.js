@@ -1,527 +1,371 @@
-/* ============================================================
-   PELItradershub — REAL DERIV TRADING ENGINE
-   ============================================================
-
-   REAL MARKET DATA
-   REAL ACCOUNT SESSION
-   REAL PROPOSALS
-   REAL CONTRACT PURCHASE
-   REAL CONTRACT MONITORING
-   REAL SELL
-   REAL PORTFOLIO
-   REAL STATEMENT
-
-   UI contract types supported:
-
-      DIGITMATCH
-      DIGITDIFF
-      DIGITEVEN
-      DIGITODD
-      DIGITOVER
-      DIGITUNDER
-
-   The browser receives the authenticated WebSocket URL from:
-
-      /api/deriv/session
-
-   The backend must return an authenticated REAL account session.
-
-   ============================================================ */
+// PELItradershub — REAL DERIV ENGINE
+// Replace the entire existing Deriv engine file.
 
 (() => {
-
   "use strict";
 
-
-  /* ==========================================================
-     CONFIGURATION
-     ========================================================== */
-
+  const SESSION_URL = "/api/deriv/session";
   const PUBLIC_WS =
     "wss://api.derivws.com/trading/v1/options/ws/public";
 
-  const SESSION_URL =
-    "/api/deriv/session";
-
-
-  /* ==========================================================
-     EVENT SYSTEM
-     ========================================================== */
-
-  const listeners = Object.create(null);
-
-
-  function on(name, callback) {
-
-    if (!listeners[name]) {
-      listeners[name] = [];
-    }
-
-    listeners[name].push(callback);
-
-    return () => {
-
-      listeners[name] =
-        (listeners[name] || [])
-          .filter(fn => fn !== callback);
-
-    };
-  }
-
-
-  function emit(name, data) {
-
-    const callbacks =
-      listeners[name] || [];
-
-    callbacks.forEach(callback => {
-
-      try {
-
-        callback(data);
-
-      } catch (error) {
-
-        console.error(
-          `PELI Deriv listener error [${name}]`,
-          error
-        );
-
-      }
-
-    });
-
-  }
-
-
-  /* ==========================================================
-     INTERNAL STATE
-     ========================================================== */
-
   const state = {
-
     publicWs: null,
-
     authWs: null,
 
     authenticated: false,
+    connecting: false,
 
     account: null,
-
     symbol: "R_100",
 
     pipSize: 0.01,
 
     lastQuote: null,
-
     lastDigit: null,
-
+    previousQuote: null,
+    previousDigit: null,
     lastEpoch: null,
 
-    previousQuote: null,
-
-    previousDigit: null,
-
     digits: Array(10).fill(0),
-
     recentDigits: [],
-
     recentTicks: [],
 
     proposal: null,
-
-    activeProposalId: null,
-
     currentContract: null,
 
     openContracts: new Map(),
+    pending: new Map(),
 
     reqId: 1000,
 
-    pending: new Map(),
-
     publicReconnectTimer: null,
-
-    authReconnectTimer: null,
-
     publicReconnectAttempts: 0,
 
-    authReconnectAttempts: 0,
-
-    manuallyClosedPublic: false,
-
-    manuallyClosedAuth: false,
-
-    connectionGeneration: 0
-
+    manualPublicClose: false,
+    manualAuthClose: false
   };
 
 
-  /* ==========================================================
-     CONSTANTS
-     ========================================================== */
+  // ============================================================
+  // EVENTS
+  // ============================================================
 
-  const DIGIT_CONTRACTS = [
+  const listeners = {};
 
-    "DIGITMATCH",
-    "DIGITDIFF",
-    "DIGITEVEN",
-    "DIGITODD",
-    "DIGITOVER",
-    "DIGITUNDER"
+  function on(event, callback) {
+    if (!listeners[event]) {
+      listeners[event] = [];
+    }
 
-  ];
+    listeners[event].push(callback);
+
+    return () => {
+      listeners[event] =
+        (listeners[event] || [])
+          .filter(fn => fn !== callback);
+    };
+  }
+
+  function emit(event, data) {
+    (listeners[event] || []).forEach(callback => {
+      try {
+        callback(data);
+      } catch (error) {
+        console.error(
+          `PELI_DERIV event error: ${event}`,
+          error
+        );
+      }
+    });
+  }
 
 
-  const PREDICTION_CONTRACTS = [
-
-    "DIGITMATCH",
-    "DIGITDIFF",
-    "DIGITOVER",
-    "DIGITUNDER"
-
-  ];
-
-
-  /* ==========================================================
-     REQUEST IDS
-     ========================================================== */
+  // ============================================================
+  // REQUEST ID
+  // ============================================================
 
   function nextReqId() {
-
     state.reqId += 1;
-
     return state.reqId;
-
   }
 
 
-  /* ==========================================================
-     SAFE JSON
-     ========================================================== */
+  // ============================================================
+  // DIGIT
+  // ============================================================
 
-  function parseMessage(raw) {
+  function getDigit(quote) {
+    const number = Number(quote);
 
-    try {
-
-      return JSON.parse(raw);
-
-    } catch (error) {
-
-      console.error(
-        "Invalid Deriv WebSocket message:",
-        raw
-      );
-
+    if (!Number.isFinite(number)) {
       return null;
-
     }
 
-  }
-
-
-  /* ==========================================================
-     GENERIC SEND
-     ========================================================== */
-
-  function send(ws, payload) {
-
-    if (
-      !ws ||
-      ws.readyState !== WebSocket.OPEN
-    ) {
-
-      throw new Error(
-        "Deriv WebSocket is not connected."
-      );
-
-    }
-
-
-    const req_id =
-      payload.req_id ||
-      nextReqId();
-
-
-    const message = {
-
-      ...payload,
-
-      req_id
-
-    };
-
-
-    ws.send(
-      JSON.stringify(message)
-    );
-
-
-    return req_id;
-
-  }
-
-
-  function publicSend(payload) {
-
-    return send(
-      state.publicWs,
-      payload
-    );
-
-  }
-
-
-  function authSend(payload) {
-
-    return send(
-      state.authWs,
-      payload
-    );
-
-  }
-
-
-  /* ==========================================================
-     DIGIT CALCULATION
-     ========================================================== */
-
-  function digitFromQuote(quote) {
-
-    const number =
-      Number(quote);
-
-
-    if (
-      !Number.isFinite(number)
-    ) {
-
-      return null;
-
-    }
-
-
-    const pip =
-      Number(state.pipSize);
-
+    const pip = Number(state.pipSize);
 
     if (
       Number.isFinite(pip) &&
       pip > 0 &&
       pip < 1
     ) {
-
-      const decimalPlaces =
-        Math.max(
-          0,
-          Math.round(
-            -Math.log10(pip)
-          )
-        );
-
+      const decimals = Math.max(
+        0,
+        Math.round(-Math.log10(pip))
+      );
 
       const multiplier =
-        Math.pow(
-          10,
-          decimalPlaces
-        );
-
-
-      const scaled =
-        Math.round(
-          Math.abs(number) *
-          multiplier
-        );
-
+        Math.pow(10, decimals);
 
       return (
-        scaled % 10
+        Math.round(
+          Math.abs(number) * multiplier
+        ) % 10
       );
-
     }
-
-
-    const text =
-      String(quote);
-
 
     const match =
-      text.match(
-        /(\d)\s*$/
-      );
+      String(quote).match(/(\d)\s*$/);
 
-
-    if (!match) {
-
-      return null;
-
-    }
-
-
-    return Number(
-      match[1]
-    );
-
+    return match
+      ? Number(match[1])
+      : null;
   }
 
 
-  /* ==========================================================
-     RESET DIGIT DATA
-     ========================================================== */
+  // ============================================================
+  // RESET
+  // ============================================================
 
   function resetStats() {
-
-    state.digits =
-      Array(10).fill(0);
-
+    state.digits = Array(10).fill(0);
     state.recentDigits = [];
-
     state.recentTicks = [];
 
+    state.lastQuote = null;
     state.lastDigit = null;
-
+    state.previousQuote = null;
+    state.previousDigit = null;
+    state.lastEpoch = null;
   }
 
 
-  /* ==========================================================
-     PROCESS TICK
-     ========================================================== */
+  // ============================================================
+  // TICK
+  // ============================================================
 
-  function handleTick(tick) {
-
+  function processTick(tick) {
     if (
       !tick ||
       tick.quote === undefined
     ) {
-
       return;
-
     }
 
+    const quote = Number(tick.quote);
 
-    const quote =
-      Number(tick.quote);
-
-
-    if (
-      !Number.isFinite(quote)
-    ) {
-
+    if (!Number.isFinite(quote)) {
       return;
-
     }
 
-
-    const digit =
-      digitFromQuote(
-        quote
-      );
-
+    const digit = getDigit(quote);
 
     state.previousQuote =
       state.lastQuote;
 
-
     state.previousDigit =
       state.lastDigit;
 
-
-    state.lastQuote =
-      quote;
-
-
-    state.lastDigit =
-      digit;
-
+    state.lastQuote = quote;
+    state.lastDigit = digit;
 
     state.lastEpoch =
-      tick.epoch ||
-      null;
+      tick.epoch || null;
 
-
-    if (
-      digit !== null
-    ) {
-
-      state.digits[digit] += 1;
-
-      state.recentDigits.push(
-        digit
-      );
-
+    if (digit !== null) {
+      state.digits[digit]++;
+      state.recentDigits.push(digit);
     }
 
-
     state.recentTicks.push({
+      quote,
+      digit,
+      epoch: tick.epoch || null
+    });
+
+    if (state.recentDigits.length > 500) {
+      state.recentDigits =
+        state.recentDigits.slice(-500);
+    }
+
+    if (state.recentTicks.length > 500) {
+      state.recentTicks =
+        state.recentTicks.slice(-500);
+    }
+
+    emit("tick", {
+      ...tick,
 
       quote,
 
-      digit,
+      lastDigit: digit,
 
-      epoch:
-        tick.epoch ||
-        null
+      previousQuote:
+        state.previousQuote,
 
+      previousDigit:
+        state.previousDigit,
+
+      counts:
+        [...state.digits],
+
+      sampleSize:
+        state.recentDigits.length,
+
+      pipSize:
+        state.pipSize
     });
-
-
-    if (
-      state.recentDigits.length >
-      500
-    ) {
-
-      state.recentDigits =
-        state.recentDigits.slice(-500);
-
-    }
-
-
-    if (
-      state.recentTicks.length >
-      500
-    ) {
-
-      state.recentTicks =
-        state.recentTicks.slice(-500);
-
-    }
-
-
-    emit(
-      "tick",
-      {
-
-        ...tick,
-
-        quote,
-
-        lastDigit:
-          digit,
-
-        previousQuote:
-          state.previousQuote,
-
-        previousDigit:
-          state.previousDigit,
-
-        counts:
-          [...state.digits],
-
-        sampleSize:
-          state.recentDigits.length,
-
-        pipSize:
-          state.pipSize
-
-      }
-    );
-
   }
 
 
-  /* ==========================================================
-     PUBLIC MESSAGE HANDLER
-     ========================================================== */
+  // ============================================================
+  // PUBLIC SOCKET
+  // ============================================================
+
+  function connect(symbol = state.symbol) {
+
+    state.symbol = symbol;
+    state.manualPublicClose = false;
+
+    if (state.publicWs) {
+      try {
+        state.publicWs.close();
+      } catch {}
+    }
+
+    resetStats();
+
+    emit("status", {
+      publicConnecting: true,
+      publicConnected: false,
+      authenticated:
+        state.authenticated,
+      symbol: state.symbol
+    });
+
+    const ws = new WebSocket(PUBLIC_WS);
+
+    state.publicWs = ws;
+
+    ws.onopen = () => {
+
+      state.publicReconnectAttempts = 0;
+
+      emit("status", {
+        publicConnecting: false,
+        publicConnected: true,
+        authenticated:
+          state.authenticated,
+        symbol: state.symbol
+      });
+
+      try {
+
+        sendPublic({
+          active_symbols: "brief"
+        });
+
+        sendPublic({
+          ticks_history:
+            state.symbol,
+
+          end: "latest",
+
+          style: "ticks",
+
+          count: 200,
+
+          adjust_start_time: 1
+        });
+
+        sendPublic({
+          ticks:
+            state.symbol,
+
+          subscribe: 1
+        });
+
+      } catch (error) {
+
+        emit("error", {
+          message: error.message
+        });
+      }
+    };
+
+    ws.onmessage = event => {
+
+      let message;
+
+      try {
+        message =
+          JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
+      handlePublicMessage(message);
+    };
+
+    ws.onerror = () => {
+
+      emit("error", {
+        message:
+          "Live Deriv market connection error."
+      });
+    };
+
+    ws.onclose = () => {
+
+      emit("status", {
+        publicConnecting: false,
+        publicConnected: false,
+        authenticated:
+          state.authenticated
+      });
+
+      if (!state.manualPublicClose) {
+        reconnectPublic();
+      }
+    };
+
+    return ws;
+  }
+
+
+  function sendPublic(payload) {
+
+    if (
+      !state.publicWs ||
+      state.publicWs.readyState !==
+        WebSocket.OPEN
+    ) {
+      throw new Error(
+        "Deriv market is not connected."
+      );
+    }
+
+    const message = {
+      ...payload,
+      req_id: nextReqId()
+    };
+
+    state.publicWs.send(
+      JSON.stringify(message)
+    );
+
+    return message.req_id;
+  }
+
 
   function handlePublicMessage(message) {
 
@@ -529,18 +373,10 @@
       return;
     }
 
-
     if (message.error) {
-
-      emit(
-        "error",
-        message.error
-      );
-
+      emit("error", message.error);
       return;
-
     }
-
 
     if (
       message.msg_type ===
@@ -554,38 +390,24 @@
           ? message.active_symbols
           : [];
 
-
       const selected =
-        symbols.find(
-          item =>
-            (
-              item.underlying_symbol ||
-              item.symbol
-            ) ===
-            state.symbol
+        symbols.find(item =>
+          (
+            item.underlying_symbol ||
+            item.symbol
+          ) === state.symbol
         );
-
 
       if (
         selected &&
         Number(selected.pip_size) > 0
       ) {
-
         state.pipSize =
-          Number(
-            selected.pip_size
-          );
-
+          Number(selected.pip_size);
       }
 
-
-      emit(
-        "symbols",
-        symbols
-      );
-
+      emit("symbols", symbols);
     }
-
 
     if (
       message.msg_type ===
@@ -599,310 +421,47 @@
           ? message.history.prices
           : [];
 
-
       resetStats();
 
+      prices.forEach(price => {
 
-      prices.forEach(
-        priceValue => {
+        const digit =
+          getDigit(price);
 
-          const digit =
-            digitFromQuote(
-              priceValue
-            );
-
-
-          if (
-            digit !== null
-          ) {
-
-            state.digits[digit] += 1;
-
-            state.recentDigits.push(
-              digit
-            );
-
-          }
-
+        if (digit !== null) {
+          state.digits[digit]++;
+          state.recentDigits.push(digit);
         }
-      );
+      });
 
-
-      if (
-        state.recentDigits.length >
-        500
-      ) {
-
+      if (state.recentDigits.length > 500) {
         state.recentDigits =
           state.recentDigits.slice(-500);
-
       }
 
-
-      emit(
-        "history",
-        {
-
-          prices,
-
-          counts:
-            [...state.digits],
-
-          sampleSize:
-            state.recentDigits.length
-
-        }
-      );
-
+      emit("history", {
+        prices,
+        counts:
+          [...state.digits],
+        sampleSize:
+          state.recentDigits.length
+      });
     }
-
 
     if (
       message.msg_type ===
       "tick"
     ) {
-
-      handleTick(
-        message.tick
-      );
-
+      processTick(message.tick);
     }
-
   }
 
 
-  /* ==========================================================
-     PUBLIC CONNECTION
-     ========================================================== */
-
-  function connectPublic(
-    symbol = state.symbol
-  ) {
-
-    state.symbol =
-      symbol;
-
-
-    state.manuallyClosedPublic =
-      false;
-
-
-    state.connectionGeneration += 1;
-
-
-    if (
-      state.publicWs
-    ) {
-
-      try {
-
-        state.publicWs.close();
-
-      } catch (_) {}
-
-    }
-
-
-    resetStats();
-
-
-    emit(
-      "status",
-      {
-
-        publicConnecting:
-          true,
-
-        publicConnected:
-          false,
-
-        authenticated:
-          state.authenticated,
-
-        symbol:
-          state.symbol
-
-      }
-    );
-
-
-    const ws =
-      new WebSocket(
-        PUBLIC_WS
-      );
-
-
-    state.publicWs =
-      ws;
-
-
-    ws.onopen = () => {
-
-      state.publicReconnectAttempts =
-        0;
-
-
-      emit(
-        "status",
-        {
-
-          publicConnecting:
-            false,
-
-          publicConnected:
-            true,
-
-          authenticated:
-            state.authenticated,
-
-          symbol:
-            state.symbol
-
-        }
-      );
-
-
-      try {
-
-        publicSend({
-
-          active_symbols:
-            "brief"
-
-        });
-
-
-        publicSend({
-
-          ticks_history:
-            state.symbol,
-
-          end:
-            "latest",
-
-          style:
-            "ticks",
-
-          count:
-            200,
-
-          adjust_start_time:
-            1,
-
-          subscribe:
-            0
-
-        });
-
-
-        publicSend({
-
-          ticks:
-            state.symbol,
-
-          subscribe:
-            1
-
-        });
-
-      } catch (error) {
-
-        emit(
-          "error",
-          {
-
-            message:
-              error.message
-
-          }
-        );
-
-      }
-
-    };
-
-
-    ws.onmessage =
-      event => {
-
-        const message =
-          parseMessage(
-            event.data
-          );
-
-
-        handlePublicMessage(
-          message
-        );
-
-      };
-
-
-    ws.onerror =
-      () => {
-
-        emit(
-          "error",
-          {
-
-            message:
-              "Live Deriv market connection error."
-
-          }
-        );
-
-      };
-
-
-    ws.onclose =
-      () => {
-
-        emit(
-          "status",
-          {
-
-            publicConnecting:
-              false,
-
-            publicConnected:
-              false,
-
-            authenticated:
-              state.authenticated
-
-          }
-        );
-
-
-        if (
-          state.manuallyClosedPublic
-        ) {
-
-          return;
-
-        }
-
-
-        schedulePublicReconnect();
-
-      };
-
-
-    return ws;
-
-  }
-
-
-  /* ==========================================================
-     PUBLIC RECONNECT
-     ========================================================== */
-
-  function schedulePublicReconnect() {
+  function reconnectPublic() {
 
     clearTimeout(
       state.publicReconnectTimer
     );
-
 
     const attempt =
       Math.min(
@@ -910,74 +469,43 @@
         6
       );
 
-
     const delay =
       Math.min(
         10000,
         1000 *
-        Math.pow(
-          2,
-          attempt
-        )
+        Math.pow(2, attempt)
       );
 
-
-    state.publicReconnectAttempts +=
-      1;
-
+    state.publicReconnectAttempts++;
 
     state.publicReconnectTimer =
-      setTimeout(
-        () => {
-
-          connectPublic(
-            state.symbol
-          );
-
-        },
-        delay
-      );
-
+      setTimeout(() => {
+        connect(state.symbol);
+      }, delay);
   }
 
 
-  /* ==========================================================
-     CLOSE PUBLIC
-     ========================================================== */
+  function disconnect() {
 
-  function disconnectPublic() {
-
-    state.manuallyClosedPublic =
-      true;
-
+    state.manualPublicClose = true;
 
     clearTimeout(
       state.publicReconnectTimer
     );
 
-
-    if (
-      state.publicWs
-    ) {
-
+    if (state.publicWs) {
       try {
-
         state.publicWs.close();
-
-      } catch (_) {}
-
+      } catch {}
     }
 
-
-    state.publicWs =
-      null;
-
+    state.publicWs = null;
   }
 
 
-  /* ==========================================================
-     GET AUTH SESSION
-     ========================================================== */
+  // ============================================================
+  // REAL ACCOUNT SESSION
+  // ============================================================
 
   async function getSession() {
 
@@ -985,95 +513,66 @@
       await fetch(
         SESSION_URL,
         {
-
-          method:
-            "GET",
-
-          credentials:
-            "same-origin",
-
-          cache:
-            "no-store",
-
-          headers:
-            {
-
-              Accept:
-                "application/json"
-
-            }
-
+          method: "GET",
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: {
+            Accept:
+              "application/json"
+          }
         }
       );
 
-
-    let session;
-
+    let data;
 
     try {
-
-      session =
+      data =
         await response.json();
-
-    } catch (_) {
-
+    } catch {
       throw new Error(
-        "The Deriv session endpoint returned invalid JSON."
+        "Invalid response from Deriv session."
       );
-
     }
 
-
-    if (
-      !response.ok
-    ) {
-
+    if (!response.ok) {
       throw new Error(
-        session?.error ||
-        `Deriv session request failed (${response.status}).`
+        data?.error ||
+        "Unable to connect to Deriv."
       );
-
     }
 
-
     if (
-      !session ||
-      !session.ws_url
-    ) {
-
-      throw new Error(
-        session?.error ||
-        "No authenticated Deriv WebSocket URL was returned."
-      );
-
-    }
-
-
-    /*
-      Critical REAL-account protection.
-
-      Your backend must identify the account as real.
-    */
-    if (
-      session.account?.account_type !==
+      data.account?.account_type !==
       "real"
     ) {
-
       throw new Error(
-        "A REAL Deriv account session is required. The received account is not marked as real."
+        "REAL Deriv account required."
       );
-
     }
 
+    if (!data.ws_url) {
+      throw new Error(
+        "Deriv did not return a trading WebSocket."
+      );
+    }
 
-    return session;
+    if (
+      !String(data.ws_url).includes(
+        "/trading/v1/options/ws/real"
+      )
+    ) {
+      throw new Error(
+        "Security check failed: non-real Deriv WebSocket."
+      );
+    }
 
+    return data;
   }
 
 
-  /* ==========================================================
-     AUTHENTICATED CONNECTION
-     ========================================================== */
+  // ============================================================
+  // CONNECT REAL ACCOUNT
+  // ============================================================
 
   async function connectAuthenticated() {
 
@@ -1081,350 +580,198 @@
       state.authenticated &&
       state.authWs &&
       state.authWs.readyState ===
-      WebSocket.OPEN
+        WebSocket.OPEN
     ) {
-
       return state.account;
-
     }
 
+    state.connecting = true;
 
-    emit(
-      "status",
-      {
-
-        connecting:
-          true,
-
-        authenticated:
-          false
-
-      }
-    );
-
+    emit("status", {
+      connecting: true,
+      authenticated: false
+    });
 
     const session =
       await getSession();
 
-
     state.account =
-      session.account ||
-      null;
+      session.account;
 
+    state.manualAuthClose = false;
 
-    state.manuallyClosedAuth =
-      false;
-
-
-    if (
-      state.authWs
-    ) {
-
+    if (state.authWs) {
       try {
-
         state.authWs.close();
-
-      } catch (_) {}
-
+      } catch {}
     }
-
 
     const ws =
       new WebSocket(
         session.ws_url
       );
 
-
-    state.authWs =
-      ws;
-
+    state.authWs = ws;
 
     await new Promise(
-      (
-        resolve,
-        reject
-      ) => {
+      (resolve, reject) => {
 
-        let settled =
-          false;
+        let finished = false;
 
+        const timer =
+          setTimeout(() => {
 
-        const timeout =
-          setTimeout(
-            () => {
-
-              if (
-                settled
-              ) {
-                return;
-              }
-
-              settled =
-                true;
-
-              try {
-
-                ws.close();
-
-              } catch (_) {}
-
-              reject(
-                new Error(
-                  "Timed out connecting to the real Deriv account."
-                )
-              );
-
-            },
-            15000
-          );
-
-
-        ws.onopen =
-          () => {
-
-            if (
-              settled
-            ) {
+            if (finished) {
               return;
             }
 
+            finished = true;
 
-            settled =
-              true;
-
-
-            clearTimeout(
-              timeout
-            );
-
-
-            state.authenticated =
-              true;
-
-
-            state.authReconnectAttempts =
-              0;
-
-
-            emit(
-              "authenticated",
-              state.account
-            );
-
-
-            emit(
-              "status",
-              {
-
-                connecting:
-                  false,
-
-                connected:
-                  true,
-
-                authenticated:
-                  true,
-
-                account:
-                  state.account
-
-              }
-            );
-
-
-            /*
-              Real account balance.
-            */
             try {
-
-              authSend({
-
-                balance:
-                  1,
-
-                subscribe:
-                  1
-
-              });
-
-            } catch (_) {}
-
-
-            /*
-              Open positions.
-            */
-            try {
-
-              authSend({
-
-                portfolio:
-                  1
-
-              });
-
-            } catch (_) {}
-
-
-            resolve();
-
-          };
-
-
-        ws.onerror =
-          () => {
-
-            if (
-              settled
-            ) {
-              return;
-            }
-
-
-            settled =
-              true;
-
-
-            clearTimeout(
-              timeout
-            );
-
+              ws.close();
+            } catch {}
 
             reject(
               new Error(
-                "Could not open the authenticated Deriv WebSocket."
+                "Timed out connecting to REAL Deriv."
               )
             );
 
-          };
+          }, 15000);
 
+        ws.onopen = () => {
+
+          if (finished) {
+            return;
+          }
+
+          finished = true;
+
+          clearTimeout(timer);
+
+          state.authenticated = true;
+          state.connecting = false;
+
+          emit(
+            "authenticated",
+            state.account
+          );
+
+          emit("status", {
+            connecting: false,
+            connected: true,
+            authenticated: true,
+            account: state.account
+          });
+
+          /*
+           * REAL BALANCE
+           */
+          authSend({
+            balance: 1,
+            subscribe: 1
+          });
+
+          /*
+           * REAL OPEN POSITIONS
+           */
+          authSend({
+            portfolio: 1
+          });
+
+          resolve();
+        };
+
+        ws.onerror = () => {
+
+          if (finished) {
+            return;
+          }
+
+          finished = true;
+
+          clearTimeout(timer);
+
+          reject(
+            new Error(
+              "Could not connect to REAL Deriv."
+            )
+          );
+        };
       }
     );
 
+    ws.onmessage = event => {
 
-    ws.onmessage =
-      event => {
+      let message;
 
-        const message =
-          parseMessage(
-            event.data
-          );
+      try {
+        message =
+          JSON.parse(event.data);
+      } catch {
+        return;
+      }
 
+      handleAuthMessage(message);
+    };
 
-        handleAuthMessage(
-          message
-        );
+    ws.onerror = () => {
 
-      };
+      emit("error", {
+        message:
+          "REAL Deriv connection error."
+      });
+    };
 
+    ws.onclose = () => {
 
-    ws.onerror =
-      () => {
+      state.authenticated = false;
+      state.authWs = null;
 
+      emit("status", {
+        connected: false,
+        authenticated: false
+      });
+
+      if (!state.manualAuthClose) {
         emit(
-          "error",
-          {
-
-            message:
-              "Authenticated Deriv connection error."
-
-          }
+          "authDisconnected",
+          true
         );
-
-      };
-
-
-    ws.onclose =
-      () => {
-
-        state.authenticated =
-          false;
-
-
-        state.authWs =
-          null;
-
-
-        emit(
-          "status",
-          {
-
-            connected:
-              false,
-
-            authenticated:
-              false
-
-          }
-        );
-
-
-        if (
-          !state.manuallyClosedAuth
-        ) {
-
-          emit(
-            "authDisconnected",
-            true
-          );
-
-        }
-
-      };
-
+      }
+    };
 
     return state.account;
-
   }
 
 
-  /* ==========================================================
-     AUTH MESSAGE HANDLER
-     ========================================================== */
+  // ============================================================
+  // AUTH MESSAGE
+  // ============================================================
 
-  function handleAuthMessage(
-    message
-  ) {
+  function handleAuthMessage(message) {
 
     if (!message) {
       return;
     }
 
+    emit("message", message);
 
-    /*
-      Always expose raw messages.
-    */
-    emit(
-      "message",
-      message
-    );
-
-
-    /*
-      Errors.
-    */
-    if (
-      message.error
-    ) {
+    if (message.error) {
 
       emit(
         "error",
         message.error
       );
 
-
-      if (
-        message.req_id
-      ) {
+      if (message.req_id) {
 
         const pending =
           state.pending.get(
             message.req_id
           );
 
-
-        if (
-          pending
-        ) {
+        if (pending) {
 
           pending.reject(
             message.error
@@ -1433,20 +780,14 @@
           state.pending.delete(
             message.req_id
           );
-
         }
-
       }
 
-
       return;
-
     }
 
 
-    /*
-      Balance.
-    */
+    // BALANCE
     if (
       message.msg_type ===
       "balance"
@@ -1456,13 +797,10 @@
         "balance",
         message.balance
       );
-
     }
 
 
-    /*
-      Proposal.
-    */
+    // PROPOSAL
     if (
       message.msg_type ===
       "proposal"
@@ -1472,23 +810,14 @@
         message.proposal ||
         null;
 
-
-      state.activeProposalId =
-        message.proposal?.id ||
-        null;
-
-
       emit(
         "proposal",
         state.proposal
       );
-
     }
 
 
-    /*
-      Buy.
-    */
+    // BUY
     if (
       message.msg_type ===
       "buy"
@@ -1498,36 +827,22 @@
         message.buy ||
         null;
 
-
-      if (
-        buy?.contract_id
-      ) {
+      if (buy?.contract_id) {
 
         state.currentContract =
           buy;
 
-
         state.openContracts.set(
-          String(
-            buy.contract_id
-          ),
+          String(buy.contract_id),
           buy
         );
-
       }
 
-
-      emit(
-        "buy",
-        buy
-      );
-
+      emit("buy", buy);
     }
 
 
-    /*
-      Open contract updates.
-    */
+    // CONTRACT
     if (
       message.msg_type ===
       "proposal_open_contract"
@@ -1537,51 +852,37 @@
         message.proposal_open_contract ||
         null;
 
-
-      if (
-        contract?.contract_id
-      ) {
+      if (contract?.contract_id) {
 
         const id =
           String(
             contract.contract_id
           );
 
-
-        state.openContracts.set(
-          id,
-          contract
-        );
-
-
         state.currentContract =
           contract;
 
+        if (contract.is_sold) {
 
-        if (
-          contract.is_sold
-        ) {
+          state.openContracts.delete(id);
 
-          state.openContracts.delete(
-            id
+        } else {
+
+          state.openContracts.set(
+            id,
+            contract
           );
-
         }
-
       }
-
 
       emit(
         "contract",
         contract
       );
-
     }
 
 
-    /*
-      Portfolio.
-    */
+    // PORTFOLIO
     if (
       message.msg_type ===
       "portfolio"
@@ -1594,44 +895,27 @@
           ? message.portfolio.contracts
           : [];
 
+      contracts.forEach(contract => {
 
-      contracts.forEach(
-        contract => {
+        if (contract?.contract_id) {
 
-          if (
-            contract?.contract_id
-          ) {
-
-            state.openContracts.set(
-              String(
-                contract.contract_id
-              ),
-              contract
-            );
-
-          }
-
+          state.openContracts.set(
+            String(
+              contract.contract_id
+            ),
+            contract
+          );
         }
-      );
+      });
 
-
-      emit(
-        "portfolio",
-        {
-
-          ...message.portfolio,
-
-          contracts
-
-        }
-      );
-
+      emit("portfolio", {
+        ...message.portfolio,
+        contracts
+      });
     }
 
 
-    /*
-      Statement.
-    */
+    // STATEMENT
     if (
       message.msg_type ===
       "statement"
@@ -1641,13 +925,10 @@
         "statement",
         message.statement
       );
-
     }
 
 
-    /*
-      Profit table.
-    */
+    // PROFIT TABLE
     if (
       message.msg_type ===
       "profit_table"
@@ -1657,13 +938,10 @@
         "profitTable",
         message.profit_table
       );
-
     }
 
 
-    /*
-      Sell response.
-    */
+    // SELL
     if (
       message.msg_type ===
       "sell"
@@ -1673,13 +951,10 @@
         "sell",
         message.sell
       );
-
     }
 
 
-    /*
-      Contract update.
-    */
+    // CONTRACT UPDATE
     if (
       message.msg_type ===
       "contract_update"
@@ -1689,351 +964,235 @@
         "contractUpdate",
         message.contract_update
       );
-
     }
 
 
-    /*
-      Generic request resolution.
-    */
-    if (
-      message.req_id
-    ) {
+    // REQUEST RESOLUTION
+    if (message.req_id) {
 
       const pending =
         state.pending.get(
           message.req_id
         );
 
+      if (pending) {
 
-      if (
-        pending
-      ) {
-
-        pending.resolve(
-          message
-        );
+        pending.resolve(message);
 
         state.pending.delete(
           message.req_id
         );
-
       }
-
     }
-
   }
 
 
-  /* ==========================================================
-     AUTH SEND WITH REQUEST TRACKING
-     ========================================================== */
+  // ============================================================
+  // AUTH SEND
+  // ============================================================
+
+  function authSend(payload) {
+
+    if (
+      !state.authWs ||
+      state.authWs.readyState !==
+        WebSocket.OPEN
+    ) {
+      throw new Error(
+        "REAL Deriv account is not connected."
+      );
+    }
+
+    const message = {
+      ...payload,
+      req_id: nextReqId()
+    };
+
+    state.authWs.send(
+      JSON.stringify(message)
+    );
+
+    return message.req_id;
+  }
+
 
   function authRequest(
     payload,
-    timeoutMs = 15000
+    timeout = 15000
   ) {
 
     return new Promise(
-      (
-        resolve,
-        reject
-      ) => {
+      (resolve, reject) => {
 
         if (
           !state.authWs ||
           state.authWs.readyState !==
-          WebSocket.OPEN
+            WebSocket.OPEN
         ) {
-
           reject(
             new Error(
-              "Real Deriv account is not connected."
+              "REAL Deriv account is not connected."
             )
           );
 
           return;
-
         }
-
 
         const req_id =
           nextReqId();
 
-
         const timer =
-          setTimeout(
-            () => {
+          setTimeout(() => {
 
-              state.pending.delete(
-                req_id
-              );
+            state.pending.delete(
+              req_id
+            );
 
+            reject(
+              new Error(
+                "Deriv request timed out."
+              )
+            );
 
-              reject(
-                new Error(
-                  "Deriv request timed out."
-                )
-              );
-
-            },
-            timeoutMs
-          );
-
+          }, timeout);
 
         state.pending.set(
           req_id,
           {
+            resolve: value => {
 
-            resolve:
-              value => {
+              clearTimeout(timer);
+              resolve(value);
+            },
 
-                clearTimeout(
-                  timer
-                );
+            reject: error => {
 
-                resolve(
-                  value
-                );
-
-              },
-
-            reject:
-              error => {
-
-                clearTimeout(
-                  timer
-                );
-
-                reject(
-                  error
-                );
-
-              }
-
+              clearTimeout(timer);
+              reject(error);
+            }
           }
         );
-
 
         try {
 
           state.authWs.send(
-            JSON.stringify(
-              {
-
-                ...payload,
-
-                req_id
-
-              }
-            )
+            JSON.stringify({
+              ...payload,
+              req_id
+            })
           );
 
         } catch (error) {
 
-          clearTimeout(
-            timer
-          );
+          clearTimeout(timer);
 
           state.pending.delete(
             req_id
           );
 
-          reject(
-            error
-          );
-
+          reject(error);
         }
-
       }
     );
-
   }
 
 
-  /* ==========================================================
-     DISCONNECT AUTH
-     ========================================================== */
+  // ============================================================
+  // DISCONNECT REAL ACCOUNT
+  // ============================================================
 
   function disconnectAuthenticated() {
 
-    state.manuallyClosedAuth =
-      true;
-
-
-    state.authenticated =
-      false;
-
-
-    state.account =
-      null;
-
+    state.manualAuthClose = true;
+    state.authenticated = false;
+    state.account = null;
 
     state.openContracts.clear();
+    state.currentContract = null;
 
+    if (state.authWs) {
 
-    state.currentContract =
-      null;
+      try {
+        state.authWs.close();
+      } catch {}
+    }
 
+    state.authWs = null;
 
-    state.authWs &&
-      (() => {
-
-        try {
-
-          state.authWs.close();
-
-        } catch (_) {}
-
-      })();
-
-
-    state.authWs =
-      null;
-
-
-    emit(
-      "status",
-      {
-
-        connected:
-          false,
-
-        authenticated:
-          false
-
-      }
-    );
-
+    emit("status", {
+      connected: false,
+      authenticated: false
+    });
   }
 
 
-  /* ==========================================================
-     BALANCE
-     ========================================================== */
+  // ============================================================
+  // BALANCE
+  // ============================================================
 
   function subscribeBalance() {
 
     return authRequest({
-
-      balance:
-        1,
-
-      subscribe:
-        1
-
+      balance: 1,
+      subscribe: 1
     });
-
   }
 
 
-  /* ==========================================================
-     PROPOSAL
-     ========================================================== */
+  // ============================================================
+  // PROPOSAL
+  // ============================================================
 
-  function validateContractType(
-    contractType
-  ) {
+  async function getProposal(params = {}) {
 
-    if (
-      typeof contractType !==
-      "string" ||
-      !contractType.trim()
-    ) {
-
+    if (!state.authenticated) {
       throw new Error(
-        "A contract type is required."
+        "Connect your REAL Deriv account first."
       );
-
     }
-
-  }
-
-
-  function getProposal(
-    params = {}
-  ) {
-
-    if (
-      !state.authenticated
-    ) {
-
-      throw new Error(
-        "Connect a real Deriv account first."
-      );
-
-    }
-
-
-    validateContractType(
-      params.contractType
-    );
-
 
     const amount =
-      Number(
-        params.amount
+      Number(params.amount);
+
+    const duration =
+      Number(params.duration);
+
+    const contractType =
+      String(
+        params.contractType || ""
       );
 
+    const symbol =
+      params.symbol ||
+      state.symbol;
 
     if (
       !Number.isFinite(amount) ||
       amount <= 0
     ) {
-
       throw new Error(
-        "Stake must be greater than zero."
+        "Invalid stake."
       );
-
     }
-
-
-    const duration =
-      Number(
-        params.duration
-      );
-
 
     if (
       !Number.isFinite(duration) ||
       duration <= 0
     ) {
-
       throw new Error(
-        "Duration must be greater than zero."
+        "Invalid duration."
       );
-
     }
 
-
-    if (
-      !params.symbol
-    ) {
-
+    if (!contractType) {
       throw new Error(
-        "A Deriv market symbol is required."
+        "Contract type is required."
       );
-
     }
 
-
-    const contractType =
-      String(
-        params.contractType
-      );
-
-
-    /*
-      Current Deriv API uses:
-        underlying_symbol
-
-      not:
-        symbol
-    */
     const request = {
 
-      proposal:
-        1,
+      proposal: 1,
 
       amount,
 
@@ -2046,6 +1205,7 @@
 
       currency:
         params.currency ||
+        state.account?.currency ||
         "USD",
 
       duration,
@@ -2055,574 +1215,371 @@
         "t",
 
       underlying_symbol:
-        params.symbol,
-
-      subscribe:
-        1
-
+        symbol
     };
 
-
-    /*
-      Digit prediction contracts use barrier.
-    */
     if (
-      PREDICTION_CONTRACTS.includes(
-        contractType
-      ) &&
-      params.barrier !==
-        undefined &&
-      params.barrier !==
-        null &&
-      params.barrier !==
-        ""
+      params.barrier !== undefined &&
+      params.barrier !== null &&
+      params.barrier !== ""
     ) {
 
       request.barrier =
         String(
           params.barrier
         );
-
     }
 
+    const response =
+      await authRequest(
+        request
+      );
 
-    state.proposal =
-      null;
+    if (response.proposal) {
 
+      state.proposal =
+        response.proposal;
 
-    state.activeProposalId =
-      null;
+      emit(
+        "proposal",
+        state.proposal
+      );
+    }
 
-
-    return authRequest(
-      request
-    );
-
+    return response;
   }
 
 
-  /* ==========================================================
-     BUY CONTRACT
-     ========================================================== */
+  // ============================================================
+  // BUY — REAL MONEY
+  // ============================================================
 
   function buyContract(
     proposalId,
     price
   ) {
 
-    if (
-      !state.authenticated
-    ) {
-
+    if (!state.authenticated) {
       throw new Error(
-        "Real Deriv account is not connected."
+        "Connect your REAL Deriv account first."
       );
-
     }
 
-
-    if (
-      !proposalId
-    ) {
-
+    if (!proposalId) {
       throw new Error(
-        "Missing Deriv proposal ID."
+        "Missing proposal ID."
       );
-
     }
 
-
-    const buyPrice =
+    const amount =
       Number(price);
 
-
     if (
-      !Number.isFinite(buyPrice) ||
-      buyPrice <= 0
+      !Number.isFinite(amount) ||
+      amount <= 0
     ) {
-
       throw new Error(
         "Invalid contract price."
       );
-
     }
 
-
-    /*
-      This is the actual Deriv trading
-      operation.
-    */
     return authRequest({
-
       buy:
-        String(
-          proposalId
-        ),
+        String(proposalId),
 
       price:
-        buyPrice
-
+        amount
     });
-
   }
 
 
-  /* ==========================================================
-     MONITOR CONTRACT
-     ========================================================== */
+  // ============================================================
+  // MONITOR
+  // ============================================================
 
   function monitorContract(
     contractId
   ) {
 
-    if (
-      !state.authenticated
-    ) {
-
+    if (!state.authenticated) {
       throw new Error(
-        "Real Deriv account is not connected."
+        "REAL Deriv account is not connected."
       );
-
     }
 
-
     const id =
-      Number(
-        contractId
-      );
+      Number(contractId);
 
-
-    if (
-      !Number.isFinite(id)
-    ) {
-
+    if (!Number.isFinite(id)) {
       throw new Error(
         "Invalid contract ID."
       );
-
     }
 
-
     return authRequest({
+      proposal_open_contract: 1,
 
-      proposal_open_contract:
-        1,
+      contract_id: id,
 
-      contract_id:
-        id,
-
-      subscribe:
-        1
-
+      subscribe: 1
     });
-
   }
 
 
-  /* ==========================================================
-     SELL OPEN CONTRACT
-     ========================================================== */
+  // ============================================================
+  // SELL
+  // ============================================================
 
   function sellContract(
     contractId,
     price = 0
   ) {
 
-    if (
-      !state.authenticated
-    ) {
-
+    if (!state.authenticated) {
       throw new Error(
-        "Real Deriv account is not connected."
+        "REAL Deriv account is not connected."
       );
-
     }
 
-
     const id =
-      Number(
-        contractId
-      );
+      Number(contractId);
 
-
-    if (
-      !Number.isFinite(id)
-    ) {
-
+    if (!Number.isFinite(id)) {
       throw new Error(
         "Invalid contract ID."
       );
-
     }
-
 
     const sellPrice =
       Number(price);
 
-
     if (
-      !Number.isFinite(
-        sellPrice
-      ) ||
+      !Number.isFinite(sellPrice) ||
       sellPrice < 0
     ) {
-
       throw new Error(
         "Invalid sell price."
       );
-
     }
 
-
-    /*
-      price = 0 means sell at market.
-    */
     return authRequest({
-
-      sell:
-        id,
-
-      price:
-        sellPrice
-
+      sell: id,
+      price: sellPrice
     });
-
   }
 
 
-  /* ==========================================================
-     PORTFOLIO
-     ========================================================== */
+  // ============================================================
+  // PORTFOLIO
+  // ============================================================
 
   function getPortfolio() {
 
-    if (
-      !state.authenticated
-    ) {
-
+    if (!state.authenticated) {
       throw new Error(
-        "Real Deriv account is not connected."
+        "REAL Deriv account is not connected."
       );
-
     }
 
-
     return authRequest({
-
-      portfolio:
-        1
-
+      portfolio: 1
     });
-
   }
 
 
-  /* ==========================================================
-     STATEMENT
-     ========================================================== */
+  // ============================================================
+  // STATEMENT
+  // ============================================================
 
-  function getStatement(
-    options = {}
-  ) {
+  function getStatement(options = {}) {
 
-    if (
-      !state.authenticated
-    ) {
-
+    if (!state.authenticated) {
       throw new Error(
-        "Real Deriv account is not connected."
+        "REAL Deriv account is not connected."
       );
-
     }
-
 
     const request = {
 
-      statement:
-        1,
+      statement: 1,
 
       limit:
         Number(
-          options.limit ||
-          100
+          options.limit || 100
         ),
 
       description:
-        options.description ===
-        undefined
+        options.description === undefined
           ? 1
           : Number(
               options.description
             )
-
     };
 
-
     if (
-      options.actionType
+      options.dateFrom !== undefined
     ) {
-
-      request.action_type =
-        options.actionType;
-
-    }
-
-
-    if (
-      options.dateFrom !==
-      undefined
-    ) {
-
       request.date_from =
         Number(
           options.dateFrom
         );
-
     }
 
-
     if (
-      options.dateTo !==
-      undefined
+      options.dateTo !== undefined
     ) {
-
       request.date_to =
         Number(
           options.dateTo
         );
-
     }
 
+    if (options.actionType) {
+      request.action_type =
+        options.actionType;
+    }
 
-    return authRequest(
-      request
-    );
-
+    return authRequest(request);
   }
 
 
-  /* ==========================================================
-     PROFIT TABLE
-     ========================================================== */
+  // ============================================================
+  // PROFIT TABLE
+  // ============================================================
 
-  function getProfitTable(
-    options = {}
-  ) {
+  function getProfitTable(options = {}) {
 
-    if (
-      !state.authenticated
-    ) {
-
+    if (!state.authenticated) {
       throw new Error(
-        "Real Deriv account is not connected."
+        "REAL Deriv account is not connected."
       );
-
     }
-
 
     const request = {
 
-      profit_table:
-        1,
+      profit_table: 1,
 
       limit:
         Number(
-          options.limit ||
-          100
+          options.limit || 100
         )
-
     };
 
-
     if (
-      options.dateFrom !==
-      undefined
+      options.dateFrom !== undefined
     ) {
-
       request.date_from =
         Number(
           options.dateFrom
         );
-
     }
 
-
     if (
-      options.dateTo !==
-      undefined
+      options.dateTo !== undefined
     ) {
-
       request.date_to =
         Number(
           options.dateTo
         );
-
     }
 
-
-    if (
-      options.contractType
-    ) {
-
+    if (options.contractType) {
       request.contract_type =
         options.contractType;
-
     }
 
-
-    return authRequest(
-      request
-    );
-
+    return authRequest(request);
   }
 
 
-  /* ==========================================================
-     ACTIVE SYMBOLS
-     ========================================================== */
+  // ============================================================
+  // ACTIVE SYMBOLS
+  // ============================================================
 
   function getActiveSymbols() {
 
-    if (
-      state.authenticated
-    ) {
-
+    if (state.authenticated) {
       return authRequest({
-
-        active_symbols:
-          "brief"
-
+        active_symbols: "brief"
       });
-
     }
 
-
-    return publicSend({
-
-      active_symbols:
-        "brief"
-
+    return sendPublic({
+      active_symbols: "brief"
     });
-
   }
 
 
-  /* ==========================================================
-     CONTRACTS FOR
-     ========================================================== */
+  // ============================================================
+  // CONTRACTS FOR
+  // ============================================================
 
   function getContractsFor(
     symbol = state.symbol
   ) {
 
-    if (
-      !symbol
-    ) {
-
+    if (!symbol) {
       throw new Error(
-        "Market symbol is required."
+        "Market symbol required."
       );
-
     }
 
-
-    if (
-      state.authenticated
-    ) {
-
+    if (state.authenticated) {
       return authRequest({
-
-        contracts_for:
-          symbol
-
+        contracts_for: symbol
       });
-
     }
 
-
-    return publicSend({
-
-      contracts_for:
-        symbol
-
+    return sendPublic({
+      contracts_for: symbol
     });
-
   }
 
 
-  /* ==========================================================
-     CHANGE MARKET
-     ========================================================== */
+  // ============================================================
+  // CHANGE MARKET
+  // ============================================================
 
-  function changeSymbol(
-    symbol
-  ) {
+  function changeSymbol(symbol) {
 
-    if (
-      !symbol
-    ) {
-
+    if (!symbol) {
       throw new Error(
-        "Market symbol is required."
+        "Market symbol required."
       );
-
     }
 
+    state.symbol = symbol;
+    state.proposal = null;
 
-    state.symbol =
-      symbol;
-
-
-    state.proposal =
-      null;
-
-
-    state.activeProposalId =
-      null;
-
-
-    connectPublic(
-      symbol
-    );
-
+    connect(symbol);
 
     emit(
       "symbolChanged",
       symbol
     );
-
   }
 
 
-  /* ==========================================================
-     DIGIT STATISTICS
-     ========================================================== */
+  // ============================================================
+  // STATS
+  // ============================================================
 
   function getDigitStats() {
 
     const total =
       state.recentDigits.length;
 
-
-    const percentages =
-      state.digits.map(
-        count =>
-          total > 0
-            ? (
-                count /
-                total
-              ) *
-              100
-            : 0
-      );
-
-
     return {
 
       counts:
         [...state.digits],
 
-      percentages,
+      percentages:
+        state.digits.map(count =>
+          total
+            ? (count / total) * 100
+            : 0
+        ),
 
       total,
 
@@ -2631,52 +1588,32 @@
 
       previousDigit:
         state.previousDigit
-
     };
-
   }
 
 
-  /* ==========================================================
-     RECENT TICKS
-     ========================================================== */
-
   function getRecentTicks() {
-
     return [
       ...state.recentTicks
     ];
-
   }
 
 
-  /* ==========================================================
-     OPEN CONTRACTS
-     ========================================================== */
-
   function getOpenContracts() {
-
     return Array.from(
       state.openContracts.values()
     );
-
   }
 
-
-  /* ==========================================================
-     CURRENT CONTRACT
-     ========================================================== */
 
   function getCurrentContract() {
-
     return state.currentContract;
-
   }
 
 
-  /* ==========================================================
-     CONNECTION INFO
-     ========================================================== */
+  // ============================================================
+  // CONNECTION INFO
+  // ============================================================
 
   function getConnectionInfo() {
 
@@ -2685,219 +1622,148 @@
       authenticated:
         state.authenticated,
 
+      connecting:
+        state.connecting,
+
       publicConnected:
         Boolean(
           state.publicWs &&
           state.publicWs.readyState ===
-          WebSocket.OPEN
+            WebSocket.OPEN
         ),
 
       authConnected:
         Boolean(
           state.authWs &&
           state.authWs.readyState ===
-          WebSocket.OPEN
+            WebSocket.OPEN
         ),
 
-      symbol:
-        state.symbol,
-
       account:
-        state.account
+        state.account,
 
+      symbol:
+        state.symbol
     };
-
   }
 
 
-  /* ==========================================================
-     FORCE ACCOUNT RECONNECT
-     ========================================================== */
+  // ============================================================
+  // RECONNECT
+  // ============================================================
 
   async function reconnectAuthenticated() {
 
     disconnectAuthenticated();
 
     return connectAuthenticated();
-
   }
 
 
-  /* ==========================================================
-     CLEANUP
-     ========================================================== */
+  // ============================================================
+  // DESTROY
+  // ============================================================
 
   function destroy() {
 
-    disconnectPublic();
+    disconnect();
 
     disconnectAuthenticated();
-
 
     state.pending.forEach(
       pending => {
 
         try {
-
           pending.reject(
             new Error(
               "Deriv engine destroyed."
             )
           );
-
-        } catch (_) {}
-
+        } catch {}
       }
     );
 
-
     state.pending.clear();
-
   }
 
 
-  /* ==========================================================
-     PUBLIC API
-     ========================================================== */
+  // ============================================================
+  // GLOBAL API
+  // ============================================================
 
   window.PELI_DERIV = {
 
-    /* events */
-
     on,
 
-
-    /* market */
-
-    connect:
-      connectPublic,
-
-    disconnect:
-      disconnectPublic,
-
+    connect,
+    disconnect,
     changeSymbol,
 
     getActiveSymbols,
-
     getContractsFor,
 
-
-    /* account */
-
     connectAuthenticated,
-
     reconnectAuthenticated,
-
     disconnectAuthenticated,
 
     subscribeBalance,
 
-
-    /* trading */
-
     getProposal,
-
     buyContract,
-
     monitorContract,
-
     sellContract,
 
-
-    /* account data */
-
     getPortfolio,
-
     getStatement,
-
     getProfitTable,
 
-
-    /* statistics */
-
     getDigitStats,
-
     getRecentTicks,
-
     getOpenContracts,
-
     getCurrentContract,
 
     getConnectionInfo,
 
-
-    /* cleanup */
-
     destroy,
 
-
-    /* compatibility getters */
-
     get authenticated() {
-
       return state.authenticated;
-
     },
-
 
     get account() {
-
       return state.account;
-
     },
-
 
     get symbol() {
-
       return state.symbol;
-
     },
-
 
     get lastQuote() {
-
       return state.lastQuote;
-
     },
-
 
     get lastDigit() {
-
       return state.lastDigit;
-
     },
-
 
     get proposal() {
-
       return state.proposal;
-
     },
-
 
     get currentContract() {
-
       return state.currentContract;
-
     },
 
-
     get state() {
-
       return state;
-
     }
-
   };
 
 
-  /* ==========================================================
-     START PUBLIC MARKET
-     ========================================================== */
+  // ============================================================
+  // START LIVE MARKET
+  // ============================================================
 
-  connectPublic(
-    state.symbol
-  );
-
+  connect(state.symbol);
 
 })();
