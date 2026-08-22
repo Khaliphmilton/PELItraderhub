@@ -1,241 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Settings | PELItradershub</title>
 
-<meta name="description" content="Manage your PELItradershub account settings.">
+<meta
+  name="description"
+  content="Manage your PELItradershub account settings."
+>
 
 <link rel="stylesheet" href="styles.css">
 
 <style>
 
 .settings-page{
-max-width:1100px;
-margin:auto;
-padding:35px 5%;
+  max-width:1100px;
+  margin:auto;
+  padding:35px 5%;
 }
 
 .page-heading{
-margin-bottom:30px;
+  margin-bottom:30px;
 }
 
 .page-heading h1{
-font-size:42px;
-margin:8px 0;
+  font-size:42px;
+  margin:8px 0;
 }
 
 .page-heading p{
-color:#7d879b;
+  color:#7d879b;
+}
+
+.account-status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+  padding:7px 11px;
+  border-radius:999px;
+  background:#101a19;
+  border:1px solid #21463f;
+  color:#39d4b6;
+  font-size:12px;
+  font-weight:700;
+}
+
+.status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#39d4b6;
 }
 
 .settings-layout{
-display:grid;
-grid-template-columns:220px 1fr;
-gap:18px;
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:18px;
 }
 
 .settings-menu{
-background:#0d121c;
-border:1px solid #202838;
-border-radius:15px;
-padding:10px;
-height:max-content;
+  background:#0d121c;
+  border:1px solid #202838;
+  border-radius:15px;
+  padding:10px;
+  height:max-content;
 }
 
 .settings-menu button{
-width:100%;
-padding:12px;
-border:0;
-background:transparent;
-color:#7d879b;
-text-align:left;
-border-radius:8px;
-cursor:pointer;
-margin-bottom:4px;
+  width:100%;
+  padding:12px;
+  border:0;
+  background:transparent;
+  color:#7d879b;
+  text-align:left;
+  border-radius:8px;
+  cursor:pointer;
+  margin-bottom:4px;
 }
 
 .settings-menu button:hover,
 .settings-menu button.active{
-background:#171d2b;
-color:white;
+  background:#171d2b;
+  color:white;
 }
 
 .settings-panel{
-background:#0d121c;
-border:1px solid #202838;
-border-radius:15px;
-padding:25px;
+  background:#0d121c;
+  border:1px solid #202838;
+  border-radius:15px;
+  padding:25px;
 }
 
 .settings-section{
-display:none;
+  display:none;
 }
 
 .settings-section.active{
-display:block;
+  display:block;
 }
 
 .settings-section h2{
-margin-bottom:7px;
+  margin-bottom:7px;
 }
 
 .settings-description{
-color:#7d879b;
-font-size:13px;
-margin-bottom:25px;
+  color:#7d879b;
+  font-size:13px;
+  margin-bottom:25px;
 }
 
 .setting-row{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:20px;
-padding:18px 0;
-border-bottom:1px solid #202838;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:18px 0;
+  border-bottom:1px solid #202838;
 }
 
 .setting-row:last-child{
-border-bottom:0;
+  border-bottom:0;
 }
 
 .setting-info strong{
-display:block;
-margin-bottom:4px;
+  display:block;
+  margin-bottom:4px;
 }
 
 .setting-info span{
-font-size:12px;
-color:#68748a;
+  font-size:12px;
+  color:#68748a;
 }
 
 .setting-input{
-width:100%;
-padding:12px;
-background:#0a0e16;
-border:1px solid #293246;
-border-radius:9px;
-color:white;
-outline:none;
+  width:100%;
+  padding:12px;
+  background:#0a0e16;
+  border:1px solid #293246;
+  border-radius:9px;
+  color:white;
+  outline:none;
+  box-sizing:border-box;
 }
 
 .setting-input:focus{
-border-color:#786cff;
+  border-color:#786cff;
 }
 
 .setting-form{
-max-width:600px;
+  max-width:600px;
 }
 
 .form-group{
-margin-bottom:18px;
+  margin-bottom:18px;
 }
 
 .form-group label{
-display:block;
-font-size:12px;
-color:#8b95a8;
-margin-bottom:7px;
+  display:block;
+  font-size:12px;
+  color:#8b95a8;
+  margin-bottom:7px;
 }
 
 .toggle{
-width:45px;
-height:24px;
-border-radius:20px;
-background:#293246;
-border:0;
-position:relative;
-cursor:pointer;
-flex-shrink:0;
+  width:45px;
+  height:24px;
+  border-radius:20px;
+  background:#293246;
+  border:0;
+  position:relative;
+  cursor:pointer;
+  flex-shrink:0;
 }
 
 .toggle::after{
-content:"";
-position:absolute;
-width:18px;
-height:18px;
-background:#8a94a8;
-border-radius:50%;
-top:3px;
-left:3px;
-transition:.2s;
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:#8a94a8;
+  border-radius:50%;
+  top:3px;
+  left:3px;
+  transition:.2s;
 }
 
 .toggle.active{
-background:#786cff;
+  background:#786cff;
 }
 
 .toggle.active::after{
-left:24px;
-background:white;
-}
-
-.danger{
-margin-top:25px;
-padding:18px;
-border:1px solid #49252f;
-border-radius:12px;
-background:#1b1015;
-}
-
-.danger h3{
-color:#ff7186;
-margin-bottom:6px;
-}
-
-.danger p{
-font-size:12px;
-color:#8f7880;
-margin-bottom:15px;
-}
-
-.danger button{
-border:1px solid #703341;
-background:#2a141b;
-color:#ff7186;
-padding:10px 14px;
-border-radius:8px;
-cursor:pointer;
+  left:24px;
+  background:white;
 }
 
 .save-button{
-padding:12px 18px;
-border:0;
-border-radius:9px;
-background:linear-gradient(135deg,#786cff,#39d4b6);
-color:#061016;
-font-weight:900;
-cursor:pointer;
+  padding:12px 18px;
+  border:0;
+  border-radius:9px;
+  background:linear-gradient(135deg,#786cff,#39d4b6);
+  color:#061016;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.save-button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.danger{
+  margin-top:25px;
+  padding:18px;
+  border:1px solid #49252f;
+  border-radius:12px;
+  background:#1b1015;
+}
+
+.danger h3{
+  color:#ff7186;
+  margin-bottom:6px;
+}
+
+.danger p{
+  font-size:12px;
+  color:#8f7880;
+  margin-bottom:15px;
+}
+
+.danger button{
+  border:1px solid #703341;
+  background:#2a141b;
+  color:#ff7186;
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.info-box{
+  margin-top:20px;
+  padding:15px;
+  border-radius:12px;
+  background:#0f1722;
+  border:1px solid #202d40;
+  color:#8e9bb0;
+  font-size:12px;
+}
+
+.info-box strong{
+  color:white;
+}
+
+.message{
+  display:none;
+  margin-bottom:18px;
+  padding:12px 14px;
+  border-radius:9px;
+  font-size:13px;
+}
+
+.message.success{
+  display:block;
+  background:#0e211d;
+  border:1px solid #245347;
+  color:#39d4b6;
+}
+
+.message.error{
+  display:block;
+  background:#241217;
+  border:1px solid #5b2935;
+  color:#ff7186;
+}
+
+.account-email{
+  color:#39d4b6;
+  word-break:break-all;
 }
 
 @media(max-width:750px){
 
-.settings-layout{
-grid-template-columns:1fr;
-}
+  .settings-layout{
+    grid-template-columns:1fr;
+  }
 
-.settings-menu{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:5px;
-}
+  .settings-menu{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:5px;
+  }
 
-.settings-menu button{
-margin:0;
-}
+  .settings-menu button{
+    margin:0;
+  }
 
-.page-heading h1{
-font-size:32px;
-}
+  .page-heading h1{
+    font-size:32px;
+  }
+
+  .setting-row{
+    align-items:flex-start;
+  }
 
 }
 
 </style>
+
 </head>
 
 <body>
+
 
 <header class="navbar">
 
@@ -244,26 +322,48 @@ font-size:32px;
 <span>PELI<span>tradershub</span></span>
 </a>
 
+
 <nav>
-<a href="dashboard.html">Dashboard</a>
-<a href="markets.html">Markets</a>
-<a href="trade.html">Trade</a>
-<a href="strategies.html">Strategies</a>
+
+<a href="dashboard.html">
+Dashboard
+</a>
+
+<a href="markets.html">
+Markets
+</a>
+
+<a href="trade.html">
+Trade
+</a>
+
+<a href="strategies.html">
+Strategies
+</a>
+
 </nav>
+
 
 <div class="nav-actions">
 
-<a href="portfolio.html" class="login-link">
+<a
+  href="portfolio.html"
+  class="login-link"
+>
 Portfolio
 </a>
 
-<a href="dashboard.html" class="button primary">
+<a
+  href="dashboard.html"
+  class="button primary"
+>
 Dashboard
 </a>
 
 </div>
 
 </header>
+
 
 
 <main class="settings-page">
@@ -283,7 +383,26 @@ Settings
 Manage your profile, preferences and trading controls.
 </p>
 
+
+<div class="account-status">
+
+<span class="status-dot"></span>
+
+<span>
+Authenticated account
+</span>
+
 </div>
+
+</div>
+
+
+
+<div
+  id="message"
+  class="message"
+></div>
+
 
 
 <div class="settings-layout">
@@ -291,48 +410,56 @@ Manage your profile, preferences and trading controls.
 
 <aside class="settings-menu">
 
+
 <button
-class="active"
-onclick="showSection('profile',this)"
+  class="active"
+  onclick="showSection('profile',this)"
 >
 Profile
 </button>
 
+
 <button
-onclick="showSection('preferences',this)"
+  onclick="showSection('preferences',this)"
 >
 Preferences
 </button>
 
+
 <button
-onclick="showSection('security',this)"
+  onclick="showSection('security',this)"
 >
 Security
 </button>
 
+
 <button
-onclick="showSection('notifications',this)"
+  onclick="showSection('notifications',this)"
 >
 Notifications
 </button>
 
+
 <button
-onclick="showSection('risk',this)"
+  onclick="showSection('risk',this)"
 >
 Risk Controls
 </button>
 
+
 </aside>
+
 
 
 <section class="settings-panel">
 
 
+
 <!-- PROFILE -->
 
 <div
-id="profile"
-class="settings-section active"
+  id="profile"
+  class="settings-section active"
 >
 
 <h2>
@@ -340,14 +467,15 @@ Profile
 </h2>
 
 <p class="settings-description">
-Update your account information.
+Your profile is connected to your authenticated PELItradershub account.
 </p>
 
 
 <form
-class="setting-form"
-onsubmit="saveSettings(event)"
+  id="profileForm"
+  class="setting-form"
 >
+
 
 <div class="form-group">
 
@@ -356,12 +484,15 @@ Full name
 </label>
 
 <input
-class="setting-input"
-type="text"
-value="PELI Trader"
+  id="fullName"
+  class="setting-input"
+  type="text"
+  autocomplete="name"
+  placeholder="Your full name"
 >
 
 </div>
+
 
 
 <div class="form-group">
@@ -371,12 +502,14 @@ Email
 </label>
 
 <input
-class="setting-input"
-type="email"
-value="demo@example.com"
+  id="email"
+  class="setting-input"
+  type="email"
+  readonly
 >
 
 </div>
+
 
 
 <div class="form-group">
@@ -385,36 +518,84 @@ value="demo@example.com"
 Country
 </label>
 
-<select class="setting-input">
+<select
+  id="country"
+  class="setting-input"
+>
 
-<option>Kenya</option>
-<option>Uganda</option>
-<option>Tanzania</option>
-<option>United Kingdom</option>
-<option>United States</option>
+<option value="">
+Select country
+</option>
+
+<option value="Kenya">
+Kenya
+</option>
+
+<option value="Uganda">
+Uganda
+</option>
+
+<option value="Tanzania">
+Tanzania
+</option>
+
+<option value="Rwanda">
+Rwanda
+</option>
+
+<option value="United Kingdom">
+United Kingdom
+</option>
+
+<option value="United States">
+United States
+</option>
+
+<option value="Other">
+Other
+</option>
 
 </select>
 
 </div>
 
 
+
 <button
-class="save-button"
-type="submit"
+  id="profileSaveButton"
+  class="save-button"
+  type="submit"
 >
 Save Changes
 </button>
 
+
 </form>
 
+
+<div class="info-box">
+
+<strong>Account email:</strong>
+
+<span
+  id="accountEmail"
+  class="account-email"
+>
+Loading...
+</span>
+
 </div>
+
+
+</div>
+
 
 
 <!-- PREFERENCES -->
 
 <div
-id="preferences"
-class="settings-section"
+  id="preferences"
+  class="settings-section"
 >
 
 <h2>
@@ -422,7 +603,7 @@ Preferences
 </h2>
 
 <p class="settings-description">
-Customize how PELItradershub works for you.
+These preferences are saved to your authenticated account.
 </p>
 
 
@@ -440,12 +621,15 @@ Use the dark trading interface.
 
 </div>
 
+
 <button
-class="toggle active"
-onclick="toggleSetting(this)"
+  id="darkInterface"
+  class="toggle active"
+  onclick="toggleSetting('darkInterface')"
 ></button>
 
 </div>
+
 
 
 <div class="setting-row">
@@ -462,12 +646,15 @@ Use a denser chart layout.
 
 </div>
 
+
 <button
-class="toggle"
-onclick="toggleSetting(this)"
+  id="compactCharts"
+  class="toggle"
+  onclick="toggleSetting('compactCharts')"
 ></button>
 
 </div>
+
 
 
 <div class="setting-row">
@@ -484,21 +671,25 @@ Ask for confirmation before placing an order.
 
 </div>
 
+
 <button
-class="toggle active"
-onclick="toggleSetting(this)"
+  id="confirmTrades"
+  class="toggle active"
+  onclick="toggleSetting('confirmTrades')"
 ></button>
 
 </div>
 
+
 </div>
+
 
 
 <!-- SECURITY -->
 
 <div
-id="security"
-class="settings-section"
+  id="security"
+  class="settings-section"
 >
 
 <h2>
@@ -506,7 +697,7 @@ Security
 </h2>
 
 <p class="settings-description">
-Manage your password and account security.
+Manage your authenticated account security.
 </p>
 
 
@@ -515,21 +706,23 @@ Manage your password and account security.
 <div class="setting-info">
 
 <strong>
-Two-factor authentication
-</strong>
+Two-factor authentication</strong>
 
 <span>
-Add another layer of protection to your account.
+Protect your account with an additional authentication step.
 </span>
 
 </div>
 
+
 <button
-class="toggle"
-onclick="toggleSetting(this)"
+  id="twoFactor"
+  class="toggle"
+  onclick="toggleSetting('twoFactor')"
 ></button>
 
 </div>
+
 
 
 <div class="setting-row">
@@ -546,33 +739,38 @@ Receive notifications when a new login occurs.
 
 </div>
 
+
 <button
-class="toggle active"
-onclick="toggleSetting(this)"
+  id="loginNotifications"
+  class="toggle active"
+  onclick="toggleSetting('loginNotifications')"
 ></button>
 
 </div>
 
 
+
 <div style="margin-top:20px;">
 
 <button
-class="button secondary"
-onclick="changePassword()"
+  class="button secondary"
+  onclick="changePassword()"
 >
 Change Password
 </button>
 
 </div>
 
+
 </div>
+
 
 
 <!-- NOTIFICATIONS -->
 
 <div
-id="notifications"
-class="settings-section"
+  id="notifications"
+  class="settings-section"
 >
 
 <h2>
@@ -598,12 +796,15 @@ Notify when a trade opens or closes.
 
 </div>
 
+
 <button
-class="toggle active"
-onclick="toggleSetting(this)"
+  id="tradeNotifications"
+  class="toggle active"
+  onclick="toggleSetting('tradeNotifications')"
 ></button>
 
 </div>
+
 
 
 <div class="setting-row">
@@ -620,12 +821,15 @@ Receive alerts when markets reach your levels.
 
 </div>
 
+
 <button
-class="toggle active"
-onclick="toggleSetting(this)"
+  id="priceAlerts"
+  class="toggle active"
+  onclick="toggleSetting('priceAlerts')"
 ></button>
 
 </div>
+
 
 
 <div class="setting-row">
@@ -642,21 +846,25 @@ Notify when a strategy generates a signal.
 
 </div>
 
+
 <button
-class="toggle"
-onclick="toggleSetting(this)"
+  id="strategyAlerts"
+  class="toggle"
+  onclick="toggleSetting('strategyAlerts')"
 ></button>
 
 </div>
 
+
 </div>
+
 
 
 <!-- RISK -->
 
 <div
-id="risk"
-class="settings-section"
+  id="risk"
+  class="settings-section"
 >
 
 <h2>
@@ -664,8 +872,9 @@ Risk Controls
 </h2>
 
 <p class="settings-description">
-Set limits designed to help control your trading activity.
+Set limits for your trading activity.
 </p>
+
 
 
 <div class="setting-row">
@@ -682,14 +891,19 @@ Maximum amount allowed for daily losses.
 
 </div>
 
+
 <input
-class="setting-input"
-style="max-width:130px;"
-type="number"
-value="100"
+  id="dailyLossLimit"
+  class="setting-input"
+  style="max-width:130px;"
+  type="number"
+  min="0"
+  step="0.01"
 >
 
+
 </div>
+
 
 
 <div class="setting-row">
@@ -706,14 +920,19 @@ Maximum stake allowed per trade.
 
 </div>
 
+
 <input
-class="setting-input"
-style="max-width:130px;"
-type="number"
-value="50"
+  id="maximumStake"
+  class="setting-input"
+  style="max-width:130px;"
+  type="number"
+  min="0"
+  step="0.01"
 >
 
+
 </div>
+
 
 
 <div class="setting-row">
@@ -725,17 +944,34 @@ Trading pause after loss limit
 </strong>
 
 <span>
-Temporarily stop trading after reaching the daily limit.
+Pause trading when the configured daily loss limit is reached.
 </span>
 
 </div>
 
+
 <button
-class="toggle active"
-onclick="toggleSetting(this)"
+  id="pauseAfterLoss"
+  class="toggle active"
+  onclick="toggleSetting('pauseAfterLoss')"
 ></button>
 
 </div>
+
+
+
+<div style="margin-top:20px;">
+
+<button
+  id="riskSaveButton"
+  class="save-button"
+  onclick="saveRiskSettings()"
+>
+Save Risk Controls
+</button>
+
+</div>
+
 
 
 <div class="danger">
@@ -750,13 +986,16 @@ not a guarantee against losses. Only trade money you can
 afford to lose.
 </p>
 
+
 <button
-onclick="pauseTrading()"
+  id="pauseTradingButton"
+  onclick="pauseTrading()"
 >
 Pause Trading
 </button>
 
 </div>
+
 
 </div>
 
@@ -766,32 +1005,22 @@ Pause Trading
 </div>
 
 
-<div style="
-margin-top:20px;
-padding:15px;
-border-radius:12px;
-background:#121122;
-border:1px solid #30294e;
-color:#aaa5ff;
-font-size:12px;
-">
-
-<strong>Demo settings:</strong>
-Your settings are currently stored only in this page.
-Persistent account settings will be connected to the backend.
-
-</div>
-
-
 </main>
+
 
 
 <footer>
 
 <div class="brand">
-<span class="brand-icon">P</span>
+
+<span class="brand-icon">
+P
+</span>
+
 PELItradershub
+
 </div>
+
 
 <p>
 Trading involves risk. No profits are guaranteed.
@@ -800,76 +1029,965 @@ Trading involves risk. No profits are guaranteed.
 </footer>
 
 
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+
+
 <script>
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentUser = null;
+
+let settings = {
+
+  preferences: {
+
+    darkInterface: true,
+    compactCharts: false,
+    confirmTrades: true
+
+  },
+
+  security: {
+
+    twoFactor: false,
+    loginNotifications: true
+
+  },
+
+  notifications: {
+
+    tradeNotifications: true,
+    priceAlerts: true,
+    strategyAlerts: false
+
+  },
+
+  risk: {
+
+    dailyLossLimit: 100,
+    maximumStake: 50,
+    pauseAfterLoss: true,
+    tradingPaused: false
+
+  }
+
+};
+
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(text,type="success"){
+
+  const box =
+    document.getElementById("message");
+
+  box.className =
+    "message " + type;
+
+  box.textContent =
+    text;
+
+}
+
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
 
 function showSection(id,button){
 
+  document
+    .querySelectorAll(".settings-section")
+    .forEach(section =>
+      section.classList.remove("active")
+    );
+
+
+  const section =
+    document.getElementById(id);
+
+
+  if(section){
+
+    section.classList.add("active");
+
+  }
+
+
+  document
+    .querySelectorAll(".settings-menu button")
+    .forEach(btn =>
+      btn.classList.remove("active")
+    );
+
+
+  if(button){
+
+    button.classList.add("active");
+
+  }
+
+}
+
+
+
+/* =========================================================
+   TOGGLE
+========================================================= */
+
+function toggleSetting(id){
+
+  const button =
+    document.getElementById(id);
+
+
+  if(!button){
+
+    return;
+
+  }
+
+
+  button.classList.toggle("active");
+
+
+  const value =
+    button.classList.contains("active");
+
+
+  if(id === "darkInterface"){
+
+    settings.preferences.darkInterface =
+      value;
+
+  }
+
+
+  if(id === "compactCharts"){
+
+    settings.preferences.compactCharts =
+      value;
+
+  }
+
+
+  if(id === "confirmTrades"){
+
+    settings.preferences.confirmTrades =
+      value;
+
+  }
+
+
+  if(id === "twoFactor"){
+
+    settings.security.twoFactor =
+      value;
+
+  }
+
+
+  if(id === "loginNotifications"){
+
+    settings.security.loginNotifications =
+      value;
+
+  }
+
+
+  if(id === "tradeNotifications"){
+
+    settings.notifications.tradeNotifications =
+      value;
+
+  }
+
+
+  if(id === "priceAlerts"){
+
+    settings.notifications.priceAlerts =
+      value;
+
+  }
+
+
+  if(id === "strategyAlerts"){
+
+    settings.notifications.strategyAlerts =
+      value;
+
+  }
+
+
+  if(id === "pauseAfterLoss"){
+
+    settings.risk.pauseAfterLoss =
+      value;
+
+  }
+
+
+  saveSettingsToAccount();
+
+}
+
+
+
+/* =========================================================
+   LOAD ACCOUNT
+========================================================= */
+
+async function loadAccount(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth.getSession();
+
+
+  if(error){
+
+    throw error;
+
+  }
+
+
+  const session =
+    data.session;
+
+
+  if(!session){
+
+    window.location.replace(
+      "login.html"
+    );
+
+    return;
+
+  }
+
+
+  currentUser =
+    session.user;
+
+
+  const metadata =
+    currentUser.user_metadata || {};
+
+
+  document.getElementById("email").value =
+    currentUser.email || "";
+
+
+  document.getElementById("accountEmail").textContent =
+    currentUser.email || "Authenticated account";
+
+
+  document.getElementById("fullName").value =
+    metadata.full_name || "";
+
+
+  document.getElementById("country").value =
+    metadata.country || "";
+
+
+  if(metadata.peli_settings){
+
+    try{
+
+      settings = {
+
+        ...settings,
+
+        ...metadata.peli_settings,
+
+        preferences:{
+          ...settings.preferences,
+          ...(metadata.peli_settings.preferences || {})
+        },
+
+        security:{
+          ...settings.security,
+          ...(metadata.peli_settings.security || {})
+        },
+
+        notifications:{
+          ...settings.notifications,
+          ...(metadata.peli_settings.notifications || {})
+        },
+
+        risk:{
+          ...settings.risk,
+          ...(metadata.peli_settings.risk || {})
+        }
+
+      };
+
+    }catch(error){
+
+      console.warn(
+        "Unable to read saved settings.",
+        error
+      );
+
+    }
+
+  }
+
+
+  applySettingsToUI();
+
+}
+
+
+
+/* =========================================================
+   APPLY SETTINGS
+========================================================= */
+
+function applySettingsToUI(){
+
+  setToggle(
+    "darkInterface",
+    settings.preferences.darkInterface
+  );
+
+
+  setToggle(
+    "compactCharts",
+    settings.preferences.compactCharts
+  );
+
+
+  setToggle(
+    "confirmTrades",
+    settings.preferences.confirmTrades
+  );
+
+
+  setToggle(
+    "twoFactor",
+    settings.security.twoFactor
+  );
+
+
+  setToggle(
+    "loginNotifications",
+    settings.security.loginNotifications
+  );
+
+
+  setToggle(
+    "tradeNotifications",
+    settings.notifications.tradeNotifications
+  );
+
+
+  setToggle(
+    "priceAlerts",
+    settings.notifications.priceAlerts
+  );
+
+
+  setToggle(
+    "strategyAlerts",
+    settings.notifications.strategyAlerts
+  );
+
+
+  setToggle(
+    "pauseAfterLoss",
+    settings.risk.pauseAfterLoss
+  );
+
+
+  document.getElementById(
+    "dailyLossLimit"
+  ).value =
+    settings.risk.dailyLossLimit;
+
+
+  document.getElementById(
+    "maximumStake"
+  ).value =
+    settings.risk.maximumStake;
+
+
+  updateTradingPauseUI();
+
+}
+
+
+
+/* =========================================================
+   TOGGLE UI
+========================================================= */
+
+function setToggle(id,value){
+
+  const button =
+    document.getElementById(id);
+
+
+  if(!button){
+
+    return;
+
+  }
+
+
+  button.classList.toggle(
+    "active",
+    Boolean(value)
+  );
+
+}
+
+
+
+/* =========================================================
+   SAVE PROFILE
+========================================================= */
+
 document
-.querySelectorAll(".settings-section")
-.forEach(section =>
-section.classList.remove("active")
-);
+  .getElementById("profileForm")
+  .addEventListener(
+    "submit",
+    async function(event){
 
-document
-.getElementById(id)
-.classList.add("active");
+      event.preventDefault();
 
-document
-.querySelectorAll(".settings-menu button")
-.forEach(btn =>
-btn.classList.remove("active")
-);
 
-button.classList.add("active");
+      if(!currentUser){
+
+        return;
+
+      }
+
+
+      const fullName =
+        document
+          .getElementById("fullName")
+          .value
+          .trim();
+
+
+      const country =
+        document
+          .getElementById("country")
+          .value;
+
+
+      const button =
+        document.getElementById(
+          "profileSaveButton"
+        );
+
+
+      button.disabled = true;
+
+
+      try{
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.updateUser({
+
+            data:{
+
+              full_name:
+                fullName,
+
+              country:
+                country
+
+            }
+
+          });
+
+
+        if(error){
+
+          throw error;
+
+        }
+
+
+        currentUser =
+          data.user;
+
+
+        showMessage(
+          "Profile updated successfully."
+        );
+
+      }catch(error){
+
+        console.error(error);
+
+
+        showMessage(
+          error.message ||
+          "Unable to update profile.",
+          "error"
+        );
+
+      }finally{
+
+        button.disabled = false;
+
+      }
+
+    }
+  );
+
+
+
+/* =========================================================
+   SAVE SETTINGS
+========================================================= */
+
+let saveTimer = null;
+
+function saveSettingsToAccount(){
+
+  clearTimeout(saveTimer);
+
+
+  saveTimer =
+    setTimeout(
+      async function(){
+
+        if(!currentUser){
+
+          return;
+
+        }
+
+
+        try{
+
+          const {
+            error
+          } =
+            await supabaseClient.auth.updateUser({
+
+              data:{
+
+                peli_settings:
+                  settings
+
+              }
+
+            });
+
+
+          if(error){
+
+            throw error;
+
+          }
+
+
+        }catch(error){
+
+          console.error(
+            "Settings save failed:",
+            error
+          );
+
+          showMessage(
+            "Unable to save the setting. Please try again.",
+            "error"
+          );
+
+        }
+
+      },
+      400
+    );
 
 }
 
 
-function toggleSetting(button){
 
-button.classList.toggle("active");
+/* =========================================================
+   RISK SETTINGS
+========================================================= */
+
+async function saveRiskSettings(){
+
+  const daily =
+    Number(
+      document.getElementById(
+        "dailyLossLimit"
+      ).value
+    );
+
+
+  const maximum =
+    Number(
+      document.getElementById(
+        "maximumStake"
+      ).value
+    );
+
+
+  if(!Number.isFinite(daily) || daily < 0){
+
+    showMessage(
+      "Enter a valid daily loss limit.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!Number.isFinite(maximum) || maximum < 0){
+
+    showMessage(
+      "Enter a valid maximum stake.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  settings.risk.dailyLossLimit =
+    daily;
+
+
+  settings.risk.maximumStake =
+    maximum;
+
+
+  const button =
+    document.getElementById(
+      "riskSaveButton"
+    );
+
+
+  button.disabled = true;
+
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.updateUser({
+
+        data:{
+
+          peli_settings:
+            settings
+
+        }
+
+      });
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    showMessage(
+      "Risk controls saved to your account."
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+
+    showMessage(
+      error.message ||
+      "Unable to save risk controls.",
+      "error"
+    );
+
+  }finally{
+
+    button.disabled = false;
+
+  }
 
 }
 
 
-function saveSettings(event){
 
-event.preventDefault();
+/* =========================================================
+   CHANGE PASSWORD
+========================================================= */
 
-alert(
-"Settings saved in this demo interface."
+async function changePassword(){
+
+  const newPassword =
+    prompt(
+      "Enter your new password:"
+    );
+
+
+  if(!newPassword){
+
+    return;
+
+  }
+
+
+  if(newPassword.length < 6){
+
+    showMessage(
+      "Password must contain at least 6 characters.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.updateUser({
+
+        password:
+          newPassword
+
+      });
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    showMessage(
+      "Password changed successfully."
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+
+    showMessage(
+      error.message ||
+      "Unable to change password.",
+      "error"
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   PAUSE TRADING
+========================================================= */
+
+async function pauseTrading(){
+
+  if(!currentUser){
+
+    return;
+
+  }
+
+
+  const shouldPause =
+    !settings.risk.tradingPaused;
+
+
+  if(shouldPause){
+
+    const confirmed =
+      confirm(
+        "Pause trading for this account?"
+      );
+
+
+    if(!confirmed){
+
+      return;
+
+    }
+
+  }
+
+
+  settings.risk.tradingPaused =
+    shouldPause;
+
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.updateUser({
+
+        data:{
+
+          peli_settings:
+            settings
+
+        }
+
+      });
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    updateTradingPauseUI();
+
+
+    showMessage(
+      shouldPause
+        ? "Trading has been paused for this account."
+        : "Trading has been resumed for this account."
+    );
+
+
+  }catch(error){
+
+    settings.risk.tradingPaused =
+      !shouldPause;
+
+
+    console.error(error);
+
+
+    showMessage(
+      error.message ||
+      "Unable to change trading status.",
+      "error"
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   PAUSE UI
+========================================================= */
+
+function updateTradingPauseUI(){
+
+  const button =
+    document.getElementById(
+      "pauseTradingButton"
+    );
+
+
+  if(!button){
+
+    return;
+
+  }
+
+
+  if(settings.risk.tradingPaused){
+
+    button.textContent =
+      "Resume Trading";
+
+  }else{
+
+    button.textContent =
+      "Pause Trading";
+
+  }
+
+}
+
+
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  function(event,session){
+
+    if(event === "SIGNED_OUT"){
+
+      window.location.replace(
+        "login.html"
+      );
+
+    }
+
+  }
 );
 
-}
 
 
-function changePassword(){
+/* =========================================================
+   INITIALIZE
+========================================================= */
 
-alert(
-"Password management will be connected to the secure authentication backend."
-);
+(async function(){
 
-}
+  try{
+
+    await loadAccount();
+
+  }catch(error){
+
+    console.error(
+      "Settings initialization error:",
+      error
+    );
 
 
-function pauseTrading(){
+    window.location.replace(
+      "login.html"
+    );
 
-const confirmed =
-confirm(
-"Pause trading for this account?"
-);
+  }
 
-if(confirmed){
-
-alert(
-"Trading pause is a demo action. The real account control will be connected to the backend."
-);
-
-}
-
-}
+})();
 
 </script>
+
 
 </body>
 </html>
