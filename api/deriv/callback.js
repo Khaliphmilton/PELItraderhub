@@ -2,22 +2,25 @@
 // PELItradershub
 // DERIV OAUTH 2.0 CALLBACK
 //
-// IMPORTANT:
-// This file is ONLY the OAuth callback.
-// Do NOT put session.js code here.
-//
 // Flow:
 //
-// Deriv
-//   -> /api/deriv/callback?code=...&state=...
-//   -> verify state
-//   -> exchange code for access token
-//   -> save token in secure HttpOnly cookie
-//   -> redirect back to the app
+// trade.html
+//     ↓
+// /api/deriv/start
+//     ↓
+// Deriv OAuth
+//     ↓
+// /api/deriv/callback
+//     ↓
+// verify state
+//     ↓
+// exchange code for access token
+//     ↓
+// secure HttpOnly cookie
+//     ↓
+// redirect back to trade.html
 //
-// The access token is then used by:
-// /api/deriv/session.js
-
+// The browser never receives the OAuth access token.
 
 const APP_ID =
   "34aZNrTmY1AZc7hjuxyLv";
@@ -25,10 +28,13 @@ const APP_ID =
 const TOKEN_URL =
   "https://auth.deriv.com/oauth2/token";
 
+const TRADE_PAGE =
+  "/trade.html";
 
-// ------------------------------------------------------------
+
+// ============================================================
 // CALLBACK
-// ------------------------------------------------------------
+// ============================================================
 
 export default async function handler(req, res) {
 
@@ -72,13 +78,12 @@ export default async function handler(req, res) {
         errorDescription || ""
       );
 
-      return res
-        .redirect(
-          `/?deriv=error&message=${encodeURIComponent(
-            errorDescription ||
-            oauthError
-          )}`
-        );
+      return res.redirect(
+        `${TRADE_PAGE}?deriv=error&message=${encodeURIComponent(
+          errorDescription ||
+          oauthError
+        )}`
+      );
 
     }
 
@@ -109,13 +114,11 @@ export default async function handler(req, res) {
 
 
     const savedState =
-      cookies.deriv_oauth_state ||
-      cookies.oauth_state;
+      cookies.deriv_oauth_state;
 
 
     const codeVerifier =
-      cookies.deriv_code_verifier ||
-      cookies.code_verifier;
+      cookies.deriv_code_verifier;
 
 
     // --------------------------------------------------------
@@ -178,47 +181,14 @@ export default async function handler(req, res) {
 
 
     // --------------------------------------------------------
-    // REDIRECT URI
+    // IMPORTANT:
+    //
+    // This MUST be exactly the same redirect URI used
+    // when starting OAuth.
     // --------------------------------------------------------
-    //
-    // This MUST exactly match the redirect URI registered
-    // in your Deriv OAuth application.
-    //
-    // For this file:
-    //
-    // https://YOUR-DOMAIN/api/deriv/callback
-    //
-    // We build it from the current request so you don't have
-    // to hard-code your Vercel domain.
-    //
-
-    const protocol =
-      (
-        req.headers["x-forwarded-proto"] ||
-        "https"
-      )
-        .toString()
-        .split(",")[0]
-        .trim();
-
-
-    const host =
-      req.headers.host;
-
-
-    if (!host) {
-
-      return res
-        .status(500)
-        .send(
-          "Unable to determine callback host."
-        );
-
-    }
-
 
     const redirectUri =
-      `${protocol}://${host}/api/deriv/callback`;
+      "https://pelitradershub.vercel.app/api/deriv/callback";
 
 
     // --------------------------------------------------------
@@ -274,7 +244,7 @@ export default async function handler(req, res) {
 
 
     // --------------------------------------------------------
-    // TOKEN ERROR
+    // TOKEN EXCHANGE FAILED
     // --------------------------------------------------------
 
     if (
@@ -303,30 +273,36 @@ export default async function handler(req, res) {
 
 
     // --------------------------------------------------------
-    // SAVE ACCESS TOKEN
+    // TOKEN EXPIRATION
     // --------------------------------------------------------
-    //
-    // HttpOnly:
-    // JavaScript cannot read the token.
-    //
-    // Secure:
-    // Only sent over HTTPS.
-    //
-    // SameSite=Lax:
-    // Works with the OAuth redirect back to the site.
-    //
 
-    const maxAge =
+    const expiresIn =
       Number(
         tokenBody.expires_in
-      ) > 0
-        ? Number(
-            tokenBody.expires_in
-          )
+      );
+
+
+    const maxAge =
+      Number.isFinite(expiresIn) &&
+      expiresIn > 0
+        ? Math.floor(expiresIn)
         : 3600;
 
 
-    const cookie =
+    // --------------------------------------------------------
+    // SAVE ACCESS TOKEN
+    //
+    // HttpOnly:
+    // Browser JavaScript cannot read it.
+    //
+    // Secure:
+    // HTTPS only.
+    //
+    // SameSite=Lax:
+    // Allows the OAuth redirect back to the site.
+    // --------------------------------------------------------
+
+    const accessTokenCookie =
       [
         `deriv_access_token=${encodeURIComponent(
           accessToken
@@ -346,7 +322,7 @@ export default async function handler(req, res) {
 
 
     // --------------------------------------------------------
-    // CLEAR ONE-TIME PKCE COOKIES
+    // CLEAR ONE-TIME STATE COOKIE
     // --------------------------------------------------------
 
     const clearStateCookie =
@@ -366,6 +342,10 @@ export default async function handler(req, res) {
       ].join("; ");
 
 
+    // --------------------------------------------------------
+    // CLEAR ONE-TIME PKCE VERIFIER COOKIE
+    // --------------------------------------------------------
+
     const clearVerifierCookie =
       [
         "deriv_code_verifier=",
@@ -384,13 +364,13 @@ export default async function handler(req, res) {
 
 
     // --------------------------------------------------------
-    // SEND COOKIES
+    // SAVE AUTHENTICATED SESSION
     // --------------------------------------------------------
 
     res.setHeader(
       "Set-Cookie",
       [
-        cookie,
+        accessTokenCookie,
         clearStateCookie,
         clearVerifierCookie
       ]
@@ -399,21 +379,24 @@ export default async function handler(req, res) {
 
     // --------------------------------------------------------
     // SUCCESS
+    //
+    // THIS IS THE IMPORTANT FIX.
+    //
+    // Previously:
+    //
+    //   /?deriv=connected
+    //
+    // Now:
+    //
+    //   /trade.html?deriv=connected
+    //
+    // The user returns directly to the trading terminal.
     // --------------------------------------------------------
-    //
-    // Browser returns to your application.
-    //
-    // /api/deriv/session can now read:
-    //
-    // deriv_access_token
-    //
-    // and request the user's Options accounts.
-    //
 
-    return res
-      .redirect(
-        "/?deriv=connected"
-      );
+    return res.redirect(
+      302,
+      `${TRADE_PAGE}?deriv=connected`
+    );
 
 
   } catch (error) {
@@ -422,7 +405,6 @@ export default async function handler(req, res) {
       "PELI DERIV CALLBACK ERROR:",
       error
     );
-
 
     return res
       .status(500)
