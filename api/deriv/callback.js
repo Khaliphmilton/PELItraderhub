@@ -165,36 +165,34 @@ export default async function handler(req, res) {
       );
     }
 
-    // --------------------------------------------------
-    // SUCCESS
-    //
-    // IMPORTANT:
-    // The access token stays on the server.
-    // It is NOT placed in the URL.
-    // It is NOT sent to the browser.
-    // --------------------------------------------------
+// --------------------------------------------------
+// SUCCESS
+// Store the Deriv access token in a secure,
+// HttpOnly cookie so the browser never gets
+// direct access to the token.
+// --------------------------------------------------
 
-    const accessToken =
-      tokenData.access_token;
+const accessToken =
+  tokenData.access_token;
 
-    const expiresIn =
-      tokenData.expires_in || 3600;
+const expiresIn =
+  Number(tokenData.expires_in || 3600);
 
-    console.log(
-      "Deriv OAuth authorization succeeded."
-    );
+console.log(
+  "Deriv OAuth authorization succeeded."
+);
 
-    /*
-     * We deliberately do NOT log accessToken.
-     *
-     * The next backend stage should securely associate
-     * this token with the authenticated PELItradershub
-     * user and store it server-side.
-     */
+// Keep the token away from JavaScript.
+// The backend will use this cookie when
+// requesting the authenticated Deriv session.
 
-    void accessToken;
-    void expiresIn;
-
+const derivCookie =
+  `deriv_access_token=${encodeURIComponent(accessToken)}; ` +
+  `Path=/; ` +
+  `HttpOnly; ` +
+  `Secure; ` +
+  `SameSite=Lax; ` +
+  `Max-Age=${expiresIn}`;
     // --------------------------------------------------
     // CLEAR TEMPORARY OAUTH COOKIES
     // --------------------------------------------------
