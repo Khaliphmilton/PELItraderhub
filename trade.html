@@ -4025,7 +4025,294 @@ connectDerivAccount();
 
 </script>
 
+<script>
+/* =========================================================
+   PELItradershub - LIVE MARKET CURSOR
+   ADD-ON ONLY
+   Does not replace your existing trading engine.
+========================================================= */
 
+(function () {
+
+    let prices = [];
+    const MAX_POINTS = 60;
+
+    function startLiveCursor() {
+
+        /* Find the existing chart */
+        const chart =
+            document.querySelector(".chart-container");
+
+        const svg =
+            document.querySelector(".chart-line");
+
+        if (!chart || !svg) {
+            console.log(
+                "PELI: chart not found yet"
+            );
+            return;
+        }
+
+
+        /* Create cursor */
+        const cursor =
+            document.createElement("div");
+
+        cursor.style.position = "absolute";
+        cursor.style.top = "0";
+        cursor.style.bottom = "0";
+        cursor.style.width = "1px";
+        cursor.style.background =
+            "rgba(255,255,255,.65)";
+        cursor.style.pointerEvents = "none";
+        cursor.style.zIndex = "20";
+
+
+        /* Create cursor dot */
+        const dot =
+            document.createElement("div");
+
+        dot.style.position = "absolute";
+        dot.style.width = "12px";
+        dot.style.height = "12px";
+        dot.style.borderRadius = "50%";
+        dot.style.background = "#39d4b6";
+        dot.style.border =
+            "3px solid #0b1018";
+        dot.style.transform =
+            "translate(-50%,-50%)";
+        dot.style.pointerEvents = "none";
+        dot.style.zIndex = "21";
+
+
+        /* Create label */
+        const label =
+            document.createElement("div");
+
+        label.style.position = "absolute";
+        label.style.padding = "7px 10px";
+        label.style.background = "#111722";
+        label.style.border =
+            "1px solid #39445a";
+        label.style.borderRadius = "8px";
+        label.style.color = "#fff";
+        label.style.fontSize = "12px";
+        label.style.fontWeight = "800";
+        label.style.transform =
+            "translate(-50%,-125%)";
+        label.style.pointerEvents = "none";
+        label.style.zIndex = "22";
+        label.innerHTML =
+            "DIGIT: <strong>—</strong>";
+
+
+        chart.style.position =
+            "relative";
+
+        chart.appendChild(cursor);
+        chart.appendChild(dot);
+        chart.appendChild(label);
+
+
+        /* Listen to the EXISTING Deriv engine */
+        if (
+            window.PELI_DERIV &&
+            typeof window.PELI_DERIV.on ===
+            "function"
+        ) {
+
+            window.PELI_DERIV.on(
+                "tick",
+                function (tick) {
+
+                    if (
+                        !tick ||
+                        tick.quote === undefined
+                    ) {
+                        return;
+                    }
+
+                    const price =
+                        Number(tick.quote);
+
+                    if (
+                        !Number.isFinite(price)
+                    ) {
+                        return;
+                    }
+
+
+                    prices.push(price);
+
+                    if (
+                        prices.length >
+                        MAX_POINTS
+                    ) {
+                        prices.shift();
+                    }
+
+
+                    /* Get last digit */
+                    const text =
+                        String(price);
+
+                    const digits =
+                        text.replace(
+                            /[^0-9]/g,
+                            ""
+                        );
+
+                    const digit =
+                        digits.length
+                            ? Number(
+                                digits[
+                                    digits.length - 1
+                                ]
+                              )
+                            : null;
+
+
+                    label.innerHTML =
+                        digit === null
+                            ? "DIGIT: —"
+                            :
+                            "DIGIT: <strong>" +
+                            digit +
+                            "</strong>";
+
+
+                    /* Position cursor at latest tick */
+                    const width =
+                        chart.clientWidth;
+
+                    const height =
+                        chart.clientHeight;
+
+
+                    const x =
+                        width - 20;
+
+
+                    cursor.style.left =
+                        x + "px";
+
+
+                    /* Use chart's SVG viewBox */
+                    const min =
+                        Math.min(...prices);
+
+                    const max =
+                        Math.max(...prices);
+
+                    const range =
+                        max - min || 1;
+
+
+                    const normalized =
+                        (price - min) /
+                        range;
+
+
+                    const y =
+                        height -
+                        (
+                            normalized *
+                            (height - 50)
+                        ) -
+                        25;
+
+
+                    dot.style.left =
+                        x + "px";
+
+                    dot.style.top =
+                        y + "px";
+
+
+                    label.style.left =
+                        x + "px";
+
+                    label.style.top =
+                        y + "px";
+
+
+                    /* Show current digit in
+                       existing UI if available */
+
+                    const digitFields =
+                        document.querySelectorAll(
+                            "[id*='digit']"
+                        );
+
+
+                    digitFields.forEach(
+                        function (field) {
+
+                            if (
+                                field.tagName ===
+                                "INPUT"
+                            ) {
+                                return;
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+            console.log(
+                "PELI: live market cursor connected"
+            );
+
+        } else {
+
+            console.log(
+                "PELI: Deriv engine not ready"
+            );
+
+        }
+
+    }
+
+
+    /* Wait for your existing Deriv engine */
+    let attempts = 0;
+
+    const timer =
+        setInterval(
+            function () {
+
+                attempts++;
+
+                if (
+                    window.PELI_DERIV
+                ) {
+
+                    clearInterval(timer);
+
+                    startLiveCursor();
+
+                }
+
+                if (
+                    attempts >= 30
+                ) {
+
+                    clearInterval(timer);
+
+                    console.log(
+                        "PELI: waiting for Deriv timed out"
+                    );
+
+                }
+
+            },
+            500
+        );
+
+})();
+</script>
 </body>
 
 </html>
