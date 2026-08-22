@@ -3854,5 +3854,796 @@ try{
 
 })();
 </script>
+  <script>
+"use strict";
+
+/*
+=========================================================
+PELI MARKET ROUTER — FINAL
+=========================================================
+
+This connects:
+
+Markets page
+      ↓
+trade.html?symbol=frxEURUSD
+      ↓
+correct Trade Terminal market
+
+It also changes the contract buttons depending
+on the selected market.
+=========================================================
+*/
+
+(function () {
+
+  /*
+  -------------------------------------------------------
+  WAIT UNTIL THE EXISTING TRADE TERMINAL IS READY
+  -------------------------------------------------------
+  */
+
+  function startMarketRouter() {
+
+    const market =
+      document.getElementById("market");
+
+    const symbolName =
+      document.getElementById("symbolName");
+
+    const typeButtons =
+      document.getElementById("typeButtons");
+
+    const predictionField =
+      document.getElementById("predictionField");
+
+    const orderTitle =
+      document.querySelector(".panel h2");
+
+    if (
+      !market ||
+      !symbolName ||
+      !typeButtons
+    ) {
+
+      setTimeout(
+        startMarketRouter,
+        100
+      );
+
+      return;
+
+    }
+
+
+    /*
+    -------------------------------------------------------
+    REAL DERIV MARKETS
+    -------------------------------------------------------
+    */
+
+    const markets = {
+
+      /*
+      SYNTHETIC
+      */
+
+      R_10:
+        "Volatility 10 Index",
+
+      R_25:
+        "Volatility 25 Index",
+
+      R_50:
+        "Volatility 50 Index",
+
+      R_75:
+        "Volatility 75 Index",
+
+      R_100:
+        "Volatility 100 Index",
+
+      R_10_1s:
+        "Volatility 10 (1s) Index",
+
+      R_25_1s:
+        "Volatility 25 (1s) Index",
+
+      R_50_1s:
+        "Volatility 50 (1s) Index",
+
+      R_75_1s:
+        "Volatility 75 (1s) Index",
+
+      R_100_1s:
+        "Volatility 100 (1s) Index",
+
+
+      /*
+      FOREX
+      */
+
+      frxEURUSD:
+        "EUR/USD",
+
+      frxGBPUSD:
+        "GBP/USD",
+
+      frxUSDJPY:
+        "USD/JPY",
+
+      frxAUDUSD:
+        "AUD/USD",
+
+      frxEURGBP:
+        "EUR/GBP",
+
+      frxGBPJPY:
+        "GBP/JPY",
+
+      frxUSDCAD:
+        "USD/CAD",
+
+      frxUSDCHF:
+        "USD/CHF",
+
+      frxEURJPY:
+        "EUR/JPY",
+
+      frxAUDJPY:
+        "AUD/JPY",
+
+
+      /*
+      CRYPTO
+      */
+
+      cryBTCUSD:
+        "BTC/USD",
+
+      cryETHUSD:
+        "ETH/USD",
+
+      cryLTCUSD:
+        "LTC/USD",
+
+      cryXRPUSD:
+        "XRP/USD"
+
+    };
+
+
+    /*
+    -------------------------------------------------------
+    ADD ALL MISSING MARKETS TO THE SELECT
+    -------------------------------------------------------
+    */
+
+    Object.entries(markets)
+      .forEach(
+        ([symbol,name]) => {
+
+          let option =
+            market.querySelector(
+              'option[value="' +
+              symbol +
+              '"]'
+            );
+
+          if (!option) {
+
+            option =
+              document.createElement(
+                "option"
+              );
+
+            option.value =
+              symbol;
+
+            option.textContent =
+              name;
+
+            market.appendChild(
+              option
+            );
+
+          }
+
+        }
+      );
+
+
+    /*
+    -------------------------------------------------------
+    MARKET GROUP
+    -------------------------------------------------------
+    */
+
+    function getMarketGroup(symbol) {
+
+      if (
+        symbol.startsWith("frx")
+      ) {
+
+        return "forex";
+
+      }
+
+      if (
+        symbol.startsWith("cry")
+      ) {
+
+        return "crypto";
+
+      }
+
+      if (
+        symbol.startsWith("R_")
+      ) {
+
+        return "synthetic";
+
+      }
+
+      return "synthetic";
+
+    }
+
+
+    /*
+    -------------------------------------------------------
+    CREATE RISE / FALL
+    -------------------------------------------------------
+    */
+
+    function createButton(
+      typeValue,
+      label
+    ) {
+
+      let button =
+        typeButtons.querySelector(
+          '[data-type="' +
+          typeValue +
+          '"]'
+        );
+
+      if (button) {
+
+        return button;
+
+      }
+
+
+      button =
+        document.createElement(
+          "button"
+        );
+
+      button.type =
+        "button";
+
+      button.className =
+        "type";
+
+      button.dataset.type =
+        typeValue;
+
+      button.textContent =
+        label;
+
+      typeButtons.appendChild(
+        button
+      );
+
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          /*
+           * Use the EXISTING terminal
+           * state variable.
+           */
+
+          type =
+            typeValue;
+
+          updateTypeUI();
+
+        }
+      );
+
+
+      return button;
+
+    }
+
+
+    const riseButton =
+      createButton(
+        "CALL",
+        "Rise"
+      );
+
+
+    const fallButton =
+      createButton(
+        "PUT",
+        "Fall"
+      );
+
+
+    /*
+    -------------------------------------------------------
+    DIGIT BUTTON TYPES
+    -------------------------------------------------------
+    */
+
+    const digitTypes = [
+
+      "DIGITMATCH",
+      "DIGITDIFF",
+      "DIGITEVEN",
+      "DIGITODD",
+      "DIGITOVER",
+      "DIGITUNDER"
+
+    ];
+
+
+    /*
+    -------------------------------------------------------
+    CONFIGURE TERMINAL
+    -------------------------------------------------------
+    */
+
+    function configureMarket() {
+
+      const symbol =
+        market.value;
+
+      const group =
+        getMarketGroup(
+          symbol
+        );
+
+
+      /*
+       * Update page title.
+       */
+
+      symbolName.textContent =
+        markets[symbol] ||
+        symbol;
+
+
+      /*
+       * Order ticket title.
+       */
+
+      if (orderTitle) {
+
+        orderTitle.textContent =
+          group === "synthetic"
+            ? "Trading Order Ticket"
+            : "Rise / Fall Order Ticket";
+
+      }
+
+
+      /*
+       * SHOW/HIDE CONTRACT TYPES
+       */
+
+      typeButtons
+        .querySelectorAll(
+          ".type"
+        )
+        .forEach(
+          button => {
+
+            const buttonType =
+              button.dataset.type;
+
+
+            /*
+             * Rise / Fall:
+             * available on all selected
+             * supported markets.
+             */
+
+            if (
+              buttonType === "CALL" ||
+              buttonType === "PUT"
+            ) {
+
+              button.style.display =
+                "";
+
+              return;
+
+            }
+
+
+            /*
+             * Digit contracts:
+             * only show for synthetic
+             * markets.
+             */
+
+            if (
+              digitTypes.includes(
+                buttonType
+              )
+            ) {
+
+              button.style.display =
+                group === "synthetic"
+                  ? ""
+                  : "none";
+
+            }
+
+          }
+        );
+
+
+      /*
+       * FOREX / CRYPTO
+       *
+       * Always start with RISE.
+       */
+
+      if (
+        group === "forex" ||
+        group === "crypto"
+      ) {
+
+        type =
+          "CALL";
+
+      }
+
+
+      /*
+       * SYNTHETIC
+       *
+       * Also start with RISE instead
+       * of Matches.
+       */
+
+      if (
+        group === "synthetic"
+      ) {
+
+        type =
+          "CALL";
+
+      }
+
+
+      /*
+       * Highlight selected type.
+       */
+
+      typeButtons
+        .querySelectorAll(
+          ".type"
+        )
+        .forEach(
+          button => {
+
+            button.classList.toggle(
+              "active",
+              button.dataset.type ===
+                type
+            );
+
+          }
+        );
+
+
+      /*
+       * Prediction digit only belongs
+       * to digit contracts.
+       */
+
+      if (
+        predictionField
+      ) {
+
+        predictionField.style.display =
+          digitTypes.includes(
+            type
+          )
+            ? ""
+            : "none";
+
+      }
+
+
+      /*
+       * Clear old proposal.
+       */
+
+      proposal =
+        null;
+
+      lastProposalKey =
+        "";
+
+
+      const payout =
+        document.getElementById(
+          "payout"
+        );
+
+      const profit =
+        document.getElementById(
+          "profit"
+        );
+
+      const askPrice =
+        document.getElementById(
+          "askPrice"
+        );
+
+
+      if (payout) {
+
+        payout.textContent =
+          "—";
+
+      }
+
+      if (profit) {
+
+        profit.textContent =
+          "—";
+
+      }
+
+      if (askPrice) {
+
+        askPrice.textContent =
+          "—";
+
+      }
+
+
+      /*
+       * Change REAL Deriv symbol.
+       */
+
+      if (
+        window.PELI_DERIV &&
+        typeof
+          window.PELI_DERIV.changeSymbol ===
+          "function"
+      ) {
+
+        try {
+
+          window.PELI_DERIV
+            .changeSymbol(
+              symbol
+            );
+
+        } catch(error) {
+
+          console.error(
+            "DERIV SYMBOL:",
+            error
+          );
+
+        }
+
+      }
+
+
+      /*
+       * Request fresh REAL proposal.
+       */
+
+      if (
+        typeof requestProposalSoon ===
+        "function"
+      ) {
+
+        requestProposalSoon();
+
+      }
+
+    }
+
+
+    /*
+    -------------------------------------------------------
+    READ ?symbol= FROM MARKETS PAGE
+    -------------------------------------------------------
+    */
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    const requestedSymbol =
+      params.get(
+        "symbol"
+      );
+
+
+    /*
+    -------------------------------------------------------
+    OPENED FROM MARKETS
+    -------------------------------------------------------
+    */
+
+    if (
+      requestedSymbol &&
+      markets[requestedSymbol]
+    ) {
+
+      /*
+       * Select the exact market.
+       */
+
+      market.value =
+        requestedSymbol;
+
+
+      /*
+       * Update everything.
+       */
+
+      configureMarket();
+
+
+      /*
+       * Trigger existing terminal
+       * market logic as well.
+       */
+
+      market.dispatchEvent(
+        new Event(
+          "change",
+          {
+            bubbles:true
+          }
+        )
+      );
+
+    } else {
+
+      /*
+       * Direct visit to trade.html.
+       *
+       * Use Volatility 100 only as
+       * the default.
+       */
+
+      if (
+        !market.value
+      ) {
+
+        market.value =
+          "R_100";
+
+      }
+
+      configureMarket();
+
+    }
+
+
+    /*
+    -------------------------------------------------------
+    MANUAL MARKET CHANGE
+    -------------------------------------------------------
+    */
+
+    market.addEventListener(
+      "change",
+      function () {
+
+        configureMarket();
+
+      }
+    );
+
+
+    /*
+    -------------------------------------------------------
+    BEAUTIFUL MARKET-SPECIFIC UI
+    -------------------------------------------------------
+    */
+
+    const style =
+      document.createElement(
+        "style"
+      );
+
+    style.textContent = `
+
+      #typeButtons .type[data-type="CALL"],
+      #typeButtons .type[data-type="PUT"] {
+        background:#111a27;
+      }
+
+      #typeButtons
+      .type[data-type="CALL"].active {
+        background:
+          linear-gradient(
+            135deg,
+            #786cff,
+            #39d4b6
+          );
+        border-color:#39d4b6;
+        color:#fff;
+      }
+
+      #typeButtons
+      .type[data-type="PUT"].active {
+        background:
+          linear-gradient(
+            135deg,
+            #786cff,
+            #39d4b6
+          );
+        border-color:#39d4b6;
+        color:#fff;
+      }
+
+    `;
+
+    document.head.appendChild(
+      style
+    );
+
+
+    console.log(
+      "PELI MARKET ROUTER READY",
+      {
+        requestedSymbol,
+        currentMarket:
+          market.value,
+        marketName:
+          markets[market.value],
+        group:
+          getMarketGroup(
+            market.value
+          )
+      }
+    );
+
+  }
+
+
+  /*
+  -------------------------------------------------------
+  START
+  -------------------------------------------------------
+  */
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      startMarketRouter
+    );
+
+  } else {
+
+    startMarketRouter();
+
+  }
+
+})();
+</script>
 </body>
 </html>
