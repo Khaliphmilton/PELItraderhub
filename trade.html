@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <title>PELItradershub — Real Digits Trader</title>
 
 <link rel="stylesheet" href="styles.css">
 
 <style>
+
 :root{
   --bg:#070b12;
-  --panel:#0b111b;
+  --panel:#0a1019;
   --card:#111a27;
-  --card2:#0d1622;
   --line:#202b3c;
   --text:#f4f7fb;
   --muted:#8490a4;
@@ -39,6 +40,10 @@ button,
 input,
 select{
   font:inherit;
+}
+
+button{
+  cursor:pointer;
 }
 
 .navbar{
@@ -86,12 +91,18 @@ select{
   display:block;
   font-size:28px;
   letter-spacing:.3px;
+  font-variant-numeric:tabular-nums;
 }
 
 .live{
   font-size:11px;
   color:var(--yellow);
 }
+
+
+/* =========================================================
+   REAL LIVE CHART
+   ========================================================= */
 
 .chart{
   height:390px;
@@ -114,87 +125,172 @@ select{
   opacity:.55;
 }
 
-.tick-stream{
+
+/*
+   The actual SVG price chart.
+   Every new REAL Deriv tick adds a point.
+*/
+
+.price-svg{
   position:absolute;
-  inset:30px 15px 30px;
-  display:flex;
-  align-items:flex-end;
-  gap:3px;
+  inset:0;
+  width:100%;
+  height:100%;
+  overflow:visible;
 }
 
-.bar{
-  flex:1;
-  max-width:8px;
-  min-width:2px;
-  border-radius:3px 3px 0 0;
-  background:var(--blue);
-  opacity:.75;
+.price-line{
+  fill:none;
+  stroke:var(--blue);
+  stroke-width:2;
+  vector-effect:non-scaling-stroke;
+  filter:drop-shadow(0 0 4px rgba(45,140,255,.35));
 }
+
+.price-area{
+  fill:rgba(45,140,255,.07);
+}
+
+
+/*
+   Moving real-market cursor.
+*/
 
 .market-cursor{
   position:absolute;
-  width:0;
+
   top:25px;
   bottom:25px;
+
+  width:0;
+
   border-left:2px dashed var(--yellow);
+
   pointer-events:none;
-  transition:left .15s linear;
+
+  transition:
+    left .18s linear;
 }
 
 .market-cursor:after{
   content:"";
+
   position:absolute;
-  top:0;
+
+  top:-2px;
   left:-6px;
+
   width:10px;
   height:10px;
+
   border-radius:50%;
+
   background:var(--yellow);
-  box-shadow:0 0 12px rgba(255,210,74,.8);
+
+  box-shadow:
+    0 0 8px rgba(255,210,74,.9),
+    0 0 18px rgba(255,210,74,.5);
 }
 
 .cursor-label{
   position:absolute;
+
   top:8px;
-  left:8px;
-  background:#111a27e8;
+
+  background:#111a27ee;
+
   border:1px solid #39475d;
+
   border-radius:7px;
+
   padding:5px 8px;
+
   font-size:10px;
+
   color:var(--yellow);
+
   pointer-events:none;
+
+  white-space:nowrap;
+
+  transform:translateX(-50%);
 }
 
-.chart-info{
+
+/*
+   Current price marker.
+*/
+
+.live-price-marker{
   position:absolute;
-  left:15px;
-  bottom:12px;
-  background:#0b121de8;
-  border:1px solid #27364a;
-  border-radius:9px;
-  padding:8px 11px;
-  font-size:11px;
-  color:var(--muted);
+
+  right:10px;
+
+  transform:translateY(-50%);
+
+  background:var(--blue);
+
+  color:#fff;
+
+  border-radius:6px;
+
+  padding:4px 7px;
+
+  font-size:10px;
+
+  font-weight:800;
+
+  pointer-events:none;
+
+  transition:top .18s linear;
 }
 
-.chart-info b{
-  color:#fff;
+.live-price-marker:before{
+  content:"";
+
+  position:absolute;
+
+  right:-5px;
+  top:50%;
+
+  transform:translateY(-50%);
+
+  border-top:5px solid transparent;
+  border-bottom:5px solid transparent;
+  border-left:5px solid var(--blue);
 }
+
+
+/*
+   Center status disappears once live ticks arrive.
+*/
 
 .chart-center{
   position:absolute;
   inset:0;
+
   display:grid;
   place-items:center;
+
   pointer-events:none;
+
+  transition:
+    opacity .25s ease;
+}
+
+.chart-center.hidden{
+  opacity:0;
 }
 
 .chart-center div{
   background:#0b121dcc;
+
   border:1px solid #29384d;
+
   border-radius:14px;
+
   padding:15px 18px;
+
   text-align:center;
 }
 
@@ -204,62 +300,246 @@ select{
 
 .chart-center span{
   display:block;
+
   color:var(--muted);
+
   font-size:11px;
+
   margin-top:5px;
 }
 
+.chart-info{
+  position:absolute;
+
+  left:15px;
+  bottom:12px;
+
+  background:#0b121de8;
+
+  border:1px solid #27364a;
+
+  border-radius:9px;
+
+  padding:8px 11px;
+
+  font-size:11px;
+
+  color:var(--muted);
+
+  z-index:5;
+}
+
+.chart-info b{
+  color:#fff;
+}
+
+
+/* =========================================================
+   DIGIT MARKET STRIP
+   ========================================================= */
+
+.live-digit-strip{
+  margin-top:10px;
+
+  border:1px solid var(--line);
+
+  border-radius:12px;
+
+  background:#0b121c;
+
+  padding:10px;
+}
+
+.live-digit-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin-bottom:8px;
+
+  font-size:10px;
+
+  color:var(--muted);
+
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.live-digit-title strong{
+  color:var(--yellow);
+}
+
+.live-digits{
+  display:grid;
+
+  grid-template-columns:
+    repeat(10,1fr);
+
+  gap:5px;
+}
+
+.live-digit{
+  position:relative;
+
+  min-width:0;
+
+  border:1px solid #29364a;
+
+  background:#101925;
+
+  border-radius:7px;
+
+  padding:7px 2px;
+
+  text-align:center;
+
+  color:#9ca8b9;
+
+  transition:
+    background .12s ease,
+    border-color .12s ease,
+    transform .12s ease;
+}
+
+.live-digit strong{
+  font-size:15px;
+}
+
+.live-digit small{
+  display:block;
+
+  margin-top:2px;
+
+  font-size:8px;
+
+  color:#68758a;
+}
+
+.live-digit.current{
+  background:#173d69;
+
+  border-color:var(--yellow);
+
+  color:#fff;
+
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 0 0 1px rgba(255,210,74,.25),
+    0 0 12px rgba(255,210,74,.18);
+}
+
+.live-digit.current:after{
+  content:"LIVE";
+
+  position:absolute;
+
+  top:-7px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  background:var(--yellow);
+
+  color:#111;
+
+  border-radius:4px;
+
+  padding:2px 4px;
+
+  font-size:7px;
+
+  font-weight:900;
+}
+
+.live-digit.selected{
+  border-color:var(--blue);
+
+  background:#102b4d;
+
+  color:#fff;
+}
+
+.live-digit.current.selected{
+  border-color:var(--yellow);
+
+  background:#183d5d;
+}
+
+
+/* =========================================================
+   RIGHT PANEL
+   ========================================================= */
+
 .panel{
   border-left:1px solid var(--line);
+
   background:#0a1019;
+
   padding:18px;
+
   overflow:auto;
 }
 
 .panel h2{
   margin:0 0 14px;
+
   font-size:20px;
 }
 
 .account{
   background:var(--card);
+
   border:1px solid var(--line);
+
   border-radius:13px;
+
   padding:14px;
+
   margin-bottom:15px;
 }
 
 .label{
   color:var(--muted);
+
   font-size:10px;
+
   text-transform:uppercase;
+
   letter-spacing:.5px;
 }
 
 .balance{
   font-size:25px;
+
   font-weight:800;
+
   margin:4px 0;
 }
 
 .account-status{
   font-size:12px;
-  color:var(--yellow);
-  margin-top:6px;
-}
 
-button{
-  cursor:pointer;
+  color:var(--yellow);
+
+  margin-top:6px;
 }
 
 .connect{
   width:100%;
+
   margin-top:10px;
+
   border:1px solid var(--purple);
+
   background:#17142e;
+
   color:#c1bbff;
+
   border-radius:9px;
+
   padding:11px;
+
   font-weight:800;
 }
 
@@ -269,21 +549,32 @@ button{
 
 .field label{
   display:block;
+
   color:#929caf;
+
   font-size:10px;
+
   margin-bottom:6px;
+
   text-transform:uppercase;
+
   letter-spacing:.4px;
 }
 
 .input,
 .select{
   width:100%;
+
   background:#0b121c;
+
   border:1px solid #29364a;
+
   color:#fff;
+
   border-radius:9px;
+
   padding:11px;
+
   outline:none;
 }
 
@@ -294,16 +585,23 @@ button{
 
 .type-buttons{
   display:grid;
+
   grid-template-columns:1fr 1fr;
+
   gap:7px;
 }
 
 .type{
   border:1px solid #29364a;
+
   background:#111a27;
+
   color:#c6ceda;
+
   border-radius:9px;
+
   padding:11px 7px;
+
   font-weight:800;
 }
 
@@ -313,36 +611,62 @@ button{
 
 .type.active{
   background:#222b5d;
+
   border-color:#786cff;
+
   color:#fff;
 }
 
+
+/* =========================================================
+   PREDICTION DIGITS
+   ========================================================= */
+
 .digits{
   display:grid;
-  grid-template-columns:repeat(10,1fr);
+
+  grid-template-columns:
+    repeat(10,1fr);
+
   gap:5px;
+
   margin:8px 0 14px;
 }
 
 .digit{
   position:relative;
+
   border:1px solid #29364a;
+
   background:#111a27;
+
   color:#dbe2ec;
+
   border-radius:8px;
+
   padding:9px 2px;
+
   text-align:center;
+
+  transition:
+    border-color .12s,
+    background .12s,
+    transform .12s;
 }
 
 .digit strong{
   display:block;
+
   font-size:16px;
 }
 
 .digit small{
   display:block;
+
   color:#8b97a9;
+
   font-size:9px;
+
   margin-top:3px;
 }
 
@@ -352,45 +676,85 @@ button{
 
 .digit.active{
   border-color:var(--blue);
+
   background:#102b4d;
-  box-shadow:0 0 0 1px rgba(45,140,255,.2);
+
+  box-shadow:
+    0 0 0 1px rgba(45,140,255,.2);
 }
 
-.digit.active:after{
-  content:"";
+
+/*
+   NEW:
+   actual live digit indicator.
+*/
+
+.digit.live-now{
+  border-color:var(--yellow);
+
+  box-shadow:
+    0 0 12px rgba(255,210,74,.25);
+
+  transform:translateY(-2px);
+}
+
+.digit.live-now:after{
+  content:"LIVE";
+
   position:absolute;
-  top:-5px;
+
+  top:-6px;
   left:50%;
+
   transform:translateX(-50%);
-  border-left:5px solid transparent;
-  border-right:5px solid transparent;
-  border-bottom:6px solid var(--yellow);
+
+  background:var(--yellow);
+
+  color:#111;
+
+  border-radius:4px;
+
+  padding:2px 4px;
+
+  font-size:7px;
+
+  font-weight:900;
 }
 
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
+.digit.active.live-now{
+  background:#183d5d;
+
+  border-color:var(--yellow);
 }
 
 .row3{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr 1fr;
+
   gap:7px;
 }
 
 .summary{
   border-top:1px solid var(--line);
+
   border-bottom:1px solid var(--line);
+
   padding:10px 0;
+
   margin:15px 0;
 }
 
 .sum{
   display:flex;
+
   justify-content:space-between;
+
   gap:15px;
+
   margin:8px 0;
+
   font-size:13px;
 }
 
@@ -400,28 +764,48 @@ button{
 
 .buy{
   width:100%;
+
   border:0;
+
   border-radius:10px;
+
   padding:14px;
-  background:linear-gradient(135deg,#786cff,#2cc9bb);
+
+  background:
+    linear-gradient(
+      135deg,
+      #786cff,
+      #2cc9bb
+    );
+
   color:#061016;
+
   font-weight:900;
 }
 
 .buy:disabled{
   opacity:.45;
+
   cursor:not-allowed;
 }
 
 .sell{
   width:100%;
+
   margin-top:8px;
+
   border:1px solid var(--red);
+
   border-radius:10px;
+
   padding:12px;
+
   background:#281318;
+
   color:#ff8b91;
+
   font-weight:900;
+
   display:none;
 }
 
@@ -431,57 +815,86 @@ button{
 
 .result{
   margin-top:12px;
+
   padding:11px;
+
   border-radius:9px;
+
   background:var(--card);
+
   border:1px solid var(--line);
+
   font-size:12px;
+
   color:#aeb8c7;
+
   white-space:pre-line;
+
   line-height:1.5;
 }
 
 .notice{
   font-size:10px;
+
   color:#788397;
+
   line-height:1.5;
+
   margin-top:12px;
 }
 
 .stats{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+
+  grid-template-columns:
+    repeat(3,1fr);
+
   gap:7px;
+
   margin-top:12px;
 }
 
 .stat{
   background:#0e1723;
+
   border:1px solid var(--line);
+
   border-radius:9px;
+
   padding:9px;
+
   text-align:center;
 }
 
 .stat span{
   display:block;
+
   color:var(--muted);
+
   font-size:9px;
+
   text-transform:uppercase;
 }
 
 .stat strong{
   display:block;
+
   margin-top:4px;
+
   font-size:13px;
 }
 
 .open-contract{
   display:none;
+
   margin-top:12px;
+
   padding:11px;
+
   background:#101b28;
+
   border:1px solid #30435b;
+
   border-radius:10px;
 }
 
@@ -491,20 +904,30 @@ button{
 
 .open-contract-title{
   font-weight:800;
+
   font-size:12px;
+
   margin-bottom:8px;
 }
 
 .contract-line{
   display:flex;
+
   justify-content:space-between;
+
   font-size:11px;
+
   margin:5px 0;
 }
 
 .contract-line span{
   color:var(--muted);
 }
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 
 @media(max-width:900px){
 
@@ -514,6 +937,7 @@ button{
 
   .panel{
     border-left:0;
+
     border-top:1px solid var(--line);
   }
 
@@ -533,7 +957,8 @@ button{
     padding:12px;
   }
 
-  .digits{
+  .digits,
+  .live-digits{
     gap:3px;
   }
 
@@ -545,11 +970,22 @@ button{
     font-size:14px;
   }
 
+  .live-digit{
+    padding:6px 1px;
+  }
+
+  .live-digit strong{
+    font-size:13px;
+  }
+
 }
+
 </style>
 </head>
 
+
 <body>
+
 
 <header class="navbar">
 
@@ -566,16 +1002,24 @@ button{
   </nav>
 
   <div class="nav-actions">
-    <a href="portfolio.html" class="login-link">Portfolio</a>
-    <a href="dashboard.html" class="button primary">Dashboard</a>
+    <a href="portfolio.html" class="login-link">
+      Portfolio
+    </a>
+
+    <a href="dashboard.html" class="button primary">
+      Dashboard
+    </a>
   </div>
 
 </header>
 
 
+
 <main class="terminal">
 
+
 <section class="market">
+
 
   <div class="top">
 
@@ -591,14 +1035,19 @@ button{
 
     </div>
 
+
     <div class="price">
 
       <strong id="price">
         —
       </strong>
 
-      <span class="live" id="liveStatus">
+      <span
+        class="live"
+        id="liveStatus">
+
         ● Connecting...
+
       </span>
 
     </div>
@@ -606,27 +1055,61 @@ button{
   </div>
 
 
+
+  <!-- =====================================================
+       REAL LIVE PRICE CHART
+       ===================================================== -->
+
   <div class="chart">
 
     <div class="grid"></div>
 
-    <div
-      class="tick-stream"
-      id="tickStream">
-    </div>
+
+    <svg
+      class="price-svg"
+      id="priceSvg"
+      preserveAspectRatio="none">
+
+      <polygon
+        id="priceArea"
+        class="price-area">
+      </polygon>
+
+      <polyline
+        id="priceLine"
+        class="price-line">
+      </polyline>
+
+    </svg>
+
 
     <div
       class="market-cursor"
       id="marketCursor">
+
+      <div
+        class="cursor-label"
+        id="cursorLabel">
+
+        LIVE
+
+      </div>
+
     </div>
+
 
     <div
-      class="cursor-label"
-      id="cursorLabel">
-      MARKET
+      class="live-price-marker"
+      id="livePriceMarker">
+
+      —
+
     </div>
 
-    <div class="chart-center">
+
+    <div
+      class="chart-center"
+      id="chartCenter">
 
       <div>
 
@@ -641,6 +1124,7 @@ button{
       </div>
 
     </div>
+
 
     <div class="chart-info">
 
@@ -657,21 +1141,77 @@ button{
   </div>
 
 
+
+  <!-- =====================================================
+       LIVE DIGIT STRIP
+       ===================================================== -->
+
+  <div class="live-digit-strip">
+
+    <div class="live-digit-title">
+
+      <span>
+        LIVE LAST-DIGIT TRACKER
+      </span>
+
+      <strong id="liveDigitText">
+        Waiting...
+      </strong>
+
+    </div>
+
+    <div
+      class="live-digits"
+      id="liveDigits">
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       STATS
+       ===================================================== -->
+
   <div class="stats">
 
     <div class="stat">
-      <span>Last Digit</span>
-      <strong id="lastDigit">—</strong>
+
+      <span>
+        Last Digit
+      </span>
+
+      <strong id="lastDigit">
+        —
+      </strong>
+
     </div>
 
-    <div class="stat">
-      <span>Previous</span>
-      <strong id="previousDigit">—</strong>
-    </div>
 
     <div class="stat">
-      <span>Ticks</span>
-      <strong id="sampleCount">0</strong>
+
+      <span>
+        Previous
+      </span>
+
+      <strong id="previousDigit">
+        —
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Ticks
+      </span>
+
+      <strong id="sampleCount">
+        0
+      </strong>
+
     </div>
 
   </div>
@@ -679,7 +1219,13 @@ button{
 </section>
 
 
+
+<!-- =======================================================
+     TRADING PANEL
+     ======================================================= -->
+
 <aside class="panel">
+
 
   <h2>
     Digits Order Ticket
@@ -697,28 +1243,38 @@ button{
     <div
       class="balance"
       id="accountBalance">
+
       —
+
     </div>
 
     <div
       class="label"
       id="accountCurrency">
+
       Checking account...
+
     </div>
 
     <div
       class="account-status"
       id="accountStatus">
+
       Real Deriv account not connected
+
     </div>
+
 
     <button
       class="connect"
       id="connectButton">
+
       CONNECT REAL DERIV ACCOUNT
+
     </button>
 
   </div>
+
 
 
   <!-- MARKET -->
@@ -778,6 +1334,7 @@ button{
   </div>
 
 
+
   <!-- TRADE TYPE -->
 
   <div class="field">
@@ -793,42 +1350,55 @@ button{
       <button
         class="type active"
         data-type="DIGITMATCH">
+
         Matches
+
       </button>
 
       <button
         class="type"
         data-type="DIGITDIFF">
+
         Differs
+
       </button>
 
       <button
         class="type"
         data-type="DIGITEVEN">
+
         Even
+
       </button>
 
       <button
         class="type"
         data-type="DIGITODD">
+
         Odd
+
       </button>
 
       <button
         class="type"
         data-type="DIGITOVER">
+
         Over
+
       </button>
 
       <button
         class="type"
         data-type="DIGITUNDER">
+
         Under
+
       </button>
 
     </div>
 
   </div>
+
 
 
   <!-- PREDICTION -->
@@ -844,9 +1414,11 @@ button{
     <div
       class="digits"
       id="digits">
+
     </div>
 
   </div>
+
 
 
   <!-- DURATION -->
@@ -886,7 +1458,8 @@ button{
   </div>
 
 
-  <!-- TRADE INPUTS -->
+
+  <!-- INPUTS -->
 
   <div class="row3">
 
@@ -942,6 +1515,7 @@ button{
   </div>
 
 
+
   <!-- FREQUENCY -->
 
   <div class="field">
@@ -954,9 +1528,11 @@ button{
     <div
       class="digits"
       id="frequency">
+
     </div>
 
   </div>
+
 
 
   <!-- SUMMARY -->
@@ -1004,6 +1580,7 @@ button{
   </div>
 
 
+
   <!-- BUY -->
 
   <button
@@ -1014,6 +1591,7 @@ button{
     CONNECT REAL DERIV ACCOUNT TO TRADE
 
   </button>
+
 
 
   <!-- SELL -->
@@ -1027,6 +1605,7 @@ button{
   </button>
 
 
+
   <!-- OPEN CONTRACT -->
 
   <div
@@ -1038,26 +1617,55 @@ button{
     </div>
 
     <div class="contract-line">
-      <span>Contract ID</span>
-      <strong id="contractId">—</strong>
+
+      <span>
+        Contract ID
+      </span>
+
+      <strong id="contractId">
+        —
+      </strong>
+
     </div>
 
     <div class="contract-line">
-      <span>Status</span>
-      <strong id="contractStatus">—</strong>
+
+      <span>
+        Status
+      </span>
+
+      <strong id="contractStatus">
+        —
+      </strong>
+
     </div>
 
     <div class="contract-line">
-      <span>Current value</span>
-      <strong id="contractValue">—</strong>
+
+      <span>
+        Current value
+      </span>
+
+      <strong id="contractValue">
+        —
+      </strong>
+
     </div>
 
     <div class="contract-line">
-      <span>Profit/Loss</span>
-      <strong id="contractProfit">—</strong>
+
+      <span>
+        Profit/Loss
+      </span>
+
+      <strong id="contractProfit">
+        —
+      </strong>
+
     </div>
 
   </div>
+
 
 
   <!-- RESULT -->
@@ -1085,16 +1693,18 @@ button{
 </main>
 
 
+
 <script src="deriv.js"></script>
 
 
 <script>
+
 "use strict";
 
 
-/* ============================================================
+/* =========================================================
    ELEMENTS
-   ============================================================ */
+   ========================================================= */
 
 const $ =
   id => document.getElementById(id);
@@ -1111,6 +1721,9 @@ const liveStatus =
 
 const chartStatus =
   $("chartStatus");
+
+const chartCenter =
+  $("chartCenter");
 
 const symbolName =
   $("symbolName");
@@ -1166,14 +1779,20 @@ const sampleSize =
 const predictionField =
   $("predictionField");
 
-const tickStream =
-  $("tickStream");
+const priceLine =
+  $("priceLine");
+
+const priceArea =
+  $("priceArea");
 
 const marketCursor =
   $("marketCursor");
 
 const cursorLabel =
   $("cursorLabel");
+
+const livePriceMarker =
+  $("livePriceMarker");
 
 const chartDigit =
   $("chartDigit");
@@ -1189,6 +1808,12 @@ const previousDigit =
 
 const sampleCount =
   $("sampleCount");
+
+const liveDigits =
+  $("liveDigits");
+
+const liveDigitText =
+  $("liveDigitText");
 
 const openContract =
   $("openContract");
@@ -1206,9 +1831,9 @@ const contractProfit =
   $("contractProfit");
 
 
-/* ============================================================
+/* =========================================================
    STATE
-   ============================================================ */
+   ========================================================= */
 
 let type =
   "DIGITMATCH";
@@ -1222,9 +1847,6 @@ let proposal =
 let connected =
   false;
 
-let bars =
-  [];
-
 let currentContractId =
   null;
 
@@ -1235,9 +1857,23 @@ let proposalTimer =
   null;
 
 
-/* ============================================================
+/*
+   REAL TICK PRICE HISTORY.
+
+   These values come directly from Deriv.
+   Nothing is generated here.
+*/
+
+let priceHistory =
+  [];
+
+const MAX_POINTS =
+  80;
+
+
+/* =========================================================
    MARKET NAMES
-   ============================================================ */
+   ========================================================= */
 
 const names = {
 
@@ -1274,9 +1910,9 @@ const names = {
 };
 
 
-/* ============================================================
+/* =========================================================
    MONEY
-   ============================================================ */
+   ========================================================= */
 
 function money(
   value,
@@ -1315,13 +1951,14 @@ function money(
 }
 
 
-/* ============================================================
-   DIGIT BUTTONS
-   ============================================================ */
+/* =========================================================
+   PREDICTION DIGITS
+   ========================================================= */
 
 function renderDigits(){
 
-  digitsBox.innerHTML = "";
+  digitsBox.innerHTML =
+    "";
 
   for(
     let i = 0;
@@ -1330,21 +1967,50 @@ function renderDigits(){
   ){
 
     const button =
-      document.createElement("button");
+      document.createElement(
+        "button"
+      );
 
     button.type =
       "button";
 
     button.className =
-      "digit" +
-      (
-        i === prediction
-          ? " active"
-          : ""
+      "digit";
+
+    if(
+      i === prediction
+    ){
+
+      button.classList.add(
+        "active"
       );
+
+    }
+
+
+    /*
+       Mark the digit that the REAL
+       market is currently producing.
+    */
+
+    if(
+      Number.isInteger(
+        window.PELI_DERIV?.lastDigit
+      ) &&
+      i ===
+      window.PELI_DERIV.lastDigit
+    ){
+
+      button.classList.add(
+        "live-now"
+      );
+
+    }
+
 
     button.innerHTML =
       `<strong>${i}</strong>`;
+
 
     button.addEventListener(
       "click",
@@ -1360,6 +2026,7 @@ function renderDigits(){
       }
     );
 
+
     digitsBox.appendChild(
       button
     );
@@ -1369,9 +2036,96 @@ function renderDigits(){
 }
 
 
-/* ============================================================
+/* =========================================================
+   LIVE DIGIT STRIP
+   ========================================================= */
+
+function renderLiveDigits(
+  currentDigit
+){
+
+  liveDigits.innerHTML =
+    "";
+
+  for(
+    let i = 0;
+    i < 10;
+    i++
+  ){
+
+    const box =
+      document.createElement(
+        "div"
+      );
+
+    box.className =
+      "live-digit";
+
+
+    if(
+      i === currentDigit
+    ){
+
+      box.classList.add(
+        "current"
+      );
+
+    }
+
+
+    if(
+      i === prediction
+    ){
+
+      box.classList.add(
+        "selected"
+      );
+
+    }
+
+
+    box.innerHTML =
+      `
+        <strong>${i}</strong>
+        <small>${
+          i === currentDigit
+            ? "LIVE"
+            : i === prediction
+              ? "SELECTED"
+              : ""
+        }</small>
+      `;
+
+
+    liveDigits.appendChild(
+      box
+    );
+
+  }
+
+
+  if(
+    Number.isInteger(
+      currentDigit
+    )
+  ){
+
+    liveDigitText.textContent =
+      `CURRENT DIGIT: ${currentDigit}`;
+
+  }else{
+
+    liveDigitText.textContent =
+      "Waiting for tick...";
+
+  }
+
+}
+
+
+/* =========================================================
    FREQUENCY
-   ============================================================ */
+   ========================================================= */
 
 function renderFrequency(
   counts,
@@ -1383,6 +2137,7 @@ function renderFrequency(
 
   sampleSize.textContent =
     total || 0;
+
 
   for(
     let i = 0;
@@ -1404,17 +2159,24 @@ function renderFrequency(
           100
         : 0;
 
+
     const box =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     box.className =
       "digit";
 
+
     box.innerHTML =
       `
         <strong>${i}</strong>
-        <small>${percentage.toFixed(1)}%</small>
+        <small>
+          ${percentage.toFixed(1)}%
+        </small>
       `;
+
 
     frequencyBox.appendChild(
       box
@@ -1425,9 +2187,9 @@ function renderFrequency(
 }
 
 
-/* ============================================================
-   TRADE TYPE
-   ============================================================ */
+/* =========================================================
+   TYPE UI
+   ========================================================= */
 
 function updateTypeUI(){
 
@@ -1478,10 +2240,6 @@ function updateTypeUI(){
 }
 
 
-/* ============================================================
-   TYPE BUTTON EVENTS
-   ============================================================ */
-
 document
   .querySelectorAll(".type")
   .forEach(
@@ -1503,9 +2261,9 @@ document
   );
 
 
-/* ============================================================
-   PROPOSAL DEBOUNCE
-   ============================================================ */
+/* =========================================================
+   PROPOSAL
+   ========================================================= */
 
 function requestProposalSoon(){
 
@@ -1521,10 +2279,6 @@ function requestProposalSoon(){
 
 }
 
-
-/* ============================================================
-   REQUEST PROPOSAL
-   ============================================================ */
 
 function requestProposal(){
 
@@ -1551,15 +2305,7 @@ function requestProposal(){
 
   if(
     !Number.isFinite(amount) ||
-    amount <= 0
-  ){
-
-    return;
-
-  }
-
-
-  if(
+    amount <= 0 ||
     !Number.isFinite(ticks) ||
     ticks <= 0
   ){
@@ -1652,9 +2398,9 @@ function requestProposal(){
 }
 
 
-/* ============================================================
+/* =========================================================
    STAKE
-   ============================================================ */
+   ========================================================= */
 
 function updateStake(){
 
@@ -1696,9 +2442,9 @@ stake.addEventListener(
 );
 
 
-/* ============================================================
+/* =========================================================
    DURATION
-   ============================================================ */
+   ========================================================= */
 
 duration.addEventListener(
   "change",
@@ -1719,9 +2465,9 @@ duration.addEventListener(
 );
 
 
-/* ============================================================
+/* =========================================================
    MARKET CHANGE
-   ============================================================ */
+   ========================================================= */
 
 market.addEventListener(
   "change",
@@ -1736,6 +2482,17 @@ market.addEventListener(
       symbol;
 
 
+    /*
+       Clear old chart because it belongs
+       to the previous market.
+    */
+
+    priceHistory =
+      [];
+
+    drawRealChart();
+
+
     proposal =
       null;
 
@@ -1747,6 +2504,7 @@ market.addEventListener(
 
     profit.textContent =
       "—";
+
 
     result.textContent =
       "Loading live Deriv market...";
@@ -1769,9 +2527,9 @@ market.addEventListener(
 );
 
 
-/* ============================================================
-   CONNECT BUTTON
-   ============================================================ */
+/* =========================================================
+   CONNECT REAL DERIV ACCOUNT
+   ========================================================= */
 
 connectButton.addEventListener(
   "click",
@@ -1784,9 +2542,9 @@ connectButton.addEventListener(
 );
 
 
-/* ============================================================
+/* =========================================================
    DERIV STATUS
-   ============================================================ */
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "status",
@@ -1818,7 +2576,7 @@ window.PELI_DERIV.on(
         "#2cc9bb";
 
       chartStatus.textContent =
-        "Live Deriv ticks connected.";
+        "Receiving real Deriv ticks.";
 
       return;
 
@@ -1851,9 +2609,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
+/* =========================================================
    REAL TICKS
-   ============================================================ */
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "tick",
@@ -1874,18 +2632,52 @@ window.PELI_DERIV.on(
     }
 
 
+    /*
+       REAL MARKET PRICE.
+    */
+
     price.textContent =
       quote.toLocaleString(
         undefined,
         {
           minimumFractionDigits:2,
-          maximumFractionDigits:5
+          maximumFractionDigits:8
         }
       );
 
 
+    /*
+       Save REAL tick.
+    */
+
+    priceHistory.push(
+      quote
+    );
+
+
+    if(
+      priceHistory.length >
+      MAX_POINTS
+    ){
+
+      priceHistory.shift();
+
+    }
+
+
+    /*
+       Draw the moving real-price line.
+    */
+
+    drawRealChart();
+
+
     const digit =
-      tick.lastDigit;
+      Number.isInteger(
+        Number(tick.lastDigit)
+      )
+        ? Number(tick.lastDigit)
+        : null;
 
 
     chartDigit.textContent =
@@ -1901,33 +2693,61 @@ window.PELI_DERIV.on(
       tick.sampleSize || 0;
 
 
+    /*
+       Update the actual 0-9 live tracker.
+    */
+
+    renderLiveDigits(
+      digit
+    );
+
+    renderDigits();
+
+
+    /*
+       Movement direction.
+    */
+
     if(
-      tick.previousQuote !==
-      null &&
-      tick.previousQuote !==
-      undefined
+      tick.previousQuote !== null &&
+      tick.previousQuote !== undefined
     ){
+
+      const previousQuote =
+        Number(
+          tick.previousQuote
+        );
+
 
       if(
         quote >
-        Number(tick.previousQuote)
+        previousQuote
       ){
 
         movement.textContent =
           "UP";
 
+        movement.style.color =
+          "#2cc9bb";
+
       }else if(
         quote <
-        Number(tick.previousQuote)
+        previousQuote
       ){
 
         movement.textContent =
           "DOWN";
 
+        movement.style.color =
+          "#f0444d";
+
       }else{
 
         movement.textContent =
           "FLAT";
+
+        movement.style.color =
+          "#ffd24a";
 
       }
 
@@ -1939,31 +2759,219 @@ window.PELI_DERIV.on(
       tick.sampleSize
     );
 
-
-    bars.push(
-      quote
-    );
-
-
-    if(
-      bars.length >
-      100
-    ){
-
-      bars.shift();
-
-    }
-
-
-    renderChart();
-
   }
 );
 
 
-/* ============================================================
+/* =========================================================
+   REAL PRICE CHART
+   ========================================================= */
+
+function drawRealChart(){
+
+  const width =
+    1000;
+
+  const height =
+    360;
+
+
+  if(
+    priceHistory.length <
+    2
+  ){
+
+    priceLine.setAttribute(
+      "points",
+      ""
+    );
+
+    priceArea.setAttribute(
+      "points",
+      ""
+    );
+
+    return;
+
+  }
+
+
+  const min =
+    Math.min(
+      ...priceHistory
+    );
+
+  const max =
+    Math.max(
+      ...priceHistory
+    );
+
+  const range =
+    max -
+    min ||
+    1;
+
+
+  const points =
+    priceHistory.map(
+      (value,index) => {
+
+        const x =
+          (
+            index /
+            (priceHistory.length - 1)
+          ) *
+          width;
+
+
+        const y =
+          25 +
+          (
+            1 -
+            (
+              (
+                value -
+                min
+              ) /
+              range
+            )
+          ) *
+          (
+            height -
+            50
+          );
+
+
+        return {
+          x,
+          y
+        };
+
+      }
+    );
+
+
+  const pointString =
+    points
+      .map(
+        p =>
+          `${p.x},${p.y}`
+      )
+      .join(" ");
+
+
+  priceLine.setAttribute(
+    "viewBox",
+    `0 0 ${width} ${height}`
+  );
+
+
+  priceArea.setAttribute(
+    "viewBox",
+    `0 0 ${width} ${height}`
+  );
+
+
+  priceLine.setAttribute(
+    "points",
+    pointString
+  );
+
+
+  priceArea.setAttribute(
+    "points",
+    `0,${height} ${pointString} ${width},${height}`
+  );
+
+
+  /*
+     IMPORTANT:
+
+     The cursor represents the newest REAL tick.
+     It moves left/right as the chart scrolls.
+  */
+
+  const latest =
+    points[
+      points.length - 1
+    ];
+
+
+  const cursorPercentage =
+    (
+      latest.x /
+      width
+    ) *
+    100;
+
+
+  marketCursor.style.left =
+    `${cursorPercentage}%`;
+
+
+  cursorLabel.style.left =
+    "0";
+
+  cursorLabel.style.transform =
+    "translateX(-50%)";
+
+
+  cursorLabel.textContent =
+    `LIVE • ${
+      window.PELI_DERIV?.lastDigit ??
+      "—"
+    }`;
+
+
+  /*
+     Move the live price label vertically
+     with the actual market price.
+  */
+
+  const chartHeight =
+    document
+      .querySelector(".chart")
+      ?.clientHeight ||
+    390;
+
+
+  const topPercentage =
+    (
+      latest.y /
+      height
+    ) *
+    100;
+
+
+  livePriceMarker.style.top =
+    `${Math.max(
+      8,
+      Math.min(
+        92,
+        topPercentage
+      )
+    )}%`;
+
+
+  livePriceMarker.textContent =
+    price.textContent;
+
+
+  /*
+     Remove waiting overlay once real
+     tick data is actually received.
+  */
+
+  chartCenter.classList.add(
+    "hidden"
+  );
+
+}
+
+
+/* =========================================================
    HISTORY
-   ============================================================ */
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "history",
@@ -1978,109 +2986,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
-   CHART
-   ============================================================ */
-
-function renderChart(){
-
-  tickStream.innerHTML =
-    "";
-
-
-  if(
-    bars.length <
-    2
-  ){
-
-    return;
-
-  }
-
-
-  const min =
-    Math.min(
-      ...bars
-    );
-
-  const max =
-    Math.max(
-      ...bars
-    );
-
-  const range =
-    max -
-    min ||
-    1;
-
-
-  bars.forEach(
-    value => {
-
-      const bar =
-        document.createElement(
-          "div"
-        );
-
-      bar.className =
-        "bar";
-
-
-      const height =
-        8 +
-        (
-          (
-            value -
-            min
-          ) /
-          range
-        ) *
-        88;
-
-
-      bar.style.height =
-        `${height}%`;
-
-
-      tickStream.appendChild(
-        bar
-      );
-
-    }
-  );
-
-
-  /*
-    Move the yellow market cursor
-    to the newest tick.
-  */
-
-  const percentage =
-    100;
-
-
-  marketCursor.style.left =
-    `${percentage}%`;
-
-  cursorLabel.style.left =
-    "auto";
-
-  cursorLabel.style.right =
-    "8px";
-
-  cursorLabel.textContent =
-    "LIVE • " +
-    (
-      window.PELI_DERIV.lastDigit ??
-      "—"
-    );
-
-}
-
-
-/* ============================================================
-   REAL ACCOUNT AUTHENTICATED
-   ============================================================ */
+/* =========================================================
+   AUTHENTICATED REAL ACCOUNT
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "authenticated",
@@ -2098,8 +3006,7 @@ window.PELI_DERIV.on(
 
 
     /*
-      Hide the Connect button after
-      successful real authentication.
+       CONNECT BUTTON DISAPPEARS.
     */
 
     connectButton.style.display =
@@ -2144,9 +3051,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
+/* =========================================================
    BALANCE
-   ============================================================ */
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "balance",
@@ -2180,9 +3087,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
+/* =========================================================
    PROPOSAL
-   ============================================================ */
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "proposal",
@@ -2227,8 +3134,7 @@ window.PELI_DERIV.on(
       Number.isFinite(ask)
 
         ? money(
-            pay -
-            ask,
+            pay - ask,
             proposalData.currency ||
             "USD"
           )
@@ -2250,9 +3156,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
+/* =========================================================
    ERROR
-   ============================================================ */
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "error",
@@ -2271,9 +3177,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
-   REAL BUY RESULT
-   ============================================================ */
+/* =========================================================
+   REAL BUY
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "buy",
@@ -2346,9 +3252,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
-   OPEN CONTRACT UPDATES
-   ============================================================ */
+/* =========================================================
+   CONTRACT UPDATES
+   ========================================================= */
 
 window.PELI_DERIV.on(
   "contract",
@@ -2427,16 +3333,10 @@ window.PELI_DERIV.on(
     }
 
 
-    /*
-      Contract finished.
-    */
-
     if(
       contract.is_sold ||
-      contract.status ===
-      "won" ||
-      contract.status ===
-      "lost"
+      contract.status === "won" ||
+      contract.status === "lost"
     ){
 
       result.textContent =
@@ -2444,15 +3344,13 @@ window.PELI_DERIV.on(
         `Status: ${
           contract.status ||
           (
-            Number(contract.profit) >
-            0
+            Number(contract.profit) > 0
               ? "won"
               : "lost"
           )
         }\n` +
         `Profit/Loss: ${
-          contract.profit !==
-          undefined
+          contract.profit !== undefined
             ? money(
                 contract.profit,
                 contract.currency ||
@@ -2489,9 +3387,9 @@ window.PELI_DERIV.on(
 );
 
 
-/* ============================================================
-   SELL / CLOSE CONTRACT
-   ============================================================ */
+/* =========================================================
+   CLOSE CONTRACT
+   ========================================================= */
 
 sellButton.addEventListener(
   "click",
@@ -2563,11 +3461,15 @@ sellButton.addEventListener(
 );
 
 
-/* ============================================================
+/* =========================================================
    INITIALISE
-   ============================================================ */
+   ========================================================= */
 
 renderDigits();
+
+renderLiveDigits(
+  null
+);
 
 renderFrequency(
   Array(10).fill(0),
@@ -2581,10 +3483,7 @@ updateStake();
 
 
 /*
-  Start the public live market.
-
-  This does NOT mean the account is logged in.
-  It only starts genuine Deriv market data.
+   START REAL PUBLIC DERIV MARKET DATA.
 */
 
 window.PELI_DERIV.connect(
@@ -2593,10 +3492,8 @@ window.PELI_DERIV.connect(
 
 
 /*
-  If the user already has an authenticated
-  real Deriv session, restore it automatically.
-
-  Otherwise the Connect button remains visible.
+   RESTORE REAL AUTHENTICATED SESSION
+   IF ONE ALREADY EXISTS.
 */
 
 window.PELI_DERIV
