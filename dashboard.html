@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>Dashboard | PELItradershub</title>
 
@@ -14,10 +19,11 @@
 <link rel="stylesheet" href="styles.css">
 
 <style>
+
 .dashboard {
-  max-width:1400px;
-  margin:auto;
-  padding:30px 5%;
+  max-width: 1400px;
+  margin: auto;
+  padding: 30px 5%;
 }
 
 .dashboard-header {
@@ -110,11 +116,12 @@
 
 .chart-box {
   height:350px;
-  background:linear-gradient(
-    180deg,
-    rgba(120,108,255,.08),
-    transparent
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(120,108,255,.08),
+      transparent
+    );
   border-radius:12px;
   overflow:hidden;
 }
@@ -283,15 +290,8 @@
   background:#39d4b6;
 }
 
-.status-error {
-  color:#ff7186;
-}
-
-.status-live {
-  color:#39d4b6;
-}
-
 @media(max-width:900px) {
+
   .dash-grid {
     grid-template-columns:repeat(2,1fr);
   }
@@ -299,9 +299,11 @@
   .dashboard-grid {
     grid-template-columns:1fr;
   }
+
 }
 
 @media(max-width:600px) {
+
   .dashboard {
     padding:20px 15px;
   }
@@ -331,8 +333,11 @@
   .dashboard-actions button {
     flex:1;
   }
+
 }
+
 </style>
+
 </head>
 
 <body>
@@ -340,17 +345,28 @@
 <header class="navbar">
 
 <a href="index.html" class="brand">
-  <span class="brand-icon">P</span>
-  <span>PELI<span>tradershub</span></span>
+
+<span class="brand-icon">P</span>
+
+<span>
+PELI<span>tradershub</span>
+</span>
+
 </a>
 
 <div class="nav-actions">
 
-<a href="markets.html" class="login-link">
+<a
+  href="markets.html"
+  class="login-link"
+>
 Markets
 </a>
 
-<a href="settings.html" class="button secondary">
+<a
+  href="settings.html"
+  class="button secondary"
+>
 ⚙
 </a>
 
@@ -363,6 +379,7 @@ Log out
 </button>
 
 </div>
+
 </header>
 
 
@@ -386,30 +403,48 @@ Your real Deriv account and live market information.
 
 <div class="user-box">
 Signed in as:
-<span id="userEmail">Checking session...</span>
-</div>
-
-<div id="connectionStatus" class="connection">
-<span class="connection-dot"></span>
-<span id="connectionText">
-Checking Deriv connection...
+<span id="userEmail">
+Connecting...
 </span>
 </div>
 
+<div
+  id="connectionStatus"
+  class="connection"
+>
+
+<span class="connection-dot"></span>
+
+<span id="connectionText">
+Starting secure connection...
+</span>
+
+</div>
+
 <div class="real-badge">
+
 <span class="real-badge-dot"></span>
+
 REAL ACCOUNT DATA ONLY
+
 </div>
 
 </div>
+
 
 <div class="dashboard-actions">
 
-<a href="trade.html" class="button primary">
+<a
+  href="trade.html"
+  class="button primary"
+>
 Open Terminal
 </a>
 
-<a href="markets.html" class="button secondary">
+<a
+  href="markets.html"
+  class="button secondary"
+>
 Markets
 </a>
 
@@ -418,10 +453,11 @@ Markets
 </div>
 
 
-<div id="errorBox" class="error-box"></div>
+<div
+  id="errorBox"
+  class="error-box"
+></div>
 
-
-<!-- ACCOUNT STATISTICS -->
 
 <section class="dash-grid">
 
@@ -431,11 +467,17 @@ Markets
 Account Balance
 </div>
 
-<div id="balanceValue" class="dash-value">
+<div
+  id="balanceValue"
+  class="dash-value"
+>
 —
 </div>
 
-<span id="balanceCurrency" class="muted">
+<span
+  id="balanceCurrency"
+  class="muted"
+>
 Waiting for real account...
 </span>
 
@@ -448,11 +490,17 @@ Waiting for real account...
 Today's P/L
 </div>
 
-<div id="todayPL" class="dash-value">
+<div
+  id="todayPL"
+  class="dash-value"
+>
 —
 </div>
 
-<span id="todayPLPercent" class="muted">
+<span
+  id="todayPLPercent"
+  class="muted"
+>
 Waiting for closed trades
 </span>
 
@@ -465,8 +513,11 @@ Waiting for closed trades
 Open Positions
 </div>
 
-<div id="openPositions" class="dash-value">
-—
+<div
+  id="openPositions"
+  class="dash-value"
+>
+0
 </div>
 
 <span class="muted">
@@ -482,11 +533,17 @@ Real Deriv portfolio
 Win Rate
 </div>
 
-<div id="winRate" class="dash-value">
+<div
+  id="winRate"
+  class="dash-value"
+>
 —
 </div>
 
-<span id="winRateDetail" class="muted">
+<span
+  id="winRateDetail"
+  class="muted"
+>
 Waiting for trade history
 </span>
 
@@ -494,8 +551,6 @@ Waiting for trade history
 
 </section>
 
-
-<!-- MARKET -->
 
 <section class="dashboard-grid">
 
@@ -561,26 +616,39 @@ Live Market
 <div class="account-info">
 
 <div>
+
 <span>Market</span>
-<strong id="chartSymbol">R_100</strong>
+
+<strong id="chartSymbol">
+R_100
+</strong>
+
 </div>
 
 <div>
+
 <span>Live Price</span>
-<strong id="chartPrice">—</strong>
+
+<strong id="chartPrice">
+—
+</strong>
+
 </div>
 
 <div>
+
 <span>Last Digit</span>
-<strong id="chartDigit">—</strong>
-</div>
+
+<strong id="chartDigit">
+—
+</strong>
 
 </div>
 
 </div>
 
+</div>
 
-<!-- WATCHLIST -->
 
 <div class="panel">
 
@@ -591,7 +659,7 @@ Live Watchlist
 <div id="watchlist">
 
 <div class="empty">
-Waiting for live markets...
+Waiting for live market data...
 </div>
 
 </div>
@@ -608,8 +676,6 @@ View All Markets
 
 </section>
 
-
-<!-- POSITIONS -->
 
 <section class="dashboard-bottom">
 
@@ -646,24 +712,67 @@ Quick Actions
 
 <div class="quick-actions">
 
-<a href="trade.html" class="quick-action">
-<strong>📈 Trade</strong>
-<small>Open real trading terminal</small>
+<a
+  href="trade.html"
+  class="quick-action"
+>
+
+<strong>
+📈 Trade
+</strong>
+
+<small>
+Open real trading terminal
+</small>
+
 </a>
 
-<a href="strategies.html" class="quick-action">
-<strong>🤖 Strategy</strong>
-<small>Manage strategies</small>
+
+<a
+  href="strategies.html"
+  class="quick-action"
+>
+
+<strong>
+🤖 Strategy
+</strong>
+
+<small>
+Manage strategies
+</small>
+
 </a>
 
-<a href="history.html" class="quick-action">
-<strong>◷ History</strong>
-<small>View real transactions</small>
+
+<a
+  href="history.html"
+  class="quick-action"
+>
+
+<strong>
+◷ History
+</strong>
+
+<small>
+View real transactions
+</small>
+
 </a>
 
-<a href="settings.html" class="quick-action">
-<strong>⚙ Settings</strong>
-<small>Account configuration</small>
+
+<a
+  href="settings.html"
+  class="quick-action"
+>
+
+<strong>
+⚙ Settings
+</strong>
+
+<small>
+Account configuration
+</small>
+
 </a>
 
 </div>
@@ -673,23 +782,36 @@ Quick Actions
 </section>
 
 
-<!-- DERIV ACCOUNT -->
-
-<div class="account-info" style="margin-top:20px;">
+<div class="account-info">
 
 <div>
+
 <span>Deriv Account</span>
-<strong id="derivAccount">Not connected</strong>
+
+<strong id="derivAccount">
+Not connected
+</strong>
+
 </div>
 
 <div>
+
 <span>Account Type</span>
-<strong id="derivType">—</strong>
+
+<strong id="derivType">
+—
+</strong>
+
 </div>
 
 <div>
+
 <span>Currency</span>
-<strong id="derivCurrency">—</strong>
+
+<strong id="derivCurrency">
+—
+</strong>
+
 </div>
 
 </div>
@@ -700,8 +822,13 @@ Quick Actions
 <footer>
 
 <div class="brand">
-<span class="brand-icon">P</span>
+
+<span class="brand-icon">
+P
+</span>
+
 PELItradershub
+
 </div>
 
 <p>
@@ -711,45 +838,146 @@ Trading involves risk. No profits are guaranteed.
 </footer>
 
 
-<!-- SUPABASE -->
+<!-- =====================================================
+     SUPABASE SDK
+===================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="supabase.js"></script>
 
-<!-- REAL DERIV ENGINE -->
+<!-- =====================================================
+     INITIALIZE SUPABASE DIRECTLY
+     No dependency on supabase.js
+===================================================== -->
+
+<script>
+
+"use strict";
+
+window.PELI_SUPABASE_URL =
+  "https://juzbrgcipfxemdvpwisw.supabase.co";
+
+window.PELI_SUPABASE_KEY =
+  "sb_publishable_62-dkeCb0yO9_Llh1hF-tA_MyfjfTKL";
+
+if (
+  window.supabase &&
+  typeof window.supabase.createClient === "function"
+) {
+
+  window.supabaseClient =
+    window.supabase.createClient(
+      window.PELI_SUPABASE_URL,
+      window.PELI_SUPABASE_KEY
+    );
+
+} else {
+
+  console.error(
+    "Supabase SDK failed to load."
+  );
+
+}
+
+</script>
+
+
+<!-- =====================================================
+     REAL DERIV ENGINE
+===================================================== -->
 
 <script src="deriv-engine.js"></script>
 
 
 <script>
+
 "use strict";
 
 
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const $ = id =>
-  document.getElementById(id);
+const $ =
+  id =>
+    document.getElementById(id);
 
 
 let balance = null;
+
 let currency = "USD";
+
 let chartPrices = [];
-let todayPL = 0;
+
+let todayProfit = 0;
+
+let todayLoss = 0;
+
+let dashboardStarted = false;
+
+const watchSockets = {};
 
 
-/* =========================================================
+/* =====================================================
+   ERROR
+===================================================== */
+
+function showError(message) {
+
+  const box =
+    $("errorBox");
+
+  if (!box) return;
+
+  box.textContent =
+    message ||
+    "Unable to load account data.";
+
+  box.style.display =
+    "block";
+
+}
+
+
+/* =====================================================
+   CONNECTION STATUS
+===================================================== */
+
+function setConnection(
+  live,
+  text
+) {
+
+  const box =
+    $("connectionStatus");
+
+  const label =
+    $("connectionText");
+
+  if (!box || !label) return;
+
+  box.classList.toggle(
+    "live",
+    Boolean(live)
+  );
+
+  label.textContent =
+    text;
+
+}
+
+
+/* =====================================================
    MONEY
-========================================================= */
+===================================================== */
 
 function money(value) {
 
-  const number = Number(value);
+  const number =
+    Number(value);
 
-  if (!Number.isFinite(number)) {
+  if (
+    !Number.isFinite(number)
+  ) {
+
     return "—";
+
   }
 
   try {
@@ -767,7 +995,7 @@ function money(value) {
   } catch {
 
     return (
-      (currency || "USD") +
+      currency +
       " " +
       number.toFixed(2)
     );
@@ -777,55 +1005,9 @@ function money(value) {
 }
 
 
-/* =========================================================
-   ERROR
-========================================================= */
-
-function showError(message) {
-
-  const box = $("errorBox");
-
-  if (!box) return;
-
-  box.textContent =
-    message ||
-    "Unable to connect to the real Deriv account.";
-
-  box.style.display = "block";
-
-}
-
-
-/* =========================================================
-   CONNECTION STATUS
-========================================================= */
-
-function setConnection(
-  live,
-  text
-) {
-
-  const status =
-    $("connectionStatus");
-
-  const label =
-    $("connectionText");
-
-  if (!status || !label) return;
-
-  status.classList.toggle(
-    "live",
-    Boolean(live)
-  );
-
-  label.textContent = text;
-
-}
-
-
-/* =========================================================
-   ACCOUNT UPDATE
-========================================================= */
+/* =====================================================
+   ACCOUNT
+===================================================== */
 
 function updateAccount(account) {
 
@@ -853,7 +1035,8 @@ function updateAccount(account) {
       Number.isFinite(value)
     ) {
 
-      balance = value;
+      balance =
+        value;
 
     }
 
@@ -892,99 +1075,310 @@ function updateAccount(account) {
 }
 
 
-/* =========================================================
-   REAL BALANCE
-========================================================= */
+/* =====================================================
+   BALANCE
+===================================================== */
 
-function handleBalance(data) {
+if (
+  window.PELI_DERIV &&
+  typeof PELI_DERIV.on === "function"
+) {
 
-  if (!data) return;
+  PELI_DERIV.on(
+    "balance",
+    data => {
 
-
-  const value =
-    Number(
-      data.balance
-    );
-
-
-  if (
-    !Number.isFinite(value)
-  ) {
-
-    return;
-
-  }
+      if (!data) return;
 
 
-  balance = value;
+      const value =
+        Number(
+          data.balance
+        );
 
 
-  if (data.currency) {
+      if (
+        !Number.isFinite(value)
+      ) {
 
-    currency =
-      data.currency;
+        return;
 
-  }
-
-
-  $("balanceValue").textContent =
-    money(balance);
+      }
 
 
-  $("balanceCurrency").textContent =
-    currency;
+      balance =
+        value;
 
 
-  updatePL();
+      if (data.currency) {
 
-}
+        currency =
+          data.currency;
 
-
-function updatePL() {
-
-  $("todayPL").textContent =
-    money(todayPL);
+      }
 
 
-  $("todayPL").className =
-    "dash-value " +
-    (
-      todayPL >= 0
-        ? "positive"
-        : "negative"
-    );
+      $("balanceValue").textContent =
+        money(balance);
 
 
-  $("todayPLPercent").textContent =
-    "Real closed-trade result";
-
-}
+      $("balanceCurrency").textContent =
+        currency;
 
 
-/* =========================================================
-   PORTFOLIO
-========================================================= */
+      updateTodayPL();
 
-function handlePortfolio(data) {
-
-  const contracts =
-    Array.isArray(
-      data?.contracts
-    )
-      ? data.contracts
-      : [];
+    }
+  );
 
 
-  $("openPositions").textContent =
-    contracts.length;
+  /* ===================================================
+     AUTHENTICATED
+  =================================================== */
+
+  PELI_DERIV.on(
+    "authenticated",
+    account => {
+
+      setConnection(
+        true,
+        "REAL DERIV ACCOUNT CONNECTED"
+      );
 
 
-  renderPositions(
-    contracts
+      updateAccount(
+        account
+      );
+
+
+      loadAccountData();
+
+    }
+  );
+
+
+  /* ===================================================
+     STATUS
+  =================================================== */
+
+  PELI_DERIV.on(
+    "status",
+    status => {
+
+      if (
+        status?.authenticated
+      ) {
+
+        setConnection(
+          true,
+          "REAL DERIV ACCOUNT CONNECTED"
+        );
+
+        return;
+
+      }
+
+
+      if (
+        status?.connecting
+      ) {
+
+        setConnection(
+          false,
+          "CONNECTING TO REAL DERIV..."
+        );
+
+      }
+
+    }
+  );
+
+
+  /* ===================================================
+     ENGINE ERROR
+  =================================================== */
+
+  PELI_DERIV.on(
+    "error",
+    error => {
+
+      console.error(
+        "DERIV ENGINE ERROR:",
+        error
+      );
+
+      const message =
+        error?.message ||
+        error?.code ||
+        String(error || "");
+
+      if (message) {
+
+        showError(
+          message
+        );
+
+      }
+
+      setConnection(
+        false,
+        "REAL DERIV CONNECTION FAILED"
+      );
+
+    }
+  );
+
+
+  /* ===================================================
+     TICKS
+  =================================================== */
+
+  PELI_DERIV.on(
+    "tick",
+    tick => {
+
+      if (!tick) return;
+
+
+      const quote =
+        Number(
+          tick.quote
+        );
+
+
+      if (
+        !Number.isFinite(quote)
+      ) {
+
+        return;
+
+      }
+
+
+      $("chartPrice").textContent =
+        quote;
+
+
+      $("chartDigit").textContent =
+        tick.lastDigit ??
+        "—";
+
+
+      $("chartSymbol").textContent =
+        PELI_DERIV.symbol ||
+        "R_100";
+
+
+      chartPrices.push(
+        quote
+      );
+
+
+      if (
+        chartPrices.length >
+        100
+      ) {
+
+        chartPrices =
+          chartPrices.slice(-100);
+
+      }
+
+
+      updateWatchPrice(
+        PELI_DERIV.symbol,
+        quote
+      );
+
+
+      drawChart();
+
+    }
+  );
+
+
+  /* ===================================================
+     PORTFOLIO
+  =================================================== */
+
+  PELI_DERIV.on(
+    "portfolio",
+    data => {
+
+      const contracts =
+        Array.isArray(
+          data?.contracts
+        )
+          ? data.contracts
+          : [];
+
+
+      $("openPositions").textContent =
+        contracts.length;
+
+
+      renderPositions(
+        contracts
+      );
+
+    }
+  );
+
+
+  /* ===================================================
+     PROFIT TABLE
+  =================================================== */
+
+  PELI_DERIV.on(
+    "profitTable",
+    data => {
+
+      const trades =
+        Array.isArray(
+          data?.transactions
+        )
+          ? data.transactions
+          : Array.isArray(
+              data?.contracts
+            )
+              ? data.contracts
+              : [];
+
+
+      calculateWinRate(
+        trades
+      );
+
+
+      calculateTodayProfit(
+        trades
+      );
+
+    }
+  );
+
+
+  /* ===================================================
+     SYMBOLS
+  =================================================== */
+
+  PELI_DERIV.on(
+    "symbols",
+    symbols => {
+
+      renderWatchlist(
+        symbols
+      );
+
+    }
   );
 
 }
 
+
+/* =====================================================
+   POSITION DISPLAY
+===================================================== */
 
 function renderPositions(
   contracts
@@ -993,11 +1387,12 @@ function renderPositions(
   const container =
     $("positions");
 
-
-  if (!contracts.length) {
+  if (
+    !contracts.length
+  ) {
 
     container.innerHTML =
-      '<div class="empty">No open positions.</div>';
+      '<div class="empty">No open real positions.</div>';
 
     return;
 
@@ -1027,7 +1422,13 @@ function renderPositions(
           );
 
 
-        const profitClass =
+        const profitText =
+          Number.isFinite(profit)
+            ? money(profit)
+            : "—";
+
+
+        const cls =
           profit >= 0
             ? "positive"
             : "negative";
@@ -1049,12 +1450,8 @@ function renderPositions(
 
   </div>
 
-  <strong class="${profitClass}">
-    ${
-      Number.isFinite(profit)
-        ? money(profit)
-        : "—"
-    }
+  <strong class="${cls}">
+    ${profitText}
   </strong>
 
 </div>
@@ -1067,41 +1464,16 @@ function renderPositions(
 }
 
 
-/* =========================================================
-   PROFIT TABLE
-========================================================= */
-
-function handleProfitTable(data) {
-
-  const trades =
-    Array.isArray(
-      data?.transactions
-    )
-      ? data.transactions
-      : Array.isArray(
-          data?.contracts
-        )
-        ? data.contracts
-        : [];
-
-
-  calculateWinRate(
-    trades
-  );
-
-
-  calculateTodayPL(
-    trades
-  );
-
-}
-
+/* =====================================================
+   WIN RATE
+===================================================== */
 
 function calculateWinRate(
   trades
 ) {
 
   let wins = 0;
+
   let losses = 0;
 
 
@@ -1116,32 +1488,45 @@ function calculateWinRate(
 
       if (
         !Number.isFinite(profit)
-      ) return;
+      ) {
 
+        return;
 
-      if (profit > 0) {
-        wins++;
       }
 
-      if (profit < 0) {
+
+      if (
+        profit > 0
+      ) {
+
+        wins++;
+
+      } else if (
+        profit < 0
+      ) {
+
         losses++;
+
       }
 
     }
   );
 
 
-  const total =
-    wins + losses;
+  const completed =
+    wins +
+    losses;
 
 
-  if (!total) {
+  if (
+    completed === 0
+  ) {
 
     $("winRate").textContent =
       "—";
 
     $("winRateDetail").textContent =
-      "No closed trades found";
+      "No closed real trades found";
 
     return;
 
@@ -1151,40 +1536,52 @@ function calculateWinRate(
   const rate =
     (
       wins /
-      total
-    ) * 100;
+      completed
+    ) *
+    100;
 
 
   $("winRate").textContent =
-    rate.toFixed(1) + "%";
+    rate.toFixed(1) +
+    "%";
 
 
   $("winRateDetail").textContent =
-    `${wins} wins / ${total} closed`;
+    `${wins} wins / ${completed} closed`;
 
 }
 
 
-function calculateTodayPL(
+/* =====================================================
+   TODAY P/L
+===================================================== */
+
+function calculateTodayProfit(
   trades
 ) {
 
-  todayPL = 0;
+  todayProfit = 0;
+
+  todayLoss = 0;
 
 
-  const start =
+  const now =
     new Date();
 
 
-  start.setHours(
-    0,
-    0,
-    0,
-    0
-  );
+  const start =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
 
 
-  const startTime =
+  const startEpoch =
     Math.floor(
       start.getTime() / 1000
     );
@@ -1201,10 +1598,14 @@ function calculateTodayPL(
 
       if (
         !Number.isFinite(profit)
-      ) return;
+      ) {
+
+        return;
+
+      }
 
 
-      const time =
+      const epoch =
         Number(
           trade.sell_time ||
           trade.close_time ||
@@ -1215,10 +1616,22 @@ function calculateTodayPL(
 
 
       if (
-        time >= startTime
+        epoch >= startEpoch
       ) {
 
-        todayPL += profit;
+        if (
+          profit >= 0
+        ) {
+
+          todayProfit +=
+            profit;
+
+        } else {
+
+          todayLoss +=
+            profit;
+
+        }
 
       }
 
@@ -1226,129 +1639,164 @@ function calculateTodayPL(
   );
 
 
-  updatePL();
+  updateTodayPL();
 
 }
 
 
-/* =========================================================
-   REAL LIVE TICK
-========================================================= */
+/* =====================================================
+   UPDATE P/L
+===================================================== */
 
-function handleTick(tick) {
+function updateTodayPL() {
 
-  if (!tick) return;
+  const pl =
+    todayProfit +
+    todayLoss;
 
 
-  const quote =
-    Number(
-      tick.quote
+  $("todayPL").textContent =
+    money(pl);
+
+
+  $("todayPL").className =
+    "dash-value " +
+    (
+      pl >= 0
+        ? "positive"
+        : "negative"
     );
 
 
   if (
-    !Number.isFinite(quote)
-  ) return;
-
-
-  $("chartPrice").textContent =
-    quote;
-
-
-  $("chartDigit").textContent =
-    tick.lastDigit ??
-    getLastDigit(quote);
-
-
-  const symbol =
-    tick.symbol ||
-    window.PELI_DERIV?.symbol ||
-    "R_100";
-
-
-  $("chartSymbol").textContent =
-    symbol;
-
-
-  updateWatchPrice(
-    symbol,
-    quote
-  );
-
-
-  chartPrices.push(
-    quote
-  );
-
-
-  if (
-    chartPrices.length > 100
+    balance !== null
   ) {
 
-    chartPrices =
-      chartPrices.slice(-100);
+    const previous =
+      balance - pl;
+
+
+    if (
+      previous !== 0
+    ) {
+
+      const percent =
+        (
+          pl /
+          previous
+        ) *
+        100;
+
+
+      $("todayPLPercent").textContent =
+        (
+          pl >= 0
+            ? "+"
+            : ""
+        ) +
+        percent.toFixed(2) +
+        "% today";
+
+
+      $("todayPLPercent").className =
+        pl >= 0
+          ? "positive"
+          : "negative";
+
+      return;
+
+    }
 
   }
 
 
-  drawChart();
+  $("todayPLPercent").textContent =
+    "Today's closed trading result";
 
 }
 
 
-function getLastDigit(
-  price
+/* =====================================================
+   WATCHLIST
+===================================================== */
+
+function renderWatchlist(
+  symbols
 ) {
 
-  const text =
-    String(price);
+  if (
+    !Array.isArray(symbols)
+  ) {
+
+    return;
+
+  }
 
 
-  const digits =
-    text.replace(
-      /\D/g,
-      ""
+  const wanted = [
+    "R_25",
+    "R_50",
+    "R_75",
+    "R_100"
+  ];
+
+
+  const available =
+    symbols.filter(
+      item => {
+
+        const symbol =
+          item.underlying_symbol ||
+          item.symbol;
+
+        return wanted.includes(
+          symbol
+        );
+
+      }
     );
 
-
-  return digits
-    ? digits[digits.length - 1]
-    : "—";
-
-}
-
-
-/* =========================================================
-   WATCHLIST
-========================================================= */
-
-const WATCH_SYMBOLS = [
-  "R_25",
-  "R_50",
-  "R_75",
-  "R_100"
-];
-
-
-function renderWatchlist() {
 
   const container =
     $("watchlist");
 
 
+  if (
+    !available.length
+  ) {
+
+    container.innerHTML =
+      '<div class="empty">No live markets returned.</div>';
+
+    return;
+
+  }
+
+
   container.innerHTML =
-    WATCH_SYMBOLS.map(
-      symbol => `
+    available.map(
+      item => {
+
+        const symbol =
+          item.underlying_symbol ||
+          item.symbol;
+
+
+        const name =
+          item.display_name ||
+          symbol;
+
+
+        return `
 
 <div
   class="market-row"
-  data-symbol="${symbol}"
 >
 
   <div>
 
     <span class="market-name">
-      ${symbol}
+      ${escapeHTML(name)}
     </span>
 
     <span class="market-type">
@@ -1359,15 +1807,136 @@ function renderWatchlist() {
 
   <div
     class="market-price"
-    id="price-${symbol}"
+    id="price-${escapeHTML(symbol)}"
   >
     —
   </div>
 
 </div>
 
-`
+`;
+
+      }
     ).join("");
+
+
+  startWatchlistStreams(
+    available
+  );
+
+}
+
+
+/* =====================================================
+   WATCHLIST STREAMS
+===================================================== */
+
+function startWatchlistStreams(
+  symbols
+) {
+
+  symbols.forEach(
+    item => {
+
+      const symbol =
+        item.underlying_symbol ||
+        item.symbol;
+
+
+      if (
+        !symbol ||
+        watchSockets[symbol]
+      ) {
+
+        return;
+
+      }
+
+
+      try {
+
+        const ws =
+          new WebSocket(
+            "wss://api.derivws.com/trading/v1/options/ws/public"
+          );
+
+
+        watchSockets[symbol] =
+          ws;
+
+
+        ws.onopen =
+          () => {
+
+            ws.send(
+              JSON.stringify({
+
+                ticks:
+                  symbol,
+
+                subscribe:
+                  1
+
+              })
+            );
+
+          };
+
+
+        ws.onmessage =
+          event => {
+
+            try {
+
+              const data =
+                JSON.parse(
+                  event.data
+                );
+
+
+              if (
+                data.msg_type ===
+                "tick"
+              ) {
+
+                const price =
+                  Number(
+                    data.tick?.quote
+                  );
+
+
+                if (
+                  Number.isFinite(price)
+                ) {
+
+                  updateWatchPrice(
+                    symbol,
+                    price
+                  );
+
+                }
+
+              }
+
+            } catch {}
+
+          };
+
+
+        ws.onclose =
+          () => {
+
+            delete watchSockets[
+              symbol
+            ];
+
+          };
+
+
+      } catch {}
+
+    }
+  );
 
 }
 
@@ -1377,8 +1946,13 @@ function updateWatchPrice(
   price
 ) {
 
+  if (!symbol) return;
+
+
   const element =
-    $("price-" + symbol);
+    document.getElementById(
+      "price-" + symbol
+    );
 
 
   if (!element) return;
@@ -1390,19 +1964,25 @@ function updateWatchPrice(
 }
 
 
-/* =========================================================
+/* =====================================================
    CHART
-========================================================= */
+===================================================== */
 
 function drawChart() {
 
   if (
     chartPrices.length < 2
-  ) return;
+  ) {
+
+    return;
+
+  }
 
 
   const width = 900;
+
   const height = 350;
+
   const padding = 20;
 
 
@@ -1486,179 +2066,24 @@ function drawChart() {
 }
 
 
-/* =========================================================
-   ESCAPE
-========================================================= */
+/* =====================================================
+   LOAD REAL ACCOUNT DATA
+===================================================== */
 
-function escapeHTML(
-  value
-) {
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =========================================================
-   DERIV EVENT HANDLERS
-========================================================= */
-
-function attachDerivEvents() {
+async function loadAccountData() {
 
   if (
     !window.PELI_DERIV
   ) {
 
-    showError(
-      "deriv-engine.js did not load. Check that the file exists and is loading before dashboard.js."
-    );
-
-    setConnection(
-      false,
-      "DERIV ENGINE NOT LOADED"
-    );
-
-    return false;
+    return;
 
   }
 
 
-  PELI_DERIV.on(
-    "balance",
-    handleBalance
-  );
-
-
-  PELI_DERIV.on(
-    "portfolio",
-    handlePortfolio
-  );
-
-
-  PELI_DERIV.on(
-    "profitTable",
-    handleProfitTable
-  );
-
-
-  PELI_DERIV.on(
-    "tick",
-    handleTick
-  );
-
-
-  PELI_DERIV.on(
-    "authenticated",
-    account => {
-
-      setConnection(
-        true,
-        "REAL DERIV ACCOUNT CONNECTED"
-      );
-
-      updateAccount(
-        account
-      );
-
-      loadRealAccountData();
-
-    }
-  );
-
-
-  PELI_DERIV.on(
-    "status",
-    status => {
-
-      if (
-        status?.authenticated
-      ) {
-
-        setConnection(
-          true,
-          "REAL DERIV ACCOUNT CONNECTED"
-        );
-
-      } else if (
-        status?.connecting
-      ) {
-
-        setConnection(
-          false,
-          "CONNECTING TO REAL DERIV..."
-        );
-
-      }
-
-    }
-  );
-
-
-  PELI_DERIV.on(
-    "error",
-    error => {
-
-      console.error(
-        "DERIV ERROR:",
-        error
-      );
-
-
-      const message =
-        error?.message ||
-        error?.code ||
-        (
-          typeof error === "string"
-            ? error
-            : "Unknown Deriv connection error."
-        );
-
-
-      setConnection(
-        false,
-        "REAL DERIV CONNECTION FAILED"
-      );
-
-
-      showError(
-        message
-      );
-
-    }
-  );
-
-
-  return true;
-
-}
-
-
-/* =========================================================
-   LOAD REAL ACCOUNT DATA
-========================================================= */
-
-async function loadRealAccountData() {
-
-  if (
-    !window.PELI_DERIV
-  ) return;
-
-
   try {
 
-    if (
-      typeof PELI_DERIV.getPortfolio ===
-      "function"
-    ) {
-
-      await PELI_DERIV.getPortfolio();
-
-    }
+    await PELI_DERIV.getPortfolio();
 
   } catch(error) {
 
@@ -1672,21 +2097,31 @@ async function loadRealAccountData() {
 
   try {
 
-    if (
-      typeof PELI_DERIV.getProfitTable ===
-      "function"
-    ) {
-
-      await PELI_DERIV.getProfitTable({
-        limit:100
-      });
-
-    }
+    await PELI_DERIV.getProfitTable({
+      limit:100
+    });
 
   } catch(error) {
 
     console.error(
       "Profit table:",
+      error
+    );
+
+  }
+
+
+  try {
+
+    await PELI_DERIV.getStatement({
+      limit:100,
+      description:1
+    });
+
+  } catch(error) {
+
+    console.error(
+      "Statement:",
       error
     );
 
@@ -1707,31 +2142,7 @@ async function loadRealAccountData() {
   } catch(error) {
 
     console.error(
-      "Balance subscription:",
-      error
-    );
-
-  }
-
-
-  try {
-
-    if (
-      typeof PELI_DERIV.getStatement ===
-      "function"
-    ) {
-
-      await PELI_DERIV.getStatement({
-        limit:100,
-        description:1
-      });
-
-    }
-
-  } catch(error) {
-
-    console.error(
-      "Statement:",
+      "Balance:",
       error
     );
 
@@ -1740,15 +2151,24 @@ async function loadRealAccountData() {
 }
 
 
-/* =========================================================
+/* =====================================================
    REAL DERIV CONNECTION
-========================================================= */
+===================================================== */
 
 async function connectRealAccount() {
 
   if (
     !window.PELI_DERIV
   ) {
+
+    setConnection(
+      false,
+      "DERIV ENGINE NOT LOADED"
+    );
+
+    showError(
+      "deriv-engine.js could not be loaded."
+    );
 
     return;
 
@@ -1762,11 +2182,11 @@ async function connectRealAccount() {
 
     setConnection(
       false,
-      "REAL CONNECTION METHOD MISSING"
+      "DERIV ENGINE ERROR"
     );
 
     showError(
-      "Your deriv-engine.js does not contain connectAuthenticated()."
+      "Your Deriv engine does not provide connectAuthenticated()."
     );
 
     return;
@@ -1780,72 +2200,54 @@ async function connectRealAccount() {
   );
 
 
-  /*
-   * IMPORTANT:
-   *
-   * We DO NOT wait forever here.
-   *
-   * If the engine does not answer,
-   * the dashboard reports the failure
-   * instead of staying on Loading...
-   */
-
-  const timeout =
-    new Promise(
-      (_,reject) => {
-
-        setTimeout(
-          () => {
-
-            reject(
-              new Error(
-                "Deriv connection timed out. Please reconnect your real Deriv account."
-              )
-            );
-
-          },
-          15000
-        );
-
-      }
-    );
-
-
   try {
+
+    /*
+     * Important:
+     * Do not let a broken WebSocket promise
+     * keep the dashboard loading forever.
+     */
+
+    const connectionPromise =
+      PELI_DERIV
+        .connectAuthenticated();
+
+
+    const timeoutPromise =
+      new Promise(
+        (_, reject) => {
+
+          setTimeout(
+            () => {
+
+              reject(
+                new Error(
+                  "Deriv connection timed out. Check the Deriv authorization/token connection."
+                )
+              );
+
+            },
+            15000
+          );
+
+        }
+      );
+
 
     const account =
       await Promise.race([
-
-        PELI_DERIV
-          .connectAuthenticated(),
-
-        timeout
-
+        connectionPromise,
+        timeoutPromise
       ]);
 
 
-    if (!account) {
+    if (account) {
 
-      throw new Error(
-        "Deriv did not return a real account."
+      updateAccount(
+        account
       );
 
     }
-
-
-    updateAccount(
-      account
-    );
-
-
-    setConnection(
-      true,
-      "REAL DERIV ACCOUNT CONNECTED"
-    );
-
-
-    await loadRealAccountData();
-
 
   } catch(error) {
 
@@ -1857,7 +2259,7 @@ async function connectRealAccount() {
 
     setConnection(
       false,
-      "REAL DERIV NOT CONNECTED"
+      "REAL DERIV CONNECTION FAILED"
     );
 
 
@@ -1871,139 +2273,27 @@ async function connectRealAccount() {
 }
 
 
-/* =========================================================
-   INITIALIZE DASHBOARD
-========================================================= */
+/* =====================================================
+   HTML ESCAPE
+===================================================== */
 
-async function initDashboard() {
+function escapeHTML(
+  value
+) {
 
-  try {
-
-    /*
-     * Supabase must already be configured
-     * inside supabase.js.
-     */
-
-    if (
-      !window.supabaseClient
-    ) {
-
-      throw new Error(
-        "Supabase client is not available."
-      );
-
-    }
-
-
-    const result =
-      await supabaseClient.auth.getSession();
-
-
-    if (
-      result.error
-    ) {
-
-      throw result.error;
-
-    }
-
-
-    const session =
-      result.data?.session;
-
-
-    if (!session) {
-
-      window.location.replace(
-        "login.html"
-      );
-
-      return;
-
-    }
-
-
-    window.PELI_USER =
-      session.user;
-
-
-    $("userEmail").textContent =
-      session.user.email ||
-      "Authenticated user";
-
-
-    const fullName =
-      session.user
-        ?.user_metadata
-        ?.full_name;
-
-
-    if (fullName) {
-
-      const firstName =
-        fullName
-          .trim()
-          .split(/\s+/)[0];
-
-
-      $("welcomeTitle").textContent =
-        "Good day, " +
-        firstName +
-        ".";
-
-    }
-
-
-    renderWatchlist();
-
-
-    /*
-     * Attach handlers first.
-     */
-
-    const engineReady =
-      attachDerivEvents();
-
-
-    if (!engineReady) {
-      return;
-    }
-
-
-    /*
-     * Connect REAL Deriv account.
-     */
-
-    await connectRealAccount();
-
-
-  } catch(error) {
-
-    console.error(
-      "DASHBOARD INIT:",
-      error
-    );
-
-
-    showError(
-      error?.message ||
-      "Dashboard initialization failed."
-    );
-
-
-    setConnection(
-      false,
-      "DASHBOARD CONNECTION FAILED"
-    );
-
-  }
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
 
-/* =========================================================
+/* =====================================================
    LOGOUT
-========================================================= */
+===================================================== */
 
 async function peliLogout() {
 
@@ -2028,11 +2318,11 @@ async function peliLogout() {
 
       } catch {}
 
-
       try {
 
         if (
-          typeof PELI_DERIV.disconnect ===
+          typeof PELI_DERIV
+            .disconnect ===
           "function"
         ) {
 
@@ -2046,20 +2336,50 @@ async function peliLogout() {
     }
 
 
-    await supabaseClient
-      .auth
-      .signOut();
+    Object.values(
+      watchSockets
+    ).forEach(
+      ws => {
+
+        try {
+
+          ws.close();
+
+        } catch {}
+
+      }
+    );
+
+
+    if (
+      window.supabaseClient
+    ) {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .auth
+          .signOut();
+
+
+      if (error) {
+
+        throw error;
+
+      }
+
+    }
 
 
     window.location.replace(
       "login.html"
     );
 
-
   } catch(error) {
 
     console.error(
-      "LOGOUT:",
+      "Logout:",
       error
     );
 
@@ -2073,14 +2393,135 @@ async function peliLogout() {
 }
 
 
-/* =========================================================
-   START
-========================================================= */
+/* =====================================================
+   DASHBOARD INITIALIZATION
+===================================================== */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  initDashboard
-);
+async function initDashboard() {
+
+  try {
+
+    /*
+     * SUPABASE MUST EXIST
+     */
+
+    if (
+      !window.supabaseClient
+    ) {
+
+      throw new Error(
+        "Supabase client failed to initialize."
+      );
+
+    }
+
+
+    /*
+     * GET CURRENT USER SESSION
+     */
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    const session =
+      data?.session;
+
+
+    if (!session) {
+
+      window.location.replace(
+        "login.html"
+      );
+
+      return;
+
+    }
+
+
+    window.PELI_USER =
+      session.user;
+
+
+    $("userEmail").textContent =
+      session.user.email ||
+      "Authenticated user";
+
+
+    const fullName =
+      session.user
+        .user_metadata
+        ?.full_name;
+
+
+    if (fullName) {
+
+      const firstName =
+        fullName
+          .trim()
+          .split(/\s+/)[0];
+
+
+      $("welcomeTitle").textContent =
+        "Good day, " +
+        firstName +
+        ".";
+
+    }
+
+
+    /*
+     * Supabase is now confirmed.
+     * Connect to the REAL Deriv account.
+     */
+
+    await connectRealAccount();
+
+
+    dashboardStarted =
+      true;
+
+  } catch(error) {
+
+    console.error(
+      "DASHBOARD:",
+      error
+    );
+
+
+    setConnection(
+      false,
+      "DASHBOARD CONNECTION FAILED"
+    );
+
+
+    showError(
+      error?.message ||
+      "Unable to initialize dashboard."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+initDashboard();
 
 </script>
 
