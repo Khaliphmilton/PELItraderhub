@@ -1,11 +1,22 @@
 <!-- =========================================================
      PELItradershub — LIVE DERIV CHART
-     FULL REPLACEMENT FOR THE CURRENT CHART SECTION
+     FULL REPLACEMENT
+     
+     Keeps the existing appearance.
+     Fixes:
+     - immediate live price
+     - immediate tick history
+     - live price movement
+     - live digits
+     - previous digit
+     - tick counter
+     - live chart
+     - recovery if PELI_DERIV connected before this section loaded
+     - fullscreen
      ========================================================= -->
 
 <section id="peli-live-market" class="peli-market">
 
-  <!-- HEADER -->
   <div class="peli-market-header">
 
     <div>
@@ -14,7 +25,11 @@
       </div>
 
       <div class="peli-market-status-row">
-        <span id="peli-live-dot" class="peli-live-dot"></span>
+
+        <span
+          id="peli-live-dot"
+          class="peli-live-dot"
+        ></span>
 
         <span id="peli-account-status">
           REAL DERIV ACCOUNT
@@ -23,8 +38,10 @@
         <span id="peli-market-status">
           CONNECTING
         </span>
+
       </div>
     </div>
+
 
     <div class="peli-price-box">
 
@@ -95,6 +112,7 @@
         class="peli-y-axis"
       ></div>
 
+
       <svg
         id="peli-price-chart"
         class="peli-price-chart"
@@ -126,7 +144,9 @@
 
         </defs>
 
+
         <g id="peli-grid"></g>
+
 
         <path
           id="peli-area"
@@ -134,11 +154,13 @@
           d=""
         ></path>
 
+
         <path
           id="peli-line"
           class="peli-chart-line"
           d=""
         ></path>
+
 
         <circle
           id="peli-live-point"
@@ -151,8 +173,6 @@
       </svg>
 
 
-      <!-- LIVE PRICE BUBBLE -->
-
       <div
         id="peli-live-bubble"
         class="peli-live-bubble"
@@ -160,8 +180,6 @@
         --
       </div>
 
-
-      <!-- BOTTOM INFO -->
 
       <div class="peli-chart-info">
 
@@ -172,16 +190,12 @@
 
         <div>
           MOVEMENT:
-          <strong id="peli-chart-direction">
-            --
-          </strong>
+          <strong id="peli-chart-direction">--</strong>
         </div>
 
         <div>
           TICKS:
-          <strong id="peli-chart-ticks">
-            0
-          </strong>
+          <strong id="peli-chart-ticks">0</strong>
         </div>
 
       </div>
@@ -270,8 +284,6 @@
 
     </div>
 
-
-    <!-- RECENT DIGITS -->
 
     <div class="peli-recent-title">
       RECENT DIGITS
@@ -497,6 +509,7 @@
   height: min(58vh, 560px);
   min-height: 360px;
   overflow: hidden;
+
   background:
     linear-gradient(
       rgba(255,255,255,.035) 1px,
@@ -507,6 +520,7 @@
       rgba(255,255,255,.035) 1px,
       transparent 1px
     );
+
   background-size: 10% 20%;
 }
 
@@ -543,10 +557,12 @@
   top: 12px;
   bottom: 58px;
   width: 70px;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
+
   pointer-events: none;
   z-index: 5;
 }
@@ -565,13 +581,19 @@
   right: 12px;
   top: 45%;
   transform: translateY(-50%);
+
   padding: 8px 12px;
   border-radius: 10px;
+
   background: #328cf5;
   color: white;
+
   font-size: 13px;
   font-weight: 900;
-  box-shadow: 0 6px 18px rgba(50,140,245,.25);
+
+  box-shadow:
+    0 6px 18px rgba(50,140,245,.25);
+
   z-index: 8;
 }
 
@@ -580,17 +602,24 @@
   left: 14px;
   right: 14px;
   bottom: 12px;
+
   display: flex;
   flex-wrap: wrap;
   gap: 18px;
+
   padding: 10px 14px;
+
   border: 1px solid #25344a;
   border-radius: 12px;
+
   background: rgba(7,14,24,.88);
+
   backdrop-filter: blur(8px);
+
   color: #8494aa;
   font-size: 12px;
   font-weight: 700;
+
   z-index: 10;
 }
 
@@ -607,8 +636,10 @@
 .peli-digits-card {
   margin-top: 18px;
   padding: 16px;
+
   border: 1px solid #1c2a3c;
   border-radius: 20px;
+
   background: #08111d;
 }
 
@@ -617,7 +648,9 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+
   margin-bottom: 13px;
+
   color: #8fa0b8;
   font-size: 12px;
   font-weight: 800;
@@ -629,17 +662,22 @@
 
 .peli-digit-grid {
   display: grid;
-  grid-template-columns: repeat(10, minmax(45px, 1fr));
+  grid-template-columns:
+    repeat(10, minmax(45px, 1fr));
   gap: 6px;
 }
 
 .peli-digit {
   position: relative;
+
   min-height: 72px;
+
   border: 1px solid #223148;
   border-radius: 11px;
+
   background: #101a29;
   color: #aebbd0;
+
   cursor: pointer;
 }
 
@@ -661,6 +699,7 @@
   border-color: #ffd83d;
   background: #18202b;
   color: white;
+
   box-shadow:
     0 0 0 1px rgba(255,216,61,.18),
     0 0 20px rgba(255,216,61,.12);
@@ -668,14 +707,19 @@
 
 .peli-digit.live::before {
   content: "LIVE";
+
   position: absolute;
   top: -9px;
   left: 50%;
+
   transform: translateX(-50%);
+
   padding: 3px 6px;
   border-radius: 6px;
+
   background: #ffd83d;
   color: #10151c;
+
   font-size: 8px;
   font-weight: 900;
 }
@@ -688,6 +732,7 @@
 .peli-recent-title {
   margin-top: 18px;
   margin-bottom: 8px;
+
   color: #8292a9;
   font-size: 11px;
   font-weight: 800;
@@ -703,13 +748,18 @@
 .peli-recent-digit {
   width: 30px;
   height: 30px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 8px;
+
   background: #121d2c;
   border: 1px solid #23334a;
+
   color: #dce7f5;
+
   font-size: 12px;
   font-weight: 900;
 }
@@ -723,6 +773,7 @@
   display: grid;
   grid-template-columns:
     repeat(4, minmax(0, 1fr));
+
   gap: 12px;
   margin-top: 18px;
 }
@@ -730,8 +781,10 @@
 .peli-stat-box {
   padding: 18px 12px;
   text-align: center;
+
   border: 1px solid #1c2a3c;
   border-radius: 16px;
+
   background: #0b1522;
 }
 
@@ -745,6 +798,7 @@
 .peli-stat-box strong {
   display: block;
   margin-top: 9px;
+
   color: #f2f7ff;
   font-size: 21px;
   font-weight: 900;
@@ -758,6 +812,7 @@
 #peli-chart-card:fullscreen {
   width: 100vw;
   height: 100vh;
+
   border-radius: 0;
   background: #050b13;
 }
@@ -818,6 +873,7 @@
   .peli-fullscreen-button {
     font-size: 10px;
   }
+
 }
 
 </style>
@@ -825,115 +881,80 @@
 
 <script>
 
-/* =========================================================
-   PELItradershub — LIVE CHART ENGINE
-   ========================================================= */
-
 (() => {
 
   "use strict";
 
 
-  const chartCard =
-    document.getElementById(
-      "peli-chart-card"
-    );
+  /* =========================================================
+     ELEMENTS
+     ========================================================= */
 
-  const chart =
-    document.getElementById(
-      "peli-price-chart"
-    );
+  const $ = id =>
+    document.getElementById(id);
+
+
+  const chartCard =
+    $("peli-chart-card");
 
   const line =
-    document.getElementById(
-      "peli-line"
-    );
+    $("peli-line");
 
   const area =
-    document.getElementById(
-      "peli-area"
-    );
+    $("peli-area");
 
   const livePoint =
-    document.getElementById(
-      "peli-live-point"
-    );
+    $("peli-live-point");
 
   const liveBubble =
-    document.getElementById(
-      "peli-live-bubble"
-    );
+    $("peli-live-bubble");
 
   const currentPrice =
-    document.getElementById(
-      "peli-current-price"
-    );
+    $("peli-current-price");
 
   const priceMovement =
-    document.getElementById(
-      "peli-price-movement"
-    );
+    $("peli-price-movement");
 
   const chartDigit =
-    document.getElementById(
-      "peli-chart-digit"
-    );
+    $("peli-chart-digit");
 
   const chartDirection =
-    document.getElementById(
-      "peli-chart-direction"
-    );
+    $("peli-chart-direction");
 
   const chartTicks =
-    document.getElementById(
-      "peli-chart-ticks"
-    );
+    $("peli-chart-ticks");
 
   const currentDigit =
-    document.getElementById(
-      "peli-current-digit"
-    );
+    $("peli-current-digit");
 
   const statLast =
-    document.getElementById(
-      "peli-stat-last"
-    );
+    $("peli-stat-last");
 
   const statPrevious =
-    document.getElementById(
-      "peli-stat-previous"
-    );
+    $("peli-stat-previous");
 
   const statCount =
-    document.getElementById(
-      "peli-stat-count"
-    );
+    $("peli-stat-count");
 
   const statPrice =
-    document.getElementById(
-      "peli-stat-price"
-    );
+    $("peli-stat-price");
 
   const recentDigits =
-    document.getElementById(
-      "peli-recent-digits"
-    );
+    $("peli-recent-digits");
 
   const marketStatus =
-    document.getElementById(
-      "peli-market-status"
-    );
+    $("peli-market-status");
 
   const liveDot =
-    document.getElementById(
-      "peli-live-dot"
-    );
+    $("peli-live-dot");
 
   const yAxis =
-    document.getElementById(
-      "peli-y-axis"
-    );
+    $("peli-y-axis");
 
+
+  /* =========================================================
+     DATA
+     ========================================================= */
 
   let prices = [];
 
@@ -943,42 +964,119 @@
 
   let previousPrice = null;
 
-  let maxPoints = 200;
+  let lastDigit = null;
+
+  let previousDigit = null;
+
+  let lastEpoch = null;
+
+  let initialized = false;
+
+  const maxPoints = 200;
 
 
-  /* =======================================================
-     NUMBER FORMAT
-     ======================================================= */
+  /* =========================================================
+     FORMAT PRICE
+     ========================================================= */
 
   function formatPrice(value) {
 
+    const number =
+      Number(value);
+
     if (
-      value === null ||
-      value === undefined ||
-      !Number.isFinite(Number(value))
+      !Number.isFinite(number)
     ) {
       return "--";
     }
 
-    const n = Number(value);
+    /*
+     * Preserve useful precision for
+     * synthetic indices.
+     */
 
-    return n.toFixed(
-      n < 100
-        ? 4
-        : 2
-    );
+    const absolute =
+      Math.abs(number);
+
+    if (absolute >= 1000) {
+      return number.toFixed(2);
+    }
+
+    if (absolute >= 100) {
+      return number.toFixed(2);
+    }
+
+    return number.toFixed(4);
   }
 
 
-  /* =======================================================
+  /* =========================================================
+     GET DIGIT
+     ========================================================= */
+
+  function getDigitFromQuote(
+    quote
+  ) {
+
+    const number =
+      Number(quote);
+
+    if (
+      !Number.isFinite(number)
+    ) {
+      return null;
+    }
+
+
+    /*
+     * Use the actual displayed decimal
+     * representation rather than relying
+     * on an incorrect fixed precision.
+     */
+
+    const text =
+      String(number);
+
+
+    const decimal =
+      text.split(".")[1];
+
+
+    if (decimal && decimal.length) {
+
+      const match =
+        decimal.match(/(\d)$/);
+
+      if (match) {
+        return Number(match[1]);
+      }
+
+    }
+
+
+    const integer =
+      text.match(/(\d)\s*$/);
+
+    return integer
+      ? Number(integer[1])
+      : null;
+  }
+
+
+  /* =========================================================
      DRAW CHART
-     ======================================================= */
+     ========================================================= */
 
   function drawChart() {
 
-    if (!chart || !line || !area) {
+    if (
+      !line ||
+      !area ||
+      !livePoint
+    ) {
       return;
     }
+
 
     if (!prices.length) {
 
@@ -991,6 +1089,20 @@
         "d",
         ""
       );
+
+      livePoint.setAttribute(
+        "cx",
+        "0"
+      );
+
+      livePoint.setAttribute(
+        "cy",
+        "0"
+      );
+
+      if (yAxis) {
+        yAxis.innerHTML = "";
+      }
 
       return;
     }
@@ -1014,11 +1126,23 @@
       Math.max(...prices);
 
 
-    if (min === max) {
+    if (
+      min === max
+    ) {
 
-      min -= 0.01;
+      /*
+       * Give a live single-price chart
+       * enough vertical space to be visible.
+       */
 
-      max += 0.01;
+      const spread =
+        Math.max(
+          Math.abs(min) * 0.0005,
+          0.05
+        );
+
+      min -= spread;
+      max += spread;
     }
 
 
@@ -1027,7 +1151,10 @@
 
 
     const extra =
-      range * 0.12;
+      Math.max(
+        range * 0.12,
+        0.02
+      );
 
 
     min -= extra;
@@ -1085,7 +1212,11 @@
       points
         .map(
           (point, index) =>
-            `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
+            `${
+              index === 0
+                ? "M"
+                : "L"
+            } ${point.x} ${point.y}`
         )
         .join(" ");
 
@@ -1094,7 +1225,9 @@
       points[0];
 
     const last =
-      points[points.length - 1];
+      points[
+        points.length - 1
+      ];
 
 
     const areaPath =
@@ -1118,12 +1251,13 @@
 
     livePoint.setAttribute(
       "cx",
-      last.x
+      String(last.x)
     );
+
 
     livePoint.setAttribute(
       "cy",
-      last.y
+      String(last.y)
     );
 
 
@@ -1135,9 +1269,9 @@
   }
 
 
-  /* =======================================================
+  /* =========================================================
      Y AXIS
-     ======================================================= */
+     ========================================================= */
 
   function renderYAxis(
     min,
@@ -1148,9 +1282,12 @@
       return;
     }
 
+
     yAxis.innerHTML = "";
 
+
     const steps = 5;
+
 
     for (
       let i = 0;
@@ -1172,19 +1309,23 @@
           "span"
         );
 
+
       span.textContent =
         formatPrice(value);
+
 
       yAxis.appendChild(
         span
       );
+
     }
+
   }
 
 
-  /* =======================================================
-     DIGIT UI
-     ======================================================= */
+  /* =========================================================
+     UPDATE DIGITS
+     ========================================================= */
 
   function updateDigits() {
 
@@ -1195,12 +1336,17 @@
     digits.forEach(
       digit => {
 
+        const n =
+          Number(digit);
+
         if (
-          Number.isInteger(digit) &&
-          digit >= 0 &&
-          digit <= 9
+          Number.isInteger(n) &&
+          n >= 0 &&
+          n <= 9
         ) {
-          counts[digit]++;
+
+          counts[n]++;
+
         }
 
       }
@@ -1223,6 +1369,7 @@
               button.dataset.digit
             );
 
+
           const percentage =
             total
               ? (
@@ -1243,6 +1390,7 @@
 
             small.textContent =
               `${percentage.toFixed(1)}%`;
+
           }
 
         }
@@ -1262,8 +1410,7 @@
     }
 
 
-    recentDigits.innerHTML =
-      "";
+    recentDigits.innerHTML = "";
 
 
     recent.forEach(
@@ -1274,11 +1421,14 @@
             "div"
           );
 
+
         item.className =
           "peli-recent-digit";
 
+
         item.textContent =
           digit;
+
 
         recentDigits.appendChild(
           item
@@ -1290,11 +1440,84 @@
   }
 
 
-  /* =======================================================
-     PROCESS TICK
-     ======================================================= */
+  /* =========================================================
+     SET LIVE DIGIT
+     ========================================================= */
 
-  function handleTick(data) {
+  function setLiveDigit(
+    digit
+  ) {
+
+    if (
+      !Number.isInteger(
+        Number(digit)
+      )
+    ) {
+      return;
+    }
+
+
+    const value =
+      Number(digit);
+
+
+    previousDigit =
+      lastDigit;
+
+    lastDigit =
+      value;
+
+
+    currentDigit.textContent =
+      value;
+
+
+    chartDigit.textContent =
+      value;
+
+
+    statLast.textContent =
+      value;
+
+
+    if (
+      previousDigit !== null
+    ) {
+
+      statPrevious.textContent =
+        previousDigit;
+
+    }
+
+
+    document
+      .querySelectorAll(
+        ".peli-digit"
+      )
+      .forEach(
+        button => {
+
+          button.classList.toggle(
+            "live",
+            Number(
+              button.dataset.digit
+            ) === value
+          );
+
+        }
+      );
+
+  }
+
+
+  /* =========================================================
+     PROCESS ONE LIVE TICK
+     ========================================================= */
+
+  function handleTick(
+    data,
+    fromRecovery = false
+  ) {
 
     if (!data) {
       return;
@@ -1314,12 +1537,44 @@
     }
 
 
+    /*
+     * Avoid adding the exact same tick twice.
+     */
+
+    const epoch =
+      data.epoch !== undefined &&
+      data.epoch !== null
+        ? Number(data.epoch)
+        : null;
+
+
+    if (
+      fromRecovery &&
+      epoch !== null &&
+      lastEpoch !== null &&
+      epoch === lastEpoch &&
+      prices.length
+    ) {
+      return;
+    }
+
+
     previousPrice =
       lastPrice;
+
 
     lastPrice =
       quote;
 
+
+    if (epoch !== null) {
+      lastEpoch = epoch;
+    }
+
+
+    /*
+     * Add price to chart.
+     */
 
     prices.push(
       quote
@@ -1335,8 +1590,14 @@
         prices.slice(
           -maxPoints
         );
+
     }
 
+
+    /*
+     * Get digit from Deriv engine first.
+     * Fall back to the quote.
+     */
 
     let digit =
       data.lastDigit;
@@ -1344,39 +1605,30 @@
 
     if (
       digit === undefined ||
-      digit === null
+      digit === null ||
+      !Number.isInteger(
+        Number(digit)
+      )
     ) {
 
-      const text =
-        String(
+      digit =
+        getDigitFromQuote(
           quote
         );
-
-      const match =
-        text.match(
-          /(\d)\s*$/
-        );
-
-
-      if (match) {
-
-        digit =
-          Number(
-            match[1]
-          );
-
-      }
 
     }
 
 
     if (
-      Number.isInteger(digit)
+      Number.isInteger(
+        Number(digit)
+      )
     ) {
 
       digits.push(
-        digit
+        Number(digit)
       );
+
 
       if (
         digits.length >
@@ -1390,134 +1642,128 @@
 
       }
 
+
+      setLiveDigit(
+        Number(digit)
+      );
+
     }
 
 
-    /* PRICE */
+    /* =====================================================
+       PRICE
+       ===================================================== */
+
+    const formatted =
+      formatPrice(
+        quote
+      );
+
 
     currentPrice.textContent =
-      formatPrice(
-        quote
-      );
+      formatted;
+
 
     statPrice.textContent =
-      formatPrice(
-        quote
-      );
+      formatted;
 
 
     liveBubble.textContent =
-      formatPrice(
-        quote
-      );
+      formatted;
 
 
-    /* DIGIT */
+    /*
+     * First tick is already LIVE.
+     */
 
     if (
-      Number.isInteger(digit)
+      previousPrice === null
     ) {
 
-      currentDigit.textContent =
-        digit;
-
-      chartDigit.textContent =
-        digit;
-
-      statLast.textContent =
-        digit;
+      priceMovement.textContent =
+        "● LIVE";
 
 
-      document
-        .querySelectorAll(
-          ".peli-digit"
-        )
-        .forEach(
-          button => {
+      chartDirection.textContent =
+        "LIVE";
 
-            button.classList.toggle(
-              "live",
-              Number(
-                button.dataset.digit
-              ) === digit
-            );
 
-          }
-        );
+      priceMovement.style.color =
+        "#32d9b6";
+
+
+      chartDirection.style.color =
+        "#32d9b6";
+
+    }
+
+    else if (
+      quote >
+      previousPrice
+    ) {
+
+      priceMovement.textContent =
+        "▲ UP";
+
+
+      chartDirection.textContent =
+        "UP";
+
+
+      priceMovement.style.color =
+        "#32d9b6";
+
+
+      chartDirection.style.color =
+        "#32d9b6";
+
+    }
+
+    else if (
+      quote <
+      previousPrice
+    ) {
+
+      priceMovement.textContent =
+        "▼ DOWN";
+
+
+      chartDirection.textContent =
+        "DOWN";
+
+
+      priceMovement.style.color =
+        "#ff647c";
+
+
+      chartDirection.style.color =
+        "#ff647c";
+
+    }
+
+    else {
+
+      priceMovement.textContent =
+        "— FLAT";
+
+
+      chartDirection.textContent =
+        "FLAT";
+
+
+      priceMovement.style.color =
+        "#ffd83d";
+
+
+      chartDirection.style.color =
+        "#ffd83d";
 
     }
 
 
-    /* PREVIOUS */
-
-    if (
-      data.previousDigit !==
-      undefined &&
-      data.previousDigit !== null
-    ) {
-
-      statPrevious.textContent =
-        data.previousDigit;
-
-    }
-
-
-    /* MOVEMENT */
-
-    if (
-      previousPrice !== null
-    ) {
-
-      if (
-        quote >
-        previousPrice
-      ) {
-
-        priceMovement.textContent =
-          "▲ UP";
-
-        chartDirection.textContent =
-          "UP";
-
-        priceMovement.style.color =
-          "#32d9b6";
-
-        chartDirection.style.color =
-          "#32d9b6";
-
-      }
-
-      else if (
-        quote <
-        previousPrice
-      ) {
-
-        priceMovement.textContent =
-          "▼ DOWN";
-
-        chartDirection.textContent =
-          "DOWN";
-
-        priceMovement.style.color =
-          "#ff647c";
-
-        chartDirection.style.color =
-          "#ff647c";
-
-      }
-
-      else {
-
-        priceMovement.textContent =
-          "— FLAT";
-
-        chartDirection.textContent =
-          "FLAT";
-
-      }
-
-    }
-
+    /*
+     * Count actual chart points.
+     */
 
     const count =
       prices.length;
@@ -1525,6 +1771,7 @@
 
     chartTicks.textContent =
       count;
+
 
     statCount.textContent =
       count;
@@ -1537,11 +1784,13 @@
   }
 
 
-  /* =======================================================
+  /* =========================================================
      HISTORY
-     ======================================================= */
+     ========================================================= */
 
-  function handleHistory(data) {
+  function handleHistory(
+    data
+  ) {
 
     if (!data) {
       return;
@@ -1554,27 +1803,30 @@
       )
     ) {
 
-      prices =
+      const history =
         data.prices
           .map(Number)
           .filter(
             Number.isFinite
-          )
-          .slice(
-            -maxPoints
           );
 
 
-      drawChart();
+      if (history.length) {
 
-      chartTicks.textContent =
-        prices.length;
+        prices =
+          history.slice(
+            -maxPoints
+          );
 
-      statCount.textContent =
-        prices.length;
+      }
 
     }
 
+
+    /*
+     * Rebuild digit distribution from
+     * Deriv's counts when supplied.
+     */
 
     if (
       Array.isArray(
@@ -1584,12 +1836,32 @@
 
       digits = [];
 
+
       data.counts.forEach(
         (count, digit) => {
 
+          const amount =
+            Math.max(
+              0,
+              Number(count) || 0
+            );
+
+
+          /*
+           * Don't create an enormous
+           * client-side array.
+           */
+
+          const limited =
+            Math.min(
+              amount,
+              500
+            );
+
+
           for (
             let i = 0;
-            i < Number(count);
+            i < limited;
             i++
           ) {
 
@@ -1608,32 +1880,49 @@
           -500
         );
 
-
-      updateDigits();
-
     }
+
+
+    drawChart();
+
+    updateDigits();
+
+
+    chartTicks.textContent =
+      prices.length;
+
+
+    statCount.textContent =
+      prices.length;
 
   }
 
 
-  /* =======================================================
-     CONNECTION STATUS
-     ======================================================= */
+  /* =========================================================
+     STATUS
+     ========================================================= */
 
-  function handleStatus(data) {
+  function handleStatus(
+    data
+  ) {
 
     if (!data) {
       return;
     }
 
 
-    if (
-      data.publicConnected
-    ) {
+    const connected =
+      Boolean(
+        data.publicConnected
+      );
+
+
+    if (connected) {
 
       liveDot.classList.add(
         "connected"
       );
+
 
       marketStatus.textContent =
         "CONNECTED";
@@ -1646,22 +1935,167 @@
         "connected"
       );
 
-      marketStatus.textContent =
-        "CONNECTING";
+
+      /*
+       * Do not hide an already working
+       * live price just because the
+       * authenticated account status
+       * changes.
+       */
+
+      if (
+        !lastPrice
+      ) {
+
+        marketStatus.textContent =
+          data.publicConnecting
+            ? "CONNECTING"
+            : "WAITING";
+
+      }
 
     }
 
   }
 
 
-  /* =======================================================
-     RESET
-     ======================================================= */
+  /* =========================================================
+     INITIALIZE FROM CURRENT ENGINE STATE
+     ========================================================= */
 
-  document
-    .getElementById(
-      "peli-reset-chart"
-    )
+  function recoverCurrentState() {
+
+    if (
+      !window.PELI_DERIV
+    ) {
+      return;
+    }
+
+
+    /*
+     * Current connection status.
+     */
+
+    if (
+      typeof
+      window.PELI_DERIV
+        .getConnectionInfo ===
+      "function"
+    ) {
+
+      const info =
+        window.PELI_DERIV
+          .getConnectionInfo();
+
+
+      handleStatus({
+        publicConnected:
+          info.publicConnected,
+
+        publicConnecting:
+          info.connecting
+      });
+
+    }
+
+
+    /*
+     * Recover existing ticks.
+     *
+     * This is important when the
+     * Deriv engine connected before
+     * this chart script loaded.
+     */
+
+    if (
+      typeof
+      window.PELI_DERIV
+        .getRecentTicks ===
+      "function"
+    ) {
+
+      const existing =
+        window.PELI_DERIV
+          .getRecentTicks();
+
+
+      if (
+        Array.isArray(existing) &&
+        existing.length
+      ) {
+
+        /*
+         * Start with the most recent
+         * chart points.
+         */
+
+        const recent =
+          existing.slice(
+            -maxPoints
+          );
+
+
+        recent.forEach(
+          tick => {
+
+            handleTick(
+              {
+                quote:
+                  tick.quote,
+
+                lastDigit:
+                  tick.digit,
+
+                epoch:
+                  tick.epoch
+              },
+              true
+            );
+
+          }
+        );
+
+      }
+
+    }
+
+
+    /*
+     * Recover the engine's current
+     * quote even if recentTicks is
+     * empty.
+     */
+
+    if (
+      lastPrice === null &&
+      Number.isFinite(
+        Number(
+          window.PELI_DERIV.lastQuote
+        )
+      )
+    ) {
+
+      handleTick({
+        quote:
+          window.PELI_DERIV.lastQuote,
+
+        lastDigit:
+          window.PELI_DERIV.lastDigit
+      });
+
+    }
+
+
+    initialized = true;
+
+  }
+
+
+  /* =========================================================
+     RESET
+     ========================================================= */
+
+  $("peli-reset-chart")
     ?.addEventListener(
       "click",
       () => {
@@ -1674,28 +2108,82 @@
 
         previousPrice = null;
 
+        lastDigit = null;
+
+        previousDigit = null;
+
+        lastEpoch = null;
+
+
         drawChart();
 
         updateDigits();
 
+
         chartTicks.textContent =
           "0";
 
+
         statCount.textContent =
           "0";
+
+
+        currentPrice.textContent =
+          "--";
+
+
+        statPrice.textContent =
+          "--";
+
+
+        currentDigit.textContent =
+          "--";
+
+
+        chartDigit.textContent =
+          "--";
+
+
+        statLast.textContent =
+          "--";
+
+
+        statPrevious.textContent =
+          "--";
+
+
+        priceMovement.textContent =
+          "WAITING";
+
+
+        chartDirection.textContent =
+          "--";
+
+
+        liveBubble.textContent =
+          "--";
+
+
+        document
+          .querySelectorAll(
+            ".peli-digit"
+          )
+          .forEach(
+            button =>
+              button.classList.remove(
+                "live"
+              )
+          );
 
       }
     );
 
 
-  /* =======================================================
+  /* =========================================================
      FULLSCREEN
-     ======================================================= */
+     ========================================================= */
 
-  document
-    .getElementById(
-      "peli-fullscreen"
-    )
+  $("peli-fullscreen")
     ?.addEventListener(
       "click",
       async () => {
@@ -1706,13 +2194,15 @@
             !document.fullscreenElement
           ) {
 
-            await chartCard.requestFullscreen();
+            await chartCard
+              .requestFullscreen();
 
           }
 
           else {
 
-            await document.exitFullscreen();
+            await document
+              .exitFullscreen();
 
           }
 
@@ -1731,9 +2221,9 @@
     );
 
 
-  /* =======================================================
-     DERIV EVENTS
-     ======================================================= */
+  /* =========================================================
+     DERIV CONNECTION
+     ========================================================= */
 
   function attachDeriv() {
 
@@ -1746,16 +2236,27 @@
 
       setTimeout(
         attachDeriv,
-        300
+        250
       );
 
       return;
     }
 
 
+    /*
+     * Register listeners FIRST.
+     */
+
     window.PELI_DERIV.on(
       "tick",
-      handleTick
+      tick => {
+
+        handleTick(
+          tick,
+          false
+        );
+
+      }
     );
 
 
@@ -1771,60 +2272,19 @@
     );
 
 
-    /* =====================================================
-       LOAD CURRENT STATE IMMEDIATELY
-       ===================================================== */
+    /*
+     * Now recover anything that
+     * arrived before this UI existed.
+     */
 
-    const existingTicks =
-      window.PELI_DERIV
-        .getRecentTicks?.();
-
-
-    if (
-      Array.isArray(
-        existingTicks
-      ) &&
-      existingTicks.length
-    ) {
-
-      existingTicks.forEach(
-        tick => {
-
-          handleTick({
-            quote:
-              tick.quote,
-
-            lastDigit:
-              tick.digit,
-
-            epoch:
-              tick.epoch
-          });
-
-        }
-      );
-
-    }
-
-
-    const stats =
-      window.PELI_DERIV
-        .getDigitStats?.();
-
-
-    if (
-      stats &&
-      Array.isArray(
-        stats.counts
-      )
-    ) {
-
-      updateDigits();
-
-    }
+    recoverCurrentState();
 
   }
 
+
+  /* =========================================================
+     START
+     ========================================================= */
 
   attachDeriv();
 
