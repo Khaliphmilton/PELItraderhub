@@ -229,24 +229,49 @@ export default async function handler(req, res) {
 
     if (!realAccount) {
 
-      return res.status(200).json({
+  return res.status(200).json({
 
-        connected: true,
+    connected: true,
 
-        authenticated: false,
+    authenticated: false,
 
-        real_account_available: false,
+    real_account_available: false,
 
-        account: null,
+    account: null,
 
-        ws_url: null,
+    ws_url: null,
 
-        error:
-          "Your Deriv authorization is valid, but Deriv did not return a REAL Options account. No demo account will be used."
+    error:
+      "Deriv returned Options accounts, but no REAL account was found.",
 
-      });
+    debug_accounts:
+      accounts.map(account => ({
+        account_id:
+          account?.account_id ??
+          account?.id ??
+          null,
 
-    }
+        account_type:
+          account?.account_type ??
+          account?.type ??
+          null,
+
+        status:
+          account?.status ??
+          null,
+
+        currency:
+          account?.currency ??
+          null,
+
+        group:
+          account?.group ??
+          null
+      }))
+
+  });
+
+}
 
     // ------------------------------------------------
     // ACCOUNT ID
