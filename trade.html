@@ -1,1215 +1,345 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!-- =========================================================
+     PELItradershub — LIVE DERIV CHART
+     FULL REPLACEMENT FOR THE CURRENT CHART SECTION
+     ========================================================= -->
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<section id="peli-live-market" class="peli-market">
 
-<title>PELItradershub — Real Digits Trader</title>
+  <!-- HEADER -->
+  <div class="peli-market-header">
 
-<link rel="stylesheet" href="styles.css">
-
-<style>
-
-:root{
-  --bg:#070b12;
-  --panel:#0a1019;
-  --card:#111a27;
-  --line:#202b3c;
-  --text:#f4f7fb;
-  --muted:#8490a4;
-  --blue:#2d8cff;
-  --teal:#2cc9bb;
-  --red:#f0444d;
-  --yellow:#ffd24a;
-  --purple:#786cff;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-button,
-input,
-select{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-.navbar{
-  position:sticky;
-  top:0;
-  z-index:50;
-}
-
-.terminal{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 400px;
-  min-height:calc(100vh - 70px);
-}
-
-.market{
-  padding:18px;
-  min-width:0;
-}
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-  margin-bottom:15px;
-}
-
-.symbol h1{
-  margin:0;
-  font-size:22px;
-}
-
-.symbol small{
-  display:block;
-  margin-top:5px;
-  color:var(--muted);
-  font-size:11px;
-}
-
-.price{
-  text-align:right;
-}
-
-.price strong{
-  display:block;
-  font-size:28px;
-  letter-spacing:.3px;
-  font-variant-numeric:tabular-nums;
-}
-
-.live{
-  font-size:11px;
-  color:var(--yellow);
-}
-
-
-/* =========================================================
-   REAL LIVE CHART
-   ========================================================= */
-
-.chart{
-  height:390px;
-  border:1px solid var(--line);
-  border-radius:16px;
-  background:#080f18;
-  position:relative;
-  overflow:hidden;
-}
-
-.grid{
-  position:absolute;
-  inset:0;
-
-  background-image:
-    linear-gradient(#172332 1px,transparent 1px),
-    linear-gradient(90deg,#172332 1px,transparent 1px);
-
-  background-size:10% 20%;
-  opacity:.55;
-}
-
-
-/*
-   The actual SVG price chart.
-   Every new REAL Deriv tick adds a point.
-*/
-
-.price-svg{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  overflow:visible;
-}
-
-.price-line{
-  fill:none;
-  stroke:var(--blue);
-  stroke-width:2;
-  vector-effect:non-scaling-stroke;
-  filter:drop-shadow(0 0 4px rgba(45,140,255,.35));
-}
-
-.price-area{
-  fill:rgba(45,140,255,.07);
-}
-
-
-/*
-   Moving real-market cursor.
-*/
-
-.market-cursor{
-  position:absolute;
-
-  top:25px;
-  bottom:25px;
-
-  width:0;
-
-  border-left:2px dashed var(--yellow);
-
-  pointer-events:none;
-
-  transition:
-    left .18s linear;
-}
-
-.market-cursor:after{
-  content:"";
-
-  position:absolute;
-
-  top:-2px;
-  left:-6px;
-
-  width:10px;
-  height:10px;
-
-  border-radius:50%;
-
-  background:var(--yellow);
-
-  box-shadow:
-    0 0 8px rgba(255,210,74,.9),
-    0 0 18px rgba(255,210,74,.5);
-}
-
-.cursor-label{
-  position:absolute;
-
-  top:8px;
-
-  background:#111a27ee;
-
-  border:1px solid #39475d;
-
-  border-radius:7px;
-
-  padding:5px 8px;
-
-  font-size:10px;
-
-  color:var(--yellow);
-
-  pointer-events:none;
-
-  white-space:nowrap;
-
-  transform:translateX(-50%);
-}
-
-
-/*
-   Current price marker.
-*/
-
-.live-price-marker{
-  position:absolute;
-
-  right:10px;
-
-  transform:translateY(-50%);
-
-  background:var(--blue);
-
-  color:#fff;
-
-  border-radius:6px;
-
-  padding:4px 7px;
-
-  font-size:10px;
-
-  font-weight:800;
-
-  pointer-events:none;
-
-  transition:top .18s linear;
-}
-
-.live-price-marker:before{
-  content:"";
-
-  position:absolute;
-
-  right:-5px;
-  top:50%;
-
-  transform:translateY(-50%);
-
-  border-top:5px solid transparent;
-  border-bottom:5px solid transparent;
-  border-left:5px solid var(--blue);
-}
-
-
-/*
-   Center status disappears once live ticks arrive.
-*/
-
-.chart-center{
-  position:absolute;
-  inset:0;
-
-  display:grid;
-  place-items:center;
-
-  pointer-events:none;
-
-  transition:
-    opacity .25s ease;
-}
-
-.chart-center.hidden{
-  opacity:0;
-}
-
-.chart-center div{
-  background:#0b121dcc;
-
-  border:1px solid #29384d;
-
-  border-radius:14px;
-
-  padding:15px 18px;
-
-  text-align:center;
-}
-
-.chart-center b{
-  font-size:14px;
-}
-
-.chart-center span{
-  display:block;
-
-  color:var(--muted);
-
-  font-size:11px;
-
-  margin-top:5px;
-}
-
-.chart-info{
-  position:absolute;
-
-  left:15px;
-  bottom:12px;
-
-  background:#0b121de8;
-
-  border:1px solid #27364a;
-
-  border-radius:9px;
-
-  padding:8px 11px;
-
-  font-size:11px;
-
-  color:var(--muted);
-
-  z-index:5;
-}
-
-.chart-info b{
-  color:#fff;
-}
-
-
-/* =========================================================
-   DIGIT MARKET STRIP
-   ========================================================= */
-
-.live-digit-strip{
-  margin-top:10px;
-
-  border:1px solid var(--line);
-
-  border-radius:12px;
-
-  background:#0b121c;
-
-  padding:10px;
-}
-
-.live-digit-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  margin-bottom:8px;
-
-  font-size:10px;
-
-  color:var(--muted);
-
-  text-transform:uppercase;
-  letter-spacing:.5px;
-}
-
-.live-digit-title strong{
-  color:var(--yellow);
-}
-
-.live-digits{
-  display:grid;
-
-  grid-template-columns:
-    repeat(10,1fr);
-
-  gap:5px;
-}
-
-.live-digit{
-  position:relative;
-
-  min-width:0;
-
-  border:1px solid #29364a;
-
-  background:#101925;
-
-  border-radius:7px;
-
-  padding:7px 2px;
-
-  text-align:center;
-
-  color:#9ca8b9;
-
-  transition:
-    background .12s ease,
-    border-color .12s ease,
-    transform .12s ease;
-}
-
-.live-digit strong{
-  font-size:15px;
-}
-
-.live-digit small{
-  display:block;
-
-  margin-top:2px;
-
-  font-size:8px;
-
-  color:#68758a;
-}
-
-.live-digit.current{
-  background:#173d69;
-
-  border-color:var(--yellow);
-
-  color:#fff;
-
-  transform:translateY(-2px);
-
-  box-shadow:
-    0 0 0 1px rgba(255,210,74,.25),
-    0 0 12px rgba(255,210,74,.18);
-}
-
-.live-digit.current:after{
-  content:"LIVE";
-
-  position:absolute;
-
-  top:-7px;
-  left:50%;
-
-  transform:translateX(-50%);
-
-  background:var(--yellow);
-
-  color:#111;
-
-  border-radius:4px;
-
-  padding:2px 4px;
-
-  font-size:7px;
-
-  font-weight:900;
-}
-
-.live-digit.selected{
-  border-color:var(--blue);
-
-  background:#102b4d;
-
-  color:#fff;
-}
-
-.live-digit.current.selected{
-  border-color:var(--yellow);
-
-  background:#183d5d;
-}
-
-
-/* =========================================================
-   RIGHT PANEL
-   ========================================================= */
-
-.panel{
-  border-left:1px solid var(--line);
-
-  background:#0a1019;
-
-  padding:18px;
-
-  overflow:auto;
-}
-
-.panel h2{
-  margin:0 0 14px;
-
-  font-size:20px;
-}
-
-.account{
-  background:var(--card);
-
-  border:1px solid var(--line);
-
-  border-radius:13px;
-
-  padding:14px;
-
-  margin-bottom:15px;
-}
-
-.label{
-  color:var(--muted);
-
-  font-size:10px;
-
-  text-transform:uppercase;
-
-  letter-spacing:.5px;
-}
-
-.balance{
-  font-size:25px;
-
-  font-weight:800;
-
-  margin:4px 0;
-}
-
-.account-status{
-  font-size:12px;
-
-  color:var(--yellow);
-
-  margin-top:6px;
-}
-
-.connect{
-  width:100%;
-
-  margin-top:10px;
-
-  border:1px solid var(--purple);
-
-  background:#17142e;
-
-  color:#c1bbff;
-
-  border-radius:9px;
-
-  padding:11px;
-
-  font-weight:800;
-}
-
-.field{
-  margin:13px 0;
-}
-
-.field label{
-  display:block;
-
-  color:#929caf;
-
-  font-size:10px;
-
-  margin-bottom:6px;
-
-  text-transform:uppercase;
-
-  letter-spacing:.4px;
-}
-
-.input,
-.select{
-  width:100%;
-
-  background:#0b121c;
-
-  border:1px solid #29364a;
-
-  color:#fff;
-
-  border-radius:9px;
-
-  padding:11px;
-
-  outline:none;
-}
-
-.input:focus,
-.select:focus{
-  border-color:var(--blue);
-}
-
-.type-buttons{
-  display:grid;
-
-  grid-template-columns:1fr 1fr;
-
-  gap:7px;
-}
-
-.type{
-  border:1px solid #29364a;
-
-  background:#111a27;
-
-  color:#c6ceda;
-
-  border-radius:9px;
-
-  padding:11px 7px;
-
-  font-weight:800;
-}
-
-.type:hover{
-  border-color:#52647f;
-}
-
-.type.active{
-  background:#222b5d;
-
-  border-color:#786cff;
-
-  color:#fff;
-}
-
-
-/* =========================================================
-   PREDICTION DIGITS
-   ========================================================= */
-
-.digits{
-  display:grid;
-
-  grid-template-columns:
-    repeat(10,1fr);
-
-  gap:5px;
-
-  margin:8px 0 14px;
-}
-
-.digit{
-  position:relative;
-
-  border:1px solid #29364a;
-
-  background:#111a27;
-
-  color:#dbe2ec;
-
-  border-radius:8px;
-
-  padding:9px 2px;
-
-  text-align:center;
-
-  transition:
-    border-color .12s,
-    background .12s,
-    transform .12s;
-}
-
-.digit strong{
-  display:block;
-
-  font-size:16px;
-}
-
-.digit small{
-  display:block;
-
-  color:#8b97a9;
-
-  font-size:9px;
-
-  margin-top:3px;
-}
-
-.digit:hover{
-  border-color:#5275a3;
-}
-
-.digit.active{
-  border-color:var(--blue);
-
-  background:#102b4d;
-
-  box-shadow:
-    0 0 0 1px rgba(45,140,255,.2);
-}
-
-
-/*
-   NEW:
-   actual live digit indicator.
-*/
-
-.digit.live-now{
-  border-color:var(--yellow);
-
-  box-shadow:
-    0 0 12px rgba(255,210,74,.25);
-
-  transform:translateY(-2px);
-}
-
-.digit.live-now:after{
-  content:"LIVE";
-
-  position:absolute;
-
-  top:-6px;
-  left:50%;
-
-  transform:translateX(-50%);
-
-  background:var(--yellow);
-
-  color:#111;
-
-  border-radius:4px;
-
-  padding:2px 4px;
-
-  font-size:7px;
-
-  font-weight:900;
-}
-
-.digit.active.live-now{
-  background:#183d5d;
-
-  border-color:var(--yellow);
-}
-
-.row3{
-  display:grid;
-
-  grid-template-columns:
-    1fr 1fr 1fr;
-
-  gap:7px;
-}
-
-.summary{
-  border-top:1px solid var(--line);
-
-  border-bottom:1px solid var(--line);
-
-  padding:10px 0;
-
-  margin:15px 0;
-}
-
-.sum{
-  display:flex;
-
-  justify-content:space-between;
-
-  gap:15px;
-
-  margin:8px 0;
-
-  font-size:13px;
-}
-
-.sum span{
-  color:var(--muted);
-}
-
-.buy{
-  width:100%;
-
-  border:0;
-
-  border-radius:10px;
-
-  padding:14px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #786cff,
-      #2cc9bb
-    );
-
-  color:#061016;
-
-  font-weight:900;
-}
-
-.buy:disabled{
-  opacity:.45;
-
-  cursor:not-allowed;
-}
-
-.sell{
-  width:100%;
-
-  margin-top:8px;
-
-  border:1px solid var(--red);
-
-  border-radius:10px;
-
-  padding:12px;
-
-  background:#281318;
-
-  color:#ff8b91;
-
-  font-weight:900;
-
-  display:none;
-}
-
-.sell.visible{
-  display:block;
-}
-
-.result{
-  margin-top:12px;
-
-  padding:11px;
-
-  border-radius:9px;
-
-  background:var(--card);
-
-  border:1px solid var(--line);
-
-  font-size:12px;
-
-  color:#aeb8c7;
-
-  white-space:pre-line;
-
-  line-height:1.5;
-}
-
-.notice{
-  font-size:10px;
-
-  color:#788397;
-
-  line-height:1.5;
-
-  margin-top:12px;
-}
-
-.stats{
-  display:grid;
-
-  grid-template-columns:
-    repeat(3,1fr);
-
-  gap:7px;
-
-  margin-top:12px;
-}
-
-.stat{
-  background:#0e1723;
-
-  border:1px solid var(--line);
-
-  border-radius:9px;
-
-  padding:9px;
-
-  text-align:center;
-}
-
-.stat span{
-  display:block;
-
-  color:var(--muted);
-
-  font-size:9px;
-
-  text-transform:uppercase;
-}
-
-.stat strong{
-  display:block;
-
-  margin-top:4px;
-
-  font-size:13px;
-}
-
-.open-contract{
-  display:none;
-
-  margin-top:12px;
-
-  padding:11px;
-
-  background:#101b28;
-
-  border:1px solid #30435b;
-
-  border-radius:10px;
-}
-
-.open-contract.visible{
-  display:block;
-}
-
-.open-contract-title{
-  font-weight:800;
-
-  font-size:12px;
-
-  margin-bottom:8px;
-}
-
-.contract-line{
-  display:flex;
-
-  justify-content:space-between;
-
-  font-size:11px;
-
-  margin:5px 0;
-}
-
-.contract-line span{
-  color:var(--muted);
-}
-
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media(max-width:900px){
-
-  .terminal{
-    grid-template-columns:1fr;
-  }
-
-  .panel{
-    border-left:0;
-
-    border-top:1px solid var(--line);
-  }
-
-  .chart{
-    height:300px;
-  }
-
-}
-
-@media(max-width:500px){
-
-  .market{
-    padding:10px;
-  }
-
-  .panel{
-    padding:12px;
-  }
-
-  .digits,
-  .live-digits{
-    gap:3px;
-  }
-
-  .digit{
-    padding:7px 1px;
-  }
-
-  .digit strong{
-    font-size:14px;
-  }
-
-  .live-digit{
-    padding:6px 1px;
-  }
-
-  .live-digit strong{
-    font-size:13px;
-  }
-
-}
-
-</style>
-</head>
-
-
-<body>
-
-
-<header class="navbar">
-
-  <a href="index.html" class="brand">
-    <span class="brand-icon">P</span>
-    <span>PELI<span>tradershub</span></span>
-  </a>
-
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="markets.html">Markets</a>
-    <a href="trade.html">Trade</a>
-    <a href="strategies.html">Strategies</a>
-  </nav>
-
-  <div class="nav-actions">
-    <a href="portfolio.html" class="login-link">
-      Portfolio
-    </a>
-
-    <a href="dashboard.html" class="button primary">
-      Dashboard
-    </a>
-  </div>
-
-</header>
-
-
-
-<main class="terminal">
-
-
-<section class="market">
-
-
-  <div class="top">
-
-    <div class="symbol">
-
-      <h1 id="symbolName">
+    <div>
+      <div class="peli-market-title">
         Volatility 100 Index
-      </h1>
-
-      <small id="symbolSub">
-        LIVE DERIV MARKET
-      </small>
-
-    </div>
-
-
-    <div class="price">
-
-      <strong id="price">
-        —
-      </strong>
-
-      <span
-        class="live"
-        id="liveStatus">
-
-        ● Connecting...
-
-      </span>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- =====================================================
-       REAL LIVE PRICE CHART
-       ===================================================== -->
-
-  <div class="chart">
-
-    <div class="grid"></div>
-
-
-    <svg
-      class="price-svg"
-      id="priceSvg"
-      preserveAspectRatio="none">
-
-      <polygon
-        id="priceArea"
-        class="price-area">
-      </polygon>
-
-      <polyline
-        id="priceLine"
-        class="price-line">
-      </polyline>
-
-    </svg>
-
-
-    <div
-      class="market-cursor"
-      id="marketCursor">
-
-      <div
-        class="cursor-label"
-        id="cursorLabel">
-
-        LIVE
-
       </div>
 
-    </div>
+      <div class="peli-market-status-row">
+        <span id="peli-live-dot" class="peli-live-dot"></span>
 
-
-    <div
-      class="live-price-marker"
-      id="livePriceMarker">
-
-      —
-
-    </div>
-
-
-    <div
-      class="chart-center"
-      id="chartCenter">
-
-      <div>
-
-        <b>
-          Live Deriv Market
-        </b>
-
-        <span id="chartStatus">
-          Waiting for real Deriv ticks...
+        <span id="peli-account-status">
+          REAL DERIV ACCOUNT
         </span>
 
+        <span id="peli-market-status">
+          CONNECTING
+        </span>
+      </div>
+    </div>
+
+    <div class="peli-price-box">
+
+      <div
+        id="peli-current-price"
+        class="peli-current-price"
+      >
+        --
+      </div>
+
+      <div
+        id="peli-price-movement"
+        class="peli-price-movement"
+      >
+        WAITING
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       CHART
+       ======================================================= -->
+
+  <div
+    id="peli-chart-card"
+    class="peli-chart-card"
+  >
+
+    <div class="peli-chart-toolbar">
+
+      <div class="peli-chart-label">
+        LIVE DERIV MARKET
+      </div>
+
+      <div class="peli-chart-actions">
+
+        <button
+          id="peli-reset-chart"
+          class="peli-chart-button"
+          type="button"
+        >
+          RESET
+        </button>
+
+        <button
+          id="peli-fullscreen"
+          class="peli-chart-button peli-fullscreen-button"
+          type="button"
+        >
+          ⛶ FULL SCREEN
+        </button>
+
       </div>
 
     </div>
 
 
-    <div class="chart-info">
+    <div
+      id="peli-chart-wrapper"
+      class="peli-chart-wrapper"
+    >
 
-      Last digit:
-      <b id="chartDigit">—</b>
+      <div
+        id="peli-y-axis"
+        class="peli-y-axis"
+      ></div>
 
-      &nbsp; • &nbsp;
+      <svg
+        id="peli-price-chart"
+        class="peli-price-chart"
+        viewBox="0 0 1000 500"
+        preserveAspectRatio="none"
+      >
 
-      Movement:
-      <b id="movement">—</b>
+        <defs>
+
+          <linearGradient
+            id="peli-chart-fill"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+
+            <stop
+              offset="0%"
+              stop-opacity="0.28"
+            />
+
+            <stop
+              offset="100%"
+              stop-opacity="0"
+            />
+
+          </linearGradient>
+
+        </defs>
+
+        <g id="peli-grid"></g>
+
+        <path
+          id="peli-area"
+          class="peli-chart-area"
+          d=""
+        ></path>
+
+        <path
+          id="peli-line"
+          class="peli-chart-line"
+          d=""
+        ></path>
+
+        <circle
+          id="peli-live-point"
+          class="peli-live-point"
+          cx="0"
+          cy="0"
+          r="6"
+        ></circle>
+
+      </svg>
+
+
+      <!-- LIVE PRICE BUBBLE -->
+
+      <div
+        id="peli-live-bubble"
+        class="peli-live-bubble"
+      >
+        --
+      </div>
+
+
+      <!-- BOTTOM INFO -->
+
+      <div class="peli-chart-info">
+
+        <div>
+          LAST DIGIT:
+          <strong id="peli-chart-digit">--</strong>
+        </div>
+
+        <div>
+          MOVEMENT:
+          <strong id="peli-chart-direction">
+            --
+          </strong>
+        </div>
+
+        <div>
+          TICKS:
+          <strong id="peli-chart-ticks">
+            0
+          </strong>
+        </div>
+
+      </div>
 
     </div>
 
   </div>
 
 
+  <!-- =======================================================
+       LIVE DIGITS
+       ======================================================= -->
 
-  <!-- =====================================================
-       LIVE DIGIT STRIP
-       ===================================================== -->
+  <div class="peli-digits-card">
 
-  <div class="live-digit-strip">
+    <div class="peli-section-heading">
 
-    <div class="live-digit-title">
-
-      <span>
+      <div>
         LIVE LAST-DIGIT TRACKER
-      </span>
+      </div>
 
-      <strong id="liveDigitText">
-        Waiting...
-      </strong>
+      <div>
+        CURRENT DIGIT:
+        <strong id="peli-current-digit">
+          --
+        </strong>
+      </div>
 
+    </div>
+
+
+    <div
+      id="peli-digit-grid"
+      class="peli-digit-grid"
+    >
+
+      <button class="peli-digit" data-digit="0">
+        <span>0</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="1">
+        <span>1</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="2">
+        <span>2</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="3">
+        <span>3</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="4">
+        <span>4</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="5">
+        <span>5</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="6">
+        <span>6</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="7">
+        <span>7</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="8">
+        <span>8</span>
+        <small>0%</small>
+      </button>
+
+      <button class="peli-digit" data-digit="9">
+        <span>9</span>
+        <small>0%</small>
+      </button>
+
+    </div>
+
+
+    <!-- RECENT DIGITS -->
+
+    <div class="peli-recent-title">
+      RECENT DIGITS
     </div>
 
     <div
-      class="live-digits"
-      id="liveDigits">
-
+      id="peli-recent-digits"
+      class="peli-recent-digits"
+    >
+      Waiting for live ticks...
     </div>
 
   </div>
 
 
+  <!-- =======================================================
+       LIVE STATISTICS
+       ======================================================= -->
 
-  <!-- =====================================================
-       STATS
-       ===================================================== -->
+  <div class="peli-stat-grid">
 
-  <div class="stats">
-
-    <div class="stat">
+    <div class="peli-stat-box">
 
       <span>
-        Last Digit
+        LAST DIGIT
       </span>
 
-      <strong id="lastDigit">
-        —
+      <strong id="peli-stat-last">
+        --
       </strong>
 
     </div>
 
 
-    <div class="stat">
+    <div class="peli-stat-box">
 
       <span>
-        Previous
+        PREVIOUS DIGIT
       </span>
 
-      <strong id="previousDigit">
-        —
+      <strong id="peli-stat-previous">
+        --
       </strong>
 
     </div>
 
 
-    <div class="stat">
+    <div class="peli-stat-box">
 
       <span>
-        Ticks
+        TICKS
       </span>
 
-      <strong id="sampleCount">
+      <strong id="peli-stat-count">
         0
+      </strong>
+
+    </div>
+
+
+    <div class="peli-stat-box">
+
+      <span>
+        PRICE
+      </span>
+
+      <strong id="peli-stat-price">
+        --
       </strong>
 
     </div>
@@ -1219,2317 +349,1486 @@ button{
 </section>
 
 
-
-<!-- =======================================================
-     TRADING PANEL
-     ======================================================= -->
-
-<aside class="panel">
-
-
-  <h2>
-    Digits Order Ticket
-  </h2>
-
-
-  <!-- ACCOUNT -->
-
-  <div class="account">
-
-    <div class="label">
-      ACCOUNT
-    </div>
-
-    <div
-      class="balance"
-      id="accountBalance">
-
-      —
-
-    </div>
-
-    <div
-      class="label"
-      id="accountCurrency">
-
-      Checking account...
-
-    </div>
-
-    <div
-      class="account-status"
-      id="accountStatus">
-
-      Real Deriv account not connected
-
-    </div>
-
-
-    <button
-      class="connect"
-      id="connectButton">
-
-      CONNECT REAL DERIV ACCOUNT
-
-    </button>
-
-  </div>
-
-
-
-  <!-- MARKET -->
-
-  <div class="field">
-
-    <label>
-      Market
-    </label>
-
-    <select
-      class="select"
-      id="market">
-
-      <option value="R_10">
-        Volatility 10 Index
-      </option>
-
-      <option value="R_25">
-        Volatility 25 Index
-      </option>
-
-      <option value="R_50">
-        Volatility 50 Index
-      </option>
-
-      <option value="R_75">
-        Volatility 75 Index
-      </option>
-
-      <option value="R_100" selected>
-        Volatility 100 Index
-      </option>
-
-      <option value="R_10_1s">
-        Volatility 10 (1s) Index
-      </option>
-
-      <option value="R_25_1s">
-        Volatility 25 (1s) Index
-      </option>
-
-      <option value="R_50_1s">
-        Volatility 50 (1s) Index
-      </option>
-
-      <option value="R_75_1s">
-        Volatility 75 (1s) Index
-      </option>
-
-      <option value="R_100_1s">
-        Volatility 100 (1s) Index
-      </option>
-
-    </select>
-
-  </div>
-
-
-
-  <!-- TRADE TYPE -->
-
-  <div class="field">
-
-    <label>
-      Trade Type
-    </label>
-
-    <div
-      class="type-buttons"
-      id="typeButtons">
-
-      <button
-        class="type active"
-        data-type="DIGITMATCH">
-
-        Matches
-
-      </button>
-
-      <button
-        class="type"
-        data-type="DIGITDIFF">
-
-        Differs
-
-      </button>
-
-      <button
-        class="type"
-        data-type="DIGITEVEN">
-
-        Even
-
-      </button>
-
-      <button
-        class="type"
-        data-type="DIGITODD">
-
-        Odd
-
-      </button>
-
-      <button
-        class="type"
-        data-type="DIGITOVER">
-
-        Over
-
-      </button>
-
-      <button
-        class="type"
-        data-type="DIGITUNDER">
-
-        Under
-
-      </button>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- PREDICTION -->
-
-  <div
-    class="field"
-    id="predictionField">
-
-    <label>
-      Prediction Digit
-    </label>
-
-    <div
-      class="digits"
-      id="digits">
-
-    </div>
-
-  </div>
-
-
-
-  <!-- DURATION -->
-
-  <div class="field">
-
-    <label>
-      Number of Ticks
-    </label>
-
-    <select
-      class="select"
-      id="duration">
-
-      <option value="1">
-        1 tick
-      </option>
-
-      <option value="2">
-        2 ticks
-      </option>
-
-      <option value="5" selected>
-        5 ticks
-      </option>
-
-      <option value="10">
-        10 ticks
-      </option>
-
-      <option value="20">
-        20 ticks
-      </option>
-
-    </select>
-
-  </div>
-
-
-
-  <!-- INPUTS -->
-
-  <div class="row3">
-
-    <div class="field">
-
-      <label>
-        Ticks
-      </label>
-
-      <input
-        class="input"
-        id="ticksDisplay"
-        value="5"
-        readonly>
-
-    </div>
-
-
-    <div class="field">
-
-      <label>
-        Stake
-      </label>
-
-      <input
-        class="input"
-        id="stake"
-        type="number"
-        min="0.01"
-        step="0.01"
-        value="0.50">
-
-    </div>
-
-
-    <div class="field">
-
-      <label>
-        No. Trades
-      </label>
-
-      <input
-        class="input"
-        id="tradeCount"
-        type="number"
-        min="1"
-        max="20"
-        step="1"
-        value="1">
-
-    </div>
-
-  </div>
-
-
-
-  <!-- FREQUENCY -->
-
-  <div class="field">
-
-    <label>
-      Live Digit Frequency —
-      last <span id="sampleSize">0</span> ticks
-    </label>
-
-    <div
-      class="digits"
-      id="frequency">
-
-    </div>
-
-  </div>
-
-
-
-  <!-- SUMMARY -->
-
-  <div class="summary">
-
-    <div class="sum">
-
-      <span>
-        Stake
-      </span>
-
-      <strong id="summaryStake">
-        USD 0.50
-      </strong>
-
-    </div>
-
-
-    <div class="sum">
-
-      <span>
-        Potential payout
-      </span>
-
-      <strong id="payout">
-        —
-      </strong>
-
-    </div>
-
-
-    <div class="sum">
-
-      <span>
-        Potential profit
-      </span>
-
-      <strong id="profit">
-        —
-      </strong>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- BUY -->
-
-  <button
-    class="buy"
-    id="buyButton"
-    disabled>
-
-    CONNECT REAL DERIV ACCOUNT TO TRADE
-
-  </button>
-
-
-
-  <!-- SELL -->
-
-  <button
-    class="sell"
-    id="sellButton">
-
-    CLOSE OPEN CONTRACT
-
-  </button>
-
-
-
-  <!-- OPEN CONTRACT -->
-
-  <div
-    class="open-contract"
-    id="openContract">
-
-    <div class="open-contract-title">
-      OPEN REAL CONTRACT
-    </div>
-
-    <div class="contract-line">
-
-      <span>
-        Contract ID
-      </span>
-
-      <strong id="contractId">
-        —
-      </strong>
-
-    </div>
-
-    <div class="contract-line">
-
-      <span>
-        Status
-      </span>
-
-      <strong id="contractStatus">
-        —
-      </strong>
-
-    </div>
-
-    <div class="contract-line">
-
-      <span>
-        Current value
-      </span>
-
-      <strong id="contractValue">
-        —
-      </strong>
-
-    </div>
-
-    <div class="contract-line">
-
-      <span>
-        Profit/Loss
-      </span>
-
-      <strong id="contractProfit">
-        —
-      </strong>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- RESULT -->
-
-  <div
-    class="result"
-    id="result">
-
-    No contract selected.
-
-  </div>
-
-
-  <p class="notice">
-
-    Live market prices, digit results, proposals,
-    payouts and contract results are supplied by Deriv.
-    This terminal does not generate simulated market
-    results.
-
-  </p>
-
-</aside>
-
-</main>
-
-
-
-<script src="deriv.js"></script>
+<style>
+
+/* =========================================================
+   MARKET CONTAINER
+   ========================================================= */
+
+#peli-live-market {
+  width: 100%;
+  box-sizing: border-box;
+  color: #eef4ff;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.peli-market-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.peli-market-title {
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.peli-market-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: #4fd1c5;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.peli-live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #555;
+  box-shadow: 0 0 0 transparent;
+}
+
+.peli-live-dot.connected {
+  background: #27e0c0;
+  box-shadow: 0 0 12px rgba(39,224,192,.75);
+}
+
+#peli-market-status {
+  margin-left: 12px;
+}
+
+.peli-price-box {
+  text-align: right;
+}
+
+.peli-current-price {
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.peli-price-movement {
+  font-size: 13px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+
+/* =========================================================
+   CHART CARD
+   ========================================================= */
+
+.peli-chart-card {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #1c2a3c;
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      180deg,
+      #07101b,
+      #08111d
+    );
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.28);
+}
+
+.peli-chart-toolbar {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #182536;
+}
+
+.peli-chart-label {
+  color: #7d8da5;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.peli-chart-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.peli-chart-button {
+  border: 1px solid #26364b;
+  border-radius: 10px;
+  background: #101a28;
+  color: #d9e6f7;
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.peli-chart-button:active {
+  transform: scale(.97);
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.peli-chart-wrapper {
+  position: relative;
+  height: min(58vh, 560px);
+  min-height: 360px;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      rgba(255,255,255,.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.035) 1px,
+      transparent 1px
+    );
+  background-size: 10% 20%;
+}
+
+.peli-price-chart {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.peli-chart-line {
+  fill: none;
+  stroke: #3b8cff;
+  stroke-width: 3.5;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.peli-chart-area {
+  fill: url(#peli-chart-fill);
+  stroke: none;
+}
+
+.peli-live-point {
+  fill: #39e6c2;
+  stroke: #07101b;
+  stroke-width: 3;
+}
+
+.peli-y-axis {
+  position: absolute;
+  right: 8px;
+  top: 12px;
+  bottom: 58px;
+  width: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.peli-y-axis span {
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: rgba(5,12,21,.78);
+  color: #8ea1bb;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.peli-live-bubble {
+  position: absolute;
+  right: 12px;
+  top: 45%;
+  transform: translateY(-50%);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #328cf5;
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 6px 18px rgba(50,140,245,.25);
+  z-index: 8;
+}
+
+.peli-chart-info {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 10px 14px;
+  border: 1px solid #25344a;
+  border-radius: 12px;
+  background: rgba(7,14,24,.88);
+  backdrop-filter: blur(8px);
+  color: #8494aa;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 10;
+}
+
+.peli-chart-info strong {
+  color: #eef5ff;
+  margin-left: 4px;
+}
+
+
+/* =========================================================
+   DIGITS
+   ========================================================= */
+
+.peli-digits-card {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #1c2a3c;
+  border-radius: 20px;
+  background: #08111d;
+}
+
+.peli-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+  color: #8fa0b8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.peli-section-heading strong {
+  color: #ffd83d;
+}
+
+.peli-digit-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(45px, 1fr));
+  gap: 6px;
+}
+
+.peli-digit {
+  position: relative;
+  min-height: 72px;
+  border: 1px solid #223148;
+  border-radius: 11px;
+  background: #101a29;
+  color: #aebbd0;
+  cursor: pointer;
+}
+
+.peli-digit span {
+  display: block;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.peli-digit small {
+  display: block;
+  margin-top: 5px;
+  color: #697b95;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.peli-digit.live {
+  border-color: #ffd83d;
+  background: #18202b;
+  color: white;
+  box-shadow:
+    0 0 0 1px rgba(255,216,61,.18),
+    0 0 20px rgba(255,216,61,.12);
+}
+
+.peli-digit.live::before {
+  content: "LIVE";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #ffd83d;
+  color: #10151c;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   RECENT DIGITS
+   ========================================================= */
+
+.peli-recent-title {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  color: #8292a9;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.peli-recent-digits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 35px;
+}
+
+.peli-recent-digit {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #121d2c;
+  border: 1px solid #23334a;
+  color: #dce7f5;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.peli-stat-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.peli-stat-box {
+  padding: 18px 12px;
+  text-align: center;
+  border: 1px solid #1c2a3c;
+  border-radius: 16px;
+  background: #0b1522;
+}
+
+.peli-stat-box span {
+  display: block;
+  color: #7c8ca4;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.peli-stat-box strong {
+  display: block;
+  margin-top: 9px;
+  color: #f2f7ff;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   FULLSCREEN
+   ========================================================= */
+
+#peli-chart-card:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background: #050b13;
+}
+
+#peli-chart-card:fullscreen .peli-chart-wrapper {
+  height: calc(100vh - 58px);
+  min-height: 0;
+}
+
+#peli-chart-card:fullscreen .peli-chart-toolbar {
+  height: 58px;
+}
+
+#peli-chart-card:fullscreen .peli-fullscreen-button {
+  background: #328cf5;
+  color: white;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .peli-market-header {
+    align-items: flex-end;
+  }
+
+  .peli-market-title {
+    font-size: 26px;
+  }
+
+  .peli-current-price {
+    font-size: 28px;
+  }
+
+  .peli-chart-wrapper {
+    height: 440px;
+  }
+
+  .peli-digit-grid {
+    grid-template-columns:
+      repeat(5, minmax(45px, 1fr));
+    gap: 7px;
+  }
+
+  .peli-stat-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .peli-chart-info {
+    font-size: 10px;
+    gap: 9px;
+  }
+
+  .peli-fullscreen-button {
+    font-size: 10px;
+  }
+}
+
+</style>
 
 
 <script>
 
-"use strict";
-
-
 /* =========================================================
-   ELEMENTS
+   PELItradershub — LIVE CHART ENGINE
    ========================================================= */
 
-const $ =
-  id => document.getElementById(id);
+(() => {
+
+  "use strict";
+
+
+  const chartCard =
+    document.getElementById(
+      "peli-chart-card"
+    );
+
+  const chart =
+    document.getElementById(
+      "peli-price-chart"
+    );
+
+  const line =
+    document.getElementById(
+      "peli-line"
+    );
 
+  const area =
+    document.getElementById(
+      "peli-area"
+    );
 
-const market =
-  $("market");
+  const livePoint =
+    document.getElementById(
+      "peli-live-point"
+    );
+
+  const liveBubble =
+    document.getElementById(
+      "peli-live-bubble"
+    );
 
-const price =
-  $("price");
+  const currentPrice =
+    document.getElementById(
+      "peli-current-price"
+    );
+
+  const priceMovement =
+    document.getElementById(
+      "peli-price-movement"
+    );
 
-const liveStatus =
-  $("liveStatus");
+  const chartDigit =
+    document.getElementById(
+      "peli-chart-digit"
+    );
 
-const chartStatus =
-  $("chartStatus");
+  const chartDirection =
+    document.getElementById(
+      "peli-chart-direction"
+    );
 
-const chartCenter =
-  $("chartCenter");
+  const chartTicks =
+    document.getElementById(
+      "peli-chart-ticks"
+    );
 
-const symbolName =
-  $("symbolName");
+  const currentDigit =
+    document.getElementById(
+      "peli-current-digit"
+    );
 
-const accountBalance =
-  $("accountBalance");
+  const statLast =
+    document.getElementById(
+      "peli-stat-last"
+    );
 
-const accountCurrency =
-  $("accountCurrency");
+  const statPrevious =
+    document.getElementById(
+      "peli-stat-previous"
+    );
 
-const accountStatus =
-  $("accountStatus");
+  const statCount =
+    document.getElementById(
+      "peli-stat-count"
+    );
 
-const connectButton =
-  $("connectButton");
+  const statPrice =
+    document.getElementById(
+      "peli-stat-price"
+    );
 
-const buyButton =
-  $("buyButton");
+  const recentDigits =
+    document.getElementById(
+      "peli-recent-digits"
+    );
 
-const sellButton =
-  $("sellButton");
+  const marketStatus =
+    document.getElementById(
+      "peli-market-status"
+    );
 
-const stake =
-  $("stake");
+  const liveDot =
+    document.getElementById(
+      "peli-live-dot"
+    );
 
-const duration =
-  $("duration");
+  const yAxis =
+    document.getElementById(
+      "peli-y-axis"
+    );
 
-const ticksDisplay =
-  $("ticksDisplay");
 
-const tradeCount =
-  $("tradeCount");
+  let prices = [];
 
-const payout =
-  $("payout");
+  let digits = [];
 
-const profit =
-  $("profit");
+  let lastPrice = null;
 
-const result =
-  $("result");
+  let previousPrice = null;
 
-const digitsBox =
-  $("digits");
+  let maxPoints = 200;
 
-const frequencyBox =
-  $("frequency");
 
-const sampleSize =
-  $("sampleSize");
+  /* =======================================================
+     NUMBER FORMAT
+     ======================================================= */
 
-const predictionField =
-  $("predictionField");
+  function formatPrice(value) {
 
-const priceLine =
-  $("priceLine");
+    if (
+      value === null ||
+      value === undefined ||
+      !Number.isFinite(Number(value))
+    ) {
+      return "--";
+    }
 
-const priceArea =
-  $("priceArea");
+    const n = Number(value);
 
-const marketCursor =
-  $("marketCursor");
+    return n.toFixed(
+      n < 100
+        ? 4
+        : 2
+    );
+  }
 
-const cursorLabel =
-  $("cursorLabel");
 
-const livePriceMarker =
-  $("livePriceMarker");
+  /* =======================================================
+     DRAW CHART
+     ======================================================= */
 
-const chartDigit =
-  $("chartDigit");
+  function drawChart() {
 
-const movement =
-  $("movement");
+    if (!chart || !line || !area) {
+      return;
+    }
 
-const lastDigit =
-  $("lastDigit");
+    if (!prices.length) {
 
-const previousDigit =
-  $("previousDigit");
+      line.setAttribute(
+        "d",
+        ""
+      );
 
-const sampleCount =
-  $("sampleCount");
+      area.setAttribute(
+        "d",
+        ""
+      );
 
-const liveDigits =
-  $("liveDigits");
+      return;
+    }
 
-const liveDigitText =
-  $("liveDigitText");
 
-const openContract =
-  $("openContract");
+    const width = 1000;
 
-const contractId =
-  $("contractId");
+    const height = 500;
 
-const contractStatus =
-  $("contractStatus");
+    const paddingX = 20;
 
-const contractValue =
-  $("contractValue");
+    const paddingTop = 25;
 
-const contractProfit =
-  $("contractProfit");
+    const paddingBottom = 75;
 
 
-/* =========================================================
-   STATE
-   ========================================================= */
+    let min =
+      Math.min(...prices);
 
-let type =
-  "DIGITMATCH";
+    let max =
+      Math.max(...prices);
 
-let prediction =
-  0;
 
-let proposal =
-  null;
+    if (min === max) {
 
-let connected =
-  false;
+      min -= 0.01;
 
-let currentContractId =
-  null;
+      max += 0.01;
+    }
 
-let lastProposalKey =
-  "";
 
-let proposalTimer =
-  null;
+    const range =
+      max - min;
 
 
-/*
-   REAL TICK PRICE HISTORY.
+    const extra =
+      range * 0.12;
 
-   These values come directly from Deriv.
-   Nothing is generated here.
-*/
 
-let priceHistory =
-  [];
+    min -= extra;
 
-const MAX_POINTS =
-  80;
+    max += extra;
 
 
-/* =========================================================
-   MARKET NAMES
-   ========================================================= */
+    const usableWidth =
+      width -
+      paddingX * 2;
 
-const names = {
 
-  R_10:
-    "Volatility 10 Index",
+    const usableHeight =
+      height -
+      paddingTop -
+      paddingBottom;
 
-  R_25:
-    "Volatility 25 Index",
 
-  R_50:
-    "Volatility 50 Index",
+    const points =
+      prices.map(
+        (price, index) => {
 
-  R_75:
-    "Volatility 75 Index",
+          const x =
+            paddingX +
+            (
+              index /
+              Math.max(
+                prices.length - 1,
+                1
+              )
+            ) *
+            usableWidth;
 
-  R_100:
-    "Volatility 100 Index",
 
-  R_10_1s:
-    "Volatility 10 (1s) Index",
+          const y =
+            paddingTop +
+            (
+              (max - price) /
+              (max - min)
+            ) *
+            usableHeight;
 
-  R_25_1s:
-    "Volatility 25 (1s) Index",
 
-  R_50_1s:
-    "Volatility 50 (1s) Index",
+          return {
+            x,
+            y,
+            price
+          };
 
-  R_75_1s:
-    "Volatility 75 (1s) Index",
+        }
+      );
 
-  R_100_1s:
-    "Volatility 100 (1s) Index"
 
-};
+    const path =
+      points
+        .map(
+          (point, index) =>
+            `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
+        )
+        .join(" ");
 
 
-/* =========================================================
-   MONEY
-   ========================================================= */
+    const first =
+      points[0];
 
-function money(
-  value,
-  currency = "USD"
-){
+    const last =
+      points[points.length - 1];
 
-  const number =
-    Number(value);
 
-  if(
-    !Number.isFinite(number)
-  ){
+    const areaPath =
+      `${path}
+       L ${last.x} ${height - paddingBottom}
+       L ${first.x} ${height - paddingBottom}
+       Z`;
 
-    return "—";
+
+    line.setAttribute(
+      "d",
+      path
+    );
+
+
+    area.setAttribute(
+      "d",
+      areaPath
+    );
+
+
+    livePoint.setAttribute(
+      "cx",
+      last.x
+    );
+
+    livePoint.setAttribute(
+      "cy",
+      last.y
+    );
+
+
+    renderYAxis(
+      min,
+      max
+    );
 
   }
 
-  try{
 
-    return new Intl.NumberFormat(
-      undefined,
-      {
-        style:"currency",
-        currency,
-        minimumFractionDigits:2,
-        maximumFractionDigits:2
+  /* =======================================================
+     Y AXIS
+     ======================================================= */
+
+  function renderYAxis(
+    min,
+    max
+  ) {
+
+    if (!yAxis) {
+      return;
+    }
+
+    yAxis.innerHTML = "";
+
+    const steps = 5;
+
+    for (
+      let i = 0;
+      i < steps;
+      i++
+    ) {
+
+      const value =
+        max -
+        (
+          (max - min) *
+          i /
+          (steps - 1)
+        );
+
+
+      const span =
+        document.createElement(
+          "span"
+        );
+
+      span.textContent =
+        formatPrice(value);
+
+      yAxis.appendChild(
+        span
+      );
+    }
+  }
+
+
+  /* =======================================================
+     DIGIT UI
+     ======================================================= */
+
+  function updateDigits() {
+
+    const counts =
+      Array(10).fill(0);
+
+
+    digits.forEach(
+      digit => {
+
+        if (
+          Number.isInteger(digit) &&
+          digit >= 0 &&
+          digit <= 9
+        ) {
+          counts[digit]++;
+        }
+
       }
-    ).format(number);
-
-  }catch{
-
-    return `${currency} ${number.toFixed(2)}`;
-
-  }
-
-}
-
-
-/* =========================================================
-   PREDICTION DIGITS
-   ========================================================= */
-
-function renderDigits(){
-
-  digitsBox.innerHTML =
-    "";
-
-  for(
-    let i = 0;
-    i < 10;
-    i++
-  ){
-
-    const button =
-      document.createElement(
-        "button"
-      );
-
-    button.type =
-      "button";
-
-    button.className =
-      "digit";
-
-    if(
-      i === prediction
-    ){
-
-      button.classList.add(
-        "active"
-      );
-
-    }
-
-
-    /*
-       Mark the digit that the REAL
-       market is currently producing.
-    */
-
-    if(
-      Number.isInteger(
-        window.PELI_DERIV?.lastDigit
-      ) &&
-      i ===
-      window.PELI_DERIV.lastDigit
-    ){
-
-      button.classList.add(
-        "live-now"
-      );
-
-    }
-
-
-    button.innerHTML =
-      `<strong>${i}</strong>`;
-
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        prediction =
-          i;
-
-        renderDigits();
-
-        requestProposalSoon();
-
-      }
     );
 
 
-    digitsBox.appendChild(
-      button
-    );
-
-  }
-
-}
+    const total =
+      digits.length;
 
 
-/* =========================================================
-   LIVE DIGIT STRIP
-   ========================================================= */
+    document
+      .querySelectorAll(
+        "#peli-digit-grid .peli-digit"
+      )
+      .forEach(
+        button => {
 
-function renderLiveDigits(
-  currentDigit
-){
+          const digit =
+            Number(
+              button.dataset.digit
+            );
 
-  liveDigits.innerHTML =
-    "";
-
-  for(
-    let i = 0;
-    i < 10;
-    i++
-  ){
-
-    const box =
-      document.createElement(
-        "div"
-      );
-
-    box.className =
-      "live-digit";
-
-
-    if(
-      i === currentDigit
-    ){
-
-      box.classList.add(
-        "current"
-      );
-
-    }
-
-
-    if(
-      i === prediction
-    ){
-
-      box.classList.add(
-        "selected"
-      );
-
-    }
-
-
-    box.innerHTML =
-      `
-        <strong>${i}</strong>
-        <small>${
-          i === currentDigit
-            ? "LIVE"
-            : i === prediction
-              ? "SELECTED"
-              : ""
-        }</small>
-      `;
-
-
-    liveDigits.appendChild(
-      box
-    );
-
-  }
-
-
-  if(
-    Number.isInteger(
-      currentDigit
-    )
-  ){
-
-    liveDigitText.textContent =
-      `CURRENT DIGIT: ${currentDigit}`;
-
-  }else{
-
-    liveDigitText.textContent =
-      "Waiting for tick...";
-
-  }
-
-}
-
-
-/* =========================================================
-   FREQUENCY
-   ========================================================= */
-
-function renderFrequency(
-  counts,
-  total
-){
-
-  frequencyBox.innerHTML =
-    "";
-
-  sampleSize.textContent =
-    total || 0;
-
-
-  for(
-    let i = 0;
-    i < 10;
-    i++
-  ){
-
-    const count =
-      Number(
-        counts?.[i] || 0
-      );
-
-    const percentage =
-      total
-        ? (
-            count /
+          const percentage =
             total
-          ) *
-          100
-        : 0;
+              ? (
+                  counts[digit] /
+                  total
+                ) *
+                100
+              : 0;
 
 
-    const box =
-      document.createElement(
-        "div"
+          const small =
+            button.querySelector(
+              "small"
+            );
+
+
+          if (small) {
+
+            small.textContent =
+              `${percentage.toFixed(1)}%`;
+          }
+
+        }
       );
 
-    box.className =
-      "digit";
+
+    const recent =
+      digits.slice(-40);
 
 
-    box.innerHTML =
-      `
-        <strong>${i}</strong>
-        <small>
-          ${percentage.toFixed(1)}%
-        </small>
-      `;
+    if (!recent.length) {
+
+      recentDigits.textContent =
+        "Waiting for live ticks...";
+
+      return;
+    }
 
 
-    frequencyBox.appendChild(
-      box
-    );
-
-  }
-
-}
+    recentDigits.innerHTML =
+      "";
 
 
-/* =========================================================
-   TYPE UI
-   ========================================================= */
+    recent.forEach(
+      digit => {
 
-function updateTypeUI(){
+        const item =
+          document.createElement(
+            "div"
+          );
 
-  document
-    .querySelectorAll(".type")
-    .forEach(
-      button => {
+        item.className =
+          "peli-recent-digit";
 
-        button.classList.toggle(
-          "active",
-          button.dataset.type ===
-          type
+        item.textContent =
+          digit;
+
+        recentDigits.appendChild(
+          item
         );
 
       }
     );
 
-
-  const predictionNeeded =
-    [
-      "DIGITMATCH",
-      "DIGITDIFF",
-      "DIGITOVER",
-      "DIGITUNDER"
-    ].includes(type);
-
-
-  predictionField.style.display =
-    predictionNeeded
-      ? ""
-      : "none";
-
-
-  proposal =
-    null;
-
-  lastProposalKey =
-    "";
-
-  payout.textContent =
-    "—";
-
-  profit.textContent =
-    "—";
-
-  requestProposalSoon();
-
-}
-
-
-document
-  .querySelectorAll(".type")
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          type =
-            button.dataset.type;
-
-          updateTypeUI();
-
-        }
-      );
-
-    }
-  );
-
-
-/* =========================================================
-   PROPOSAL
-   ========================================================= */
-
-function requestProposalSoon(){
-
-  clearTimeout(
-    proposalTimer
-  );
-
-  proposalTimer =
-    setTimeout(
-      requestProposal,
-      250
-    );
-
-}
-
-
-function requestProposal(){
-
-  if(
-    !connected ||
-    !window.PELI_DERIV?.authenticated
-  ){
-
-    return;
-
   }
 
 
-  const amount =
-    Number(
-      stake.value
-    );
+  /* =======================================================
+     PROCESS TICK
+     ======================================================= */
 
-  const ticks =
-    Number(
-      duration.value
-    );
+  function handleTick(data) {
 
-
-  if(
-    !Number.isFinite(amount) ||
-    amount <= 0 ||
-    !Number.isFinite(ticks) ||
-    ticks <= 0
-  ){
-
-    return;
-
-  }
-
-
-  const barrierRequired =
-    [
-      "DIGITMATCH",
-      "DIGITDIFF",
-      "DIGITOVER",
-      "DIGITUNDER"
-    ].includes(type);
-
-
-  const key =
-    [
-      market.value,
-      type,
-      prediction,
-      amount,
-      ticks
-    ].join("|");
-
-
-  if(
-    key === lastProposalKey
-  ){
-
-    return;
-
-  }
-
-
-  lastProposalKey =
-    key;
-
-
-  payout.textContent =
-    "Loading...";
-
-  profit.textContent =
-    "Loading...";
-
-
-  try{
-
-    window.PELI_DERIV.getProposal({
-
-      amount,
-
-      contractType:
-        type,
-
-      currency:
-        "USD",
-
-      duration:
-        ticks,
-
-      durationUnit:
-        "t",
-
-      symbol:
-        market.value,
-
-      barrier:
-        barrierRequired
-          ? prediction
-          : undefined
-
-    });
-
-  }catch(error){
-
-    payout.textContent =
-      "—";
-
-    profit.textContent =
-      "—";
-
-    result.textContent =
-      error.message;
-
-  }
-
-}
-
-
-/* =========================================================
-   STAKE
-   ========================================================= */
-
-function updateStake(){
-
-  const value =
-    Number(
-      stake.value
-    );
-
-
-  $("summaryStake").textContent =
-    money(
-      value,
-      "USD"
-    );
-
-
-  proposal =
-    null;
-
-  lastProposalKey =
-    "";
-
-
-  payout.textContent =
-    "—";
-
-  profit.textContent =
-    "—";
-
-
-  requestProposalSoon();
-
-}
-
-
-stake.addEventListener(
-  "input",
-  updateStake
-);
-
-
-/* =========================================================
-   DURATION
-   ========================================================= */
-
-duration.addEventListener(
-  "change",
-  () => {
-
-    ticksDisplay.value =
-      duration.value;
-
-    proposal =
-      null;
-
-    lastProposalKey =
-      "";
-
-    requestProposalSoon();
-
-  }
-);
-
-
-/* =========================================================
-   MARKET CHANGE
-   ========================================================= */
-
-market.addEventListener(
-  "change",
-  () => {
-
-    const symbol =
-      market.value;
-
-
-    symbolName.textContent =
-      names[symbol] ||
-      symbol;
-
-
-    /*
-       Clear old chart because it belongs
-       to the previous market.
-    */
-
-    priceHistory =
-      [];
-
-    drawRealChart();
-
-
-    proposal =
-      null;
-
-    lastProposalKey =
-      "";
-
-    payout.textContent =
-      "—";
-
-    profit.textContent =
-      "—";
-
-
-    result.textContent =
-      "Loading live Deriv market...";
-
-
-    try{
-
-      window.PELI_DERIV.changeSymbol(
-        symbol
-      );
-
-    }catch(error){
-
-      result.textContent =
-        error.message;
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   CONNECT REAL DERIV ACCOUNT
-   ========================================================= */
-
-connectButton.addEventListener(
-  "click",
-  () => {
-
-    window.location.href =
-      "/api/deriv/start";
-
-  }
-);
-
-
-/* =========================================================
-   DERIV STATUS
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "status",
-  status => {
-
-    if(
-      status.authenticated
-    ){
-
-      liveStatus.textContent =
-        "● REAL DERIV ACCOUNT CONNECTED";
-
-      liveStatus.style.color =
-        "#2cc9bb";
-
+    if (!data) {
       return;
-
     }
 
-
-    if(
-      status.publicConnected
-    ){
-
-      liveStatus.textContent =
-        "● LIVE DERIV MARKET";
-
-      liveStatus.style.color =
-        "#2cc9bb";
-
-      chartStatus.textContent =
-        "Receiving real Deriv ticks.";
-
-      return;
-
-    }
-
-
-    if(
-      status.publicConnecting ||
-      status.connecting
-    ){
-
-      liveStatus.textContent =
-        "● Connecting...";
-
-      liveStatus.style.color =
-        "#ffd24a";
-
-      return;
-
-    }
-
-
-    liveStatus.textContent =
-      "● Disconnected";
-
-    liveStatus.style.color =
-      "#f0444d";
-
-  }
-);
-
-
-/* =========================================================
-   REAL TICKS
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "tick",
-  tick => {
 
     const quote =
       Number(
-        tick.quote
+        data.quote
       );
 
 
-    if(
+    if (
       !Number.isFinite(quote)
-    ){
-
+    ) {
       return;
-
     }
 
 
-    /*
-       REAL MARKET PRICE.
-    */
+    previousPrice =
+      lastPrice;
 
-    price.textContent =
-      quote.toLocaleString(
-        undefined,
-        {
-          minimumFractionDigits:2,
-          maximumFractionDigits:8
-        }
-      );
+    lastPrice =
+      quote;
 
 
-    /*
-       Save REAL tick.
-    */
-
-    priceHistory.push(
+    prices.push(
       quote
     );
 
 
-    if(
-      priceHistory.length >
-      MAX_POINTS
-    ){
+    if (
+      prices.length >
+      maxPoints
+    ) {
 
-      priceHistory.shift();
-
+      prices =
+        prices.slice(
+          -maxPoints
+        );
     }
 
 
-    /*
-       Draw the moving real-price line.
-    */
-
-    drawRealChart();
+    let digit =
+      data.lastDigit;
 
 
-    const digit =
-      Number.isInteger(
-        Number(tick.lastDigit)
-      )
-        ? Number(tick.lastDigit)
-        : null;
+    if (
+      digit === undefined ||
+      digit === null
+    ) {
 
+      const text =
+        String(
+          quote
+        );
 
-    chartDigit.textContent =
-      digit ?? "—";
-
-    lastDigit.textContent =
-      digit ?? "—";
-
-    previousDigit.textContent =
-      tick.previousDigit ?? "—";
-
-    sampleCount.textContent =
-      tick.sampleSize || 0;
-
-
-    /*
-       Update the actual 0-9 live tracker.
-    */
-
-    renderLiveDigits(
-      digit
-    );
-
-    renderDigits();
-
-
-    /*
-       Movement direction.
-    */
-
-    if(
-      tick.previousQuote !== null &&
-      tick.previousQuote !== undefined
-    ){
-
-      const previousQuote =
-        Number(
-          tick.previousQuote
+      const match =
+        text.match(
+          /(\d)\s*$/
         );
 
 
-      if(
-        quote >
-        previousQuote
-      ){
+      if (match) {
 
-        movement.textContent =
-          "UP";
-
-        movement.style.color =
-          "#2cc9bb";
-
-      }else if(
-        quote <
-        previousQuote
-      ){
-
-        movement.textContent =
-          "DOWN";
-
-        movement.style.color =
-          "#f0444d";
-
-      }else{
-
-        movement.textContent =
-          "FLAT";
-
-        movement.style.color =
-          "#ffd24a";
+        digit =
+          Number(
+            match[1]
+          );
 
       }
 
     }
 
 
-    renderFrequency(
-      tick.counts,
-      tick.sampleSize
-    );
+    if (
+      Number.isInteger(digit)
+    ) {
+
+      digits.push(
+        digit
+      );
+
+      if (
+        digits.length >
+        500
+      ) {
+
+        digits =
+          digits.slice(
+            -500
+          );
+
+      }
+
+    }
+
+
+    /* PRICE */
+
+    currentPrice.textContent =
+      formatPrice(
+        quote
+      );
+
+    statPrice.textContent =
+      formatPrice(
+        quote
+      );
+
+
+    liveBubble.textContent =
+      formatPrice(
+        quote
+      );
+
+
+    /* DIGIT */
+
+    if (
+      Number.isInteger(digit)
+    ) {
+
+      currentDigit.textContent =
+        digit;
+
+      chartDigit.textContent =
+        digit;
+
+      statLast.textContent =
+        digit;
+
+
+      document
+        .querySelectorAll(
+          ".peli-digit"
+        )
+        .forEach(
+          button => {
+
+            button.classList.toggle(
+              "live",
+              Number(
+                button.dataset.digit
+              ) === digit
+            );
+
+          }
+        );
+
+    }
+
+
+    /* PREVIOUS */
+
+    if (
+      data.previousDigit !==
+      undefined &&
+      data.previousDigit !== null
+    ) {
+
+      statPrevious.textContent =
+        data.previousDigit;
+
+    }
+
+
+    /* MOVEMENT */
+
+    if (
+      previousPrice !== null
+    ) {
+
+      if (
+        quote >
+        previousPrice
+      ) {
+
+        priceMovement.textContent =
+          "▲ UP";
+
+        chartDirection.textContent =
+          "UP";
+
+        priceMovement.style.color =
+          "#32d9b6";
+
+        chartDirection.style.color =
+          "#32d9b6";
+
+      }
+
+      else if (
+        quote <
+        previousPrice
+      ) {
+
+        priceMovement.textContent =
+          "▼ DOWN";
+
+        chartDirection.textContent =
+          "DOWN";
+
+        priceMovement.style.color =
+          "#ff647c";
+
+        chartDirection.style.color =
+          "#ff647c";
+
+      }
+
+      else {
+
+        priceMovement.textContent =
+          "— FLAT";
+
+        chartDirection.textContent =
+          "FLAT";
+
+      }
+
+    }
+
+
+    const count =
+      prices.length;
+
+
+    chartTicks.textContent =
+      count;
+
+    statCount.textContent =
+      count;
+
+
+    drawChart();
+
+    updateDigits();
 
   }
-);
 
 
-/* =========================================================
-   REAL PRICE CHART
-   ========================================================= */
+  /* =======================================================
+     HISTORY
+     ======================================================= */
 
-function drawRealChart(){
+  function handleHistory(data) {
 
-  const width =
-    1000;
-
-  const height =
-    360;
+    if (!data) {
+      return;
+    }
 
 
-  if(
-    priceHistory.length <
-    2
-  ){
+    if (
+      Array.isArray(
+        data.prices
+      )
+    ) {
 
-    priceLine.setAttribute(
-      "points",
-      ""
-    );
-
-    priceArea.setAttribute(
-      "points",
-      ""
-    );
-
-    return;
-
-  }
-
-
-  const min =
-    Math.min(
-      ...priceHistory
-    );
-
-  const max =
-    Math.max(
-      ...priceHistory
-    );
-
-  const range =
-    max -
-    min ||
-    1;
-
-
-  const points =
-    priceHistory.map(
-      (value,index) => {
-
-        const x =
-          (
-            index /
-            (priceHistory.length - 1)
-          ) *
-          width;
-
-
-        const y =
-          25 +
-          (
-            1 -
-            (
-              (
-                value -
-                min
-              ) /
-              range
-            )
-          ) *
-          (
-            height -
-            50
+      prices =
+        data.prices
+          .map(Number)
+          .filter(
+            Number.isFinite
+          )
+          .slice(
+            -maxPoints
           );
 
 
-        return {
-          x,
-          y
-        };
+      drawChart();
+
+      chartTicks.textContent =
+        prices.length;
+
+      statCount.textContent =
+        prices.length;
+
+    }
+
+
+    if (
+      Array.isArray(
+        data.counts
+      )
+    ) {
+
+      digits = [];
+
+      data.counts.forEach(
+        (count, digit) => {
+
+          for (
+            let i = 0;
+            i < Number(count);
+            i++
+          ) {
+
+            digits.push(
+              digit
+            );
+
+          }
+
+        }
+      );
+
+
+      digits =
+        digits.slice(
+          -500
+        );
+
+
+      updateDigits();
+
+    }
+
+  }
+
+
+  /* =======================================================
+     CONNECTION STATUS
+     ======================================================= */
+
+  function handleStatus(data) {
+
+    if (!data) {
+      return;
+    }
+
+
+    if (
+      data.publicConnected
+    ) {
+
+      liveDot.classList.add(
+        "connected"
+      );
+
+      marketStatus.textContent =
+        "CONNECTED";
+
+    }
+
+    else {
+
+      liveDot.classList.remove(
+        "connected"
+      );
+
+      marketStatus.textContent =
+        "CONNECTING";
+
+    }
+
+  }
+
+
+  /* =======================================================
+     RESET
+     ======================================================= */
+
+  document
+    .getElementById(
+      "peli-reset-chart"
+    )
+    ?.addEventListener(
+      "click",
+      () => {
+
+        prices = [];
+
+        digits = [];
+
+        lastPrice = null;
+
+        previousPrice = null;
+
+        drawChart();
+
+        updateDigits();
+
+        chartTicks.textContent =
+          "0";
+
+        statCount.textContent =
+          "0";
 
       }
     );
 
 
-  const pointString =
-    points
-      .map(
-        p =>
-          `${p.x},${p.y}`
+  /* =======================================================
+     FULLSCREEN
+     ======================================================= */
+
+  document
+    .getElementById(
+      "peli-fullscreen"
+    )
+    ?.addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          if (
+            !document.fullscreenElement
+          ) {
+
+            await chartCard.requestFullscreen();
+
+          }
+
+          else {
+
+            await document.exitFullscreen();
+
+          }
+
+        }
+
+        catch (error) {
+
+          console.error(
+            "Fullscreen error:",
+            error
+          );
+
+        }
+
+      }
+    );
+
+
+  /* =======================================================
+     DERIV EVENTS
+     ======================================================= */
+
+  function attachDeriv() {
+
+    if (
+      !window.PELI_DERIV ||
+      typeof
+      window.PELI_DERIV.on !==
+      "function"
+    ) {
+
+      setTimeout(
+        attachDeriv,
+        300
+      );
+
+      return;
+    }
+
+
+    window.PELI_DERIV.on(
+      "tick",
+      handleTick
+    );
+
+
+    window.PELI_DERIV.on(
+      "history",
+      handleHistory
+    );
+
+
+    window.PELI_DERIV.on(
+      "status",
+      handleStatus
+    );
+
+
+    /* =====================================================
+       LOAD CURRENT STATE IMMEDIATELY
+       ===================================================== */
+
+    const existingTicks =
+      window.PELI_DERIV
+        .getRecentTicks?.();
+
+
+    if (
+      Array.isArray(
+        existingTicks
+      ) &&
+      existingTicks.length
+    ) {
+
+      existingTicks.forEach(
+        tick => {
+
+          handleTick({
+            quote:
+              tick.quote,
+
+            lastDigit:
+              tick.digit,
+
+            epoch:
+              tick.epoch
+          });
+
+        }
+      );
+
+    }
+
+
+    const stats =
+      window.PELI_DERIV
+        .getDigitStats?.();
+
+
+    if (
+      stats &&
+      Array.isArray(
+        stats.counts
       )
-      .join(" ");
+    ) {
 
-
-  priceLine.setAttribute(
-    "viewBox",
-    `0 0 ${width} ${height}`
-  );
-
-
-  priceArea.setAttribute(
-    "viewBox",
-    `0 0 ${width} ${height}`
-  );
-
-
-  priceLine.setAttribute(
-    "points",
-    pointString
-  );
-
-
-  priceArea.setAttribute(
-    "points",
-    `0,${height} ${pointString} ${width},${height}`
-  );
-
-
-  /*
-     IMPORTANT:
-
-     The cursor represents the newest REAL tick.
-     It moves left/right as the chart scrolls.
-  */
-
-  const latest =
-    points[
-      points.length - 1
-    ];
-
-
-  const cursorPercentage =
-    (
-      latest.x /
-      width
-    ) *
-    100;
-
-
-  marketCursor.style.left =
-    `${cursorPercentage}%`;
-
-
-  cursorLabel.style.left =
-    "0";
-
-  cursorLabel.style.transform =
-    "translateX(-50%)";
-
-
-  cursorLabel.textContent =
-    `LIVE • ${
-      window.PELI_DERIV?.lastDigit ??
-      "—"
-    }`;
-
-
-  /*
-     Move the live price label vertically
-     with the actual market price.
-  */
-
-  const chartHeight =
-    document
-      .querySelector(".chart")
-      ?.clientHeight ||
-    390;
-
-
-  const topPercentage =
-    (
-      latest.y /
-      height
-    ) *
-    100;
-
-
-  livePriceMarker.style.top =
-    `${Math.max(
-      8,
-      Math.min(
-        92,
-        topPercentage
-      )
-    )}%`;
-
-
-  livePriceMarker.textContent =
-    price.textContent;
-
-
-  /*
-     Remove waiting overlay once real
-     tick data is actually received.
-  */
-
-  chartCenter.classList.add(
-    "hidden"
-  );
-
-}
-
-
-/* =========================================================
-   HISTORY
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "history",
-  history => {
-
-    renderFrequency(
-      history.counts,
-      history.sampleSize
-    );
-
-  }
-);
-
-
-/* =========================================================
-   AUTHENTICATED REAL ACCOUNT
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "authenticated",
-  account => {
-
-    connected =
-      true;
-
-
-    accountStatus.textContent =
-      "REAL DERIV ACCOUNT CONNECTED";
-
-    accountStatus.style.color =
-      "#2cc9bb";
-
-
-    /*
-       CONNECT BUTTON DISAPPEARS.
-    */
-
-    connectButton.style.display =
-      "none";
-
-
-    buyButton.disabled =
-      false;
-
-    buyButton.textContent =
-      "BUY REAL CONTRACT";
-
-
-    if(
-      account?.currency
-    ){
-
-      accountCurrency.textContent =
-        account.currency;
-
-    }
-
-
-    if(
-      account?.balance !==
-      undefined
-    ){
-
-      accountBalance.textContent =
-        money(
-          account.balance,
-          account.currency ||
-          "USD"
-        );
-
-    }
-
-
-    requestProposalSoon();
-
-  }
-);
-
-
-/* =========================================================
-   BALANCE
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "balance",
-  balance => {
-
-    if(
-      balance?.balance !==
-      undefined
-    ){
-
-      accountBalance.textContent =
-        money(
-          balance.balance,
-          balance.currency ||
-          "USD"
-        );
-
-    }
-
-
-    if(
-      balance?.currency
-    ){
-
-      accountCurrency.textContent =
-        balance.currency;
+      updateDigits();
 
     }
 
   }
-);
 
 
-/* =========================================================
-   PROPOSAL
-   ========================================================= */
+  attachDeriv();
 
-window.PELI_DERIV.on(
-  "proposal",
-  proposalData => {
 
-    proposal =
-      proposalData;
-
-
-    if(
-      !proposalData
-    ){
-
-      return;
-
-    }
-
-
-    const ask =
-      Number(
-        proposalData.ask_price
-      );
-
-    const pay =
-      Number(
-        proposalData.payout
-      );
-
-
-    payout.textContent =
-      Number.isFinite(pay)
-        ? money(
-            pay,
-            proposalData.currency ||
-            "USD"
-          )
-        : "—";
-
-
-    profit.textContent =
-      Number.isFinite(pay) &&
-      Number.isFinite(ask)
-
-        ? money(
-            pay - ask,
-            proposalData.currency ||
-            "USD"
-          )
-
-        : "—";
-
-
-    result.textContent =
-      `REAL DERIV PROPOSAL\n` +
-      `Ask price: ${
-        money(
-          ask,
-          proposalData.currency ||
-          "USD"
-        )
-      }`;
-
-  }
-);
-
-
-/* =========================================================
-   ERROR
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "error",
-  error => {
-
-    const message =
-      error?.message ||
-      error?.error?.message ||
-      "Deriv error";
-
-
-    result.textContent =
-      message;
-
-  }
-);
-
-
-/* =========================================================
-   REAL BUY
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "buy",
-  buy => {
-
-    if(
-      !buy?.contract_id
-    ){
-
-      buyButton.disabled =
-        false;
-
-      buyButton.textContent =
-        "BUY REAL CONTRACT";
-
-      return;
-
-    }
-
-
-    currentContractId =
-      buy.contract_id;
-
-
-    result.textContent =
-      `REAL CONTRACT OPEN\n` +
-      `Contract ID: ${
-        buy.contract_id
-      }`;
-
-
-    buyButton.disabled =
-      true;
-
-    buyButton.textContent =
-      "CONTRACT OPEN";
-
-
-    sellButton.classList.add(
-      "visible"
-    );
-
-
-    openContract.classList.add(
-      "visible"
-    );
-
-
-    contractId.textContent =
-      buy.contract_id;
-
-    contractStatus.textContent =
-      "OPEN";
-
-
-    try{
-
-      window.PELI_DERIV.monitorContract(
-        buy.contract_id
-      );
-
-    }catch(error){
-
-      result.textContent +=
-        `\n${error.message}`;
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   CONTRACT UPDATES
-   ========================================================= */
-
-window.PELI_DERIV.on(
-  "contract",
-  contract => {
-
-    if(
-      !contract
-    ){
-
-      return;
-
-    }
-
-
-    if(
-      contract.contract_id
-    ){
-
-      currentContractId =
-        contract.contract_id;
-
-      contractId.textContent =
-        contract.contract_id;
-
-    }
-
-
-    contractStatus.textContent =
-      contract.status ||
-      (
-        contract.is_sold
-          ? "CLOSED"
-          : "OPEN"
-      );
-
-
-    if(
-      contract.bid_price !==
-      undefined
-    ){
-
-      contractValue.textContent =
-        money(
-          contract.bid_price,
-          contract.currency ||
-          "USD"
-        );
-
-    }else if(
-      contract.payout !==
-      undefined
-    ){
-
-      contractValue.textContent =
-        money(
-          contract.payout,
-          contract.currency ||
-          "USD"
-        );
-
-    }
-
-
-    if(
-      contract.profit !==
-      undefined
-    ){
-
-      contractProfit.textContent =
-        money(
-          contract.profit,
-          contract.currency ||
-          "USD"
-        );
-
-    }
-
-
-    if(
-      contract.is_sold ||
-      contract.status === "won" ||
-      contract.status === "lost"
-    ){
-
-      result.textContent =
-        `CONTRACT FINISHED\n` +
-        `Status: ${
-          contract.status ||
-          (
-            Number(contract.profit) > 0
-              ? "won"
-              : "lost"
-          )
-        }\n` +
-        `Profit/Loss: ${
-          contract.profit !== undefined
-            ? money(
-                contract.profit,
-                contract.currency ||
-                "USD"
-              )
-            : "—"
-        }`;
-
-
-      sellButton.classList.remove(
-        "visible"
-      );
-
-
-      buyButton.disabled =
-        false;
-
-      buyButton.textContent =
-        "BUY REAL CONTRACT";
-
-
-      proposal =
-        null;
-
-      lastProposalKey =
-        "";
-
-
-      requestProposalSoon();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   CLOSE CONTRACT
-   ========================================================= */
-
-sellButton.addEventListener(
-  "click",
-  async () => {
-
-    if(
-      !currentContractId
-    ){
-
-      alert(
-        "There is no open contract."
-      );
-
-      return;
-
-    }
-
-
-    const confirmed =
-      confirm(
-        "Close this REAL Deriv contract now?\n\n" +
-        "The current market value will be used by Deriv."
-      );
-
-
-    if(
-      !confirmed
-    ){
-
-      return;
-
-    }
-
-
-    sellButton.disabled =
-      true;
-
-    sellButton.textContent =
-      "CLOSING CONTRACT...";
-
-
-    try{
-
-      await window.PELI_DERIV.sellContract(
-        currentContractId,
-        0
-      );
-
-
-      result.textContent =
-        "Sell request sent to Deriv.";
-
-    }catch(error){
-
-      result.textContent =
-        error.message;
-
-    }finally{
-
-      sellButton.disabled =
-        false;
-
-      sellButton.textContent =
-        "CLOSE OPEN CONTRACT";
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   INITIALISE
-   ========================================================= */
-
-renderDigits();
-
-renderLiveDigits(
-  null
-);
-
-renderFrequency(
-  Array(10).fill(0),
-  0
-);
-
-symbolName.textContent =
-  names[market.value];
-
-updateStake();
-
-
-/*
-   START REAL PUBLIC DERIV MARKET DATA.
-*/
-
-window.PELI_DERIV.connect(
-  market.value
-);
-
-
-/*
-   RESTORE REAL AUTHENTICATED SESSION
-   IF ONE ALREADY EXISTS.
-*/
-
-window.PELI_DERIV
-  .connectAuthenticated()
-  .catch(
-    error => {
-
-      connected =
-        false;
-
-
-      accountStatus.textContent =
-        "Real Deriv account not connected";
-
-
-      connectButton.style.display =
-        "";
-
-
-      buyButton.disabled =
-        true;
-
-
-      buyButton.textContent =
-        "CONNECT REAL DERIV ACCOUNT";
-
-
-      console.log(
-        "Deriv authentication:",
-        error.message
-      );
-
-    }
-  );
+})();
 
 </script>
-
-</body>
-</html>
