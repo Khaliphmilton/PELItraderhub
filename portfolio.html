@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
-
 <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
 >
 
 <title>Portfolio | PELItradershub</title>
 
 <meta
-    name="description"
-    content="Live Deriv account portfolio and open positions."
+  name="description"
+  content="Real Deriv portfolio and account information."
 >
 
 <link rel="stylesheet" href="styles.css">
@@ -21,455 +21,490 @@
 <style>
 
 :root{
-    --peli-bg:#070b12;
-    --peli-panel:#0d121c;
-    --peli-panel2:#101722;
-    --peli-border:#202838;
-    --peli-muted:#7d879b;
-    --peli-text:#f5f7fb;
-    --peli-green:#39d4b6;
-    --peli-red:#ff7186;
-    --peli-purple:#786cff;
+  --bg:#070b12;
+  --card:#0d141f;
+  --card2:#101a27;
+  --line:#202d40;
+  --text:#f4f7fb;
+  --muted:#8190a5;
+  --green:#2cc9bb;
+  --red:#f0444d;
+  --yellow:#ffd24a;
+  --purple:#786cff;
 }
 
 *{
-    box-sizing:border-box;
+  box-sizing:border-box;
 }
 
 body{
-    margin:0;
-    background:var(--peli-bg);
-    color:var(--peli-text);
+  margin:0;
+  background:
+    radial-gradient(
+      circle at 30% -10%,
+      rgba(120,108,255,.08),
+      transparent 35%
+    ),
+    var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
 }
 
 .portfolio-page{
-    max-width:1400px;
-    margin:auto;
-    padding:35px 5%;
+  max-width:1400px;
+  margin:auto;
+  padding:35px 5%;
 }
 
 .page-heading{
-    margin-bottom:30px;
+  margin-bottom:25px;
 }
 
 .eyebrow{
-    color:var(--peli-purple);
-    font-size:12px;
-    font-weight:800;
-    letter-spacing:2px;
+  color:#786cff;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:1.5px;
 }
 
 .page-heading h1{
-    font-size:42px;
-    margin:8px 0;
+  font-size:42px;
+  margin:8px 0;
 }
 
 .page-heading p{
-    color:var(--peli-muted);
-    margin:0;
+  color:var(--muted);
 }
 
-/* CONNECTION */
+/* =====================================================
+   CONNECTION
+===================================================== */
 
-.connection-bar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:15px;
-    padding:13px 16px;
-    margin-bottom:20px;
-    background:var(--peli-panel);
-    border:1px solid var(--peli-border);
-    border-radius:12px;
+.connection-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+
+  padding:18px 20px;
+  margin-bottom:20px;
+
+  background:#0d121c;
+  border:1px solid #202838;
+  border-radius:16px;
 }
 
 .connection-left{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    min-width:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
 .connection-dot{
-    width:9px;
-    height:9px;
-    border-radius:50%;
-    background:#777;
-    flex:none;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#687386;
 }
 
 .connection-dot.connected{
-    background:var(--peli-green);
-    box-shadow:0 0 10px rgba(57,212,182,.6);
+  background:var(--green);
+  box-shadow:
+    0 0 14px rgba(44,201,187,.8);
 }
 
 .connection-dot.error{
-    background:var(--peli-red);
+  background:var(--red);
 }
 
-.connection-text{
-    font-size:13px;
-    color:var(--peli-muted);
+.connection-text strong{
+  display:block;
+  font-size:14px;
 }
 
-.account-id{
-    font-size:12px;
-    color:#9ba5b8;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+.connection-text span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
 }
 
-/* STATS */
+.connect-button{
+  border:1px solid var(--purple);
+  background:#17142e;
+  color:#c1bcff;
+  padding:11px 15px;
+  border-radius:9px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.connect-button:hover{
+  background:#211c42;
+}
+
+.connect-button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+/* =====================================================
+   ACCOUNT
+===================================================== */
+
+.account-card{
+  background:
+    linear-gradient(
+      135deg,
+      rgba(120,108,255,.12),
+      rgba(44,201,187,.05)
+    ),
+    #0d121c;
+
+  border:1px solid #202838;
+  border-radius:18px;
+
+  padding:25px;
+  margin-bottom:20px;
+}
+
+.account-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px;
+}
+
+.account-label{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+}
+
+.account-balance{
+  font-size:42px;
+  font-weight:1000;
+  margin-top:8px;
+  letter-spacing:-1px;
+}
+
+.account-currency{
+  color:var(--muted);
+  margin-top:5px;
+  font-size:12px;
+}
+
+.real-badge{
+  padding:7px 10px;
+  border-radius:999px;
+
+  background:#101a19;
+  border:1px solid #21463f;
+
+  color:var(--green);
+  font-size:10px;
+  font-weight:900;
+}
+
+/* =====================================================
+   STATS
+===================================================== */
 
 .portfolio-stats{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:15px;
-    margin-bottom:20px;
+  display:grid;
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:15px;
+  margin-bottom:20px;
 }
 
 .portfolio-card{
-    background:var(--peli-panel);
-    border:1px solid var(--peli-border);
-    border-radius:16px;
-    padding:20px;
-    min-height:130px;
+  background:#0d121c;
+  border:1px solid #202838;
+  border-radius:16px;
+  padding:20px;
 }
 
 .portfolio-card small{
-    display:block;
-    color:var(--peli-muted);
-    font-size:12px;
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  text-transform:uppercase;
+  font-weight:800;
 }
 
 .portfolio-card strong{
-    display:block;
-    font-size:27px;
-    margin:10px 0 7px;
-    word-break:break-word;
+  display:block;
+  font-size:27px;
+  margin:8px 0;
 }
 
 .portfolio-card span{
-    color:var(--peli-muted);
-    font-size:12px;
+  color:#68748a;
+  font-size:11px;
 }
 
 .positive{
-    color:var(--peli-green)!important;
+  color:var(--green)!important;
 }
 
 .negative{
-    color:var(--peli-red)!important;
+  color:var(--red)!important;
 }
 
-/* LAYOUT */
+/* =====================================================
+   LAYOUT
+===================================================== */
 
 .portfolio-layout{
-    display:grid;
-    grid-template-columns:2fr 1fr;
-    gap:15px;
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:15px;
+  margin-bottom:15px;
 }
 
 .panel{
-    background:var(--peli-panel);
-    border:1px solid var(--peli-border);
-    border-radius:16px;
-    padding:20px;
+  background:#0d121c;
+  border:1px solid #202838;
+  border-radius:16px;
+  padding:20px;
 }
 
 .panel h2{
-    font-size:18px;
-    margin:0 0 20px;
+  font-size:18px;
+  margin:0 0 18px;
 }
 
-/* ACCOUNT */
+/* =====================================================
+   REAL OPEN POSITIONS
+===================================================== */
 
-.account-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
+.positions-table{
+  width:100%;
 }
 
-.account-item{
-    background:var(--peli-panel2);
-    border:1px solid #1b2432;
-    border-radius:12px;
-    padding:14px;
-}
+.position-header,
+.position-row{
+  display:grid;
 
-.account-item small{
-    display:block;
-    color:var(--peli-muted);
-    font-size:11px;
-    margin-bottom:6px;
-}
+  grid-template-columns:
+    1.5fr
+    .8fr
+    .8fr
+    .9fr
+    .9fr;
 
-.account-item strong{
-    font-size:14px;
-}
-
-/* PERFORMANCE */
-
-.performance-chart{
-    height:300px;
-    position:relative;
-    overflow:hidden;
-    background:
-        linear-gradient(
-            180deg,
-            rgba(120,108,255,.08),
-            transparent
-        );
-    border-radius:12px;
-}
-
-.performance-chart svg{
-    width:100%;
-    height:100%;
-}
-
-/* ALLOCATION */
-
-.allocation{
-    display:flex;
-    height:20px;
-    border-radius:20px;
-    overflow:hidden;
-    background:#1b2230;
-    margin:20px 0;
-}
-
-.allocation.synthetic{
-    background:var(--peli-purple);
-}
-
-.allocation.forex{
-    background:var(--peli-green);
-}
-
-.allocation.crypto{
-    background:#f6cf58;
-}
-
-.allocation.cash{
-    background:#ff7186;
-}
-
-.allocation-empty{
-    width:100%;
-    background:#252d3a;
-}
-
-.allocation-row{
-    display:flex;
-    justify-content:space-between;
-    padding:10px 0;
-    border-bottom:1px solid var(--peli-border);
-    font-size:13px;
-}
-
-.allocation-row:last-child{
-    border-bottom:0;
-}
-
-.dot{
-    display:inline-block;
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    margin-right:7px;
-}
-
-.dot-one{
-    background:var(--peli-purple);
-}
-
-.dot-two{
-    background:var(--peli-green);
-}
-
-.dot-three{
-    background:#f6cf58;
-}
-
-.dot-four{
-    background:var(--peli-red);
-}
-
-/* POSITIONS */
-
-.positions-panel{
-    margin-top:15px;
+  gap:10px;
+  align-items:center;
 }
 
 .position-header{
-    display:grid;
-    grid-template-columns:1.6fr .8fr .9fr .9fr .8fr;
-    gap:10px;
-    padding:0 0 12px;
-    color:var(--peli-muted);
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.5px;
+  color:#68748a;
+  font-size:10px;
+  text-transform:uppercase;
+  font-weight:900;
+
+  padding-bottom:10px;
+  border-bottom:1px solid #202838;
 }
 
 .position-row{
-    display:grid;
-    grid-template-columns:1.6fr .8fr .9fr .9fr .8fr;
-    gap:10px;
-    align-items:center;
-    padding:15px 0;
-    border-bottom:1px solid var(--peli-border);
-    font-size:13px;
+  padding:16px 0;
+  border-bottom:1px solid #202838;
+  font-size:12px;
 }
 
 .position-row:last-child{
-    border-bottom:0;
+  border-bottom:0;
 }
 
 .position-symbol{
-    font-weight:800;
+  font-weight:900;
+  color:#fff;
 }
 
 .position-type{
-    display:block;
-    color:#68748a;
-    font-size:10px;
-    margin-top:3px;
-}
-
-.position-muted{
-    color:var(--peli-muted);
-    font-size:12px;
+  display:block;
+  margin-top:4px;
+  color:#68748a;
+  font-size:10px;
 }
 
 .empty-state{
-    text-align:center;
-    padding:45px 20px;
-    color:var(--peli-muted);
+  padding:40px 15px;
+  text-align:center;
+  color:#68748a;
+  font-size:13px;
 }
 
-.empty-state strong{
-    display:block;
-    color:#dce1ea;
-    font-size:16px;
-    margin-bottom:7px;
+.contract-id{
+  font-size:9px;
+  color:#536176;
+  margin-top:4px;
 }
 
-/* ACTIONS */
+/* =====================================================
+   ALLOCATION
+===================================================== */
 
-.actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top:20px;
+.allocation-bar{
+  display:flex;
+  height:12px;
+  border-radius:20px;
+  overflow:hidden;
+  background:#151c28;
+  margin:15px 0 20px;
 }
 
-/* LIVE */
-
-.live-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:10px;
-    font-weight:800;
-    background:rgba(57,212,182,.08);
-    color:var(--peli-green);
-    border:1px solid rgba(57,212,182,.2);
+.allocation-real{
+  width:100%;
+  background:
+    linear-gradient(
+      90deg,
+      var(--purple),
+      var(--green)
+    );
 }
 
-.live-dot{
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:currentColor;
+.info-row{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:12px 0;
+  border-bottom:1px solid #202838;
+  font-size:12px;
 }
 
-/* NOTICE */
-
-.notice{
-    margin-top:20px;
-    padding:14px;
-    border-radius:12px;
-    background:#101722;
-    border:1px solid var(--peli-border);
-    color:var(--peli-muted);
-    font-size:12px;
-    line-height:1.6;
+.info-row:last-child{
+  border-bottom:0;
 }
 
-.notice strong{
-    color:#dce1ea;
+.info-row span{
+  color:#68748a;
 }
 
-/* RESPONSIVE */
+.info-row strong{
+  color:#fff;
+}
 
-@media(max-width:1100px){
+/* =====================================================
+   STATUS MESSAGE
+===================================================== */
 
-    .portfolio-stats{
-        grid-template-columns:repeat(2,1fr);
-    }
+.status-message{
+  display:none;
 
-    .portfolio-layout{
-        grid-template-columns:1fr;
-    }
+  margin-bottom:15px;
 
-    .position-header,
-    .position-row{
-        grid-template-columns:1.5fr .8fr .9fr .9fr;
-    }
+  padding:12px 15px;
 
-    .position-header > div:last-child,
-    .position-row > div:last-child{
-        display:none;
-    }
+  border-radius:10px;
+
+  font-size:12px;
+}
+
+.status-message.show{
+  display:block;
+}
+
+.status-message.error{
+  background:#241217;
+  border:1px solid #5b2935;
+  color:#ff7186;
+}
+
+.status-message.success{
+  background:#0e211d;
+  border:1px solid #245347;
+  color:#39d4b6;
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:20px;
+}
+
+.button{
+  text-decoration:none;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1000px){
+
+  .portfolio-stats{
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .portfolio-layout{
+    grid-template-columns:1fr;
+  }
 
 }
 
-@media(max-width:600px){
+@media(max-width:700px){
 
-    .portfolio-page{
-        padding:20px 15px 40px;
-    }
+  .portfolio-page{
+    padding:22px 15px 40px;
+  }
 
-    .page-heading h1{
-        font-size:32px;
-    }
+  .page-heading h1{
+    font-size:32px;
+  }
 
-    .portfolio-stats{
-        grid-template-columns:1fr 1fr;
-    }
+  .connection-card{
+    align-items:flex-start;
+    flex-direction:column;
+  }
 
-    .portfolio-card{
-        padding:15px;
-        min-height:115px;
-    }
+  .account-top{
+    flex-direction:column;
+  }
 
-    .portfolio-card strong{
-        font-size:20px;
-    }
+  .account-balance{
+    font-size:34px;
+  }
 
-    .account-grid{
-        grid-template-columns:1fr;
-    }
+  .portfolio-stats{
+    grid-template-columns:
+      1fr 1fr;
+  }
 
-    .connection-bar{
-        align-items:flex-start;
-        flex-direction:column;
-    }
+  .position-header{
+    display:none;
+  }
 
-    .position-header,
-    .position-row{
-        grid-template-columns:1.4fr .8fr .9fr;
-    }
+  .position-row{
+    grid-template-columns:
+      1fr 1fr;
 
-    .position-header > div:nth-child(4),
-    .position-row > div:nth-child(4){
-        display:none;
-    }
+    padding:15px 0;
+  }
+
+  .position-row > div:nth-child(4),
+  .position-row > div:nth-child(5){
+    text-align:right;
+  }
+
+}
+
+@media(max-width:450px){
+
+  .portfolio-stats{
+    grid-template-columns:1fr;
+  }
 
 }
 
@@ -482,20 +517,46 @@ body{
 <header class="navbar">
 
 <a href="index.html" class="brand">
-    <span class="brand-icon">P</span>
-    <span>PELI<span>tradershub</span></span>
+  <span class="brand-icon">P</span>
+  <span>PELI<span>tradershub</span></span>
 </a>
 
 <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="markets.html">Markets</a>
-    <a href="trade.html">Trade</a>
-    <a href="strategies.html">Strategies</a>
+
+<a href="dashboard.html">
+Dashboard
+</a>
+
+<a href="markets.html">
+Markets
+</a>
+
+<a href="trade.html">
+Trade
+</a>
+
+<a href="strategies.html">
+Strategies
+</a>
+
 </nav>
 
 <div class="nav-actions">
-    <a href="history.html" class="login-link">History</a>
-    <a href="dashboard.html" class="button primary">Dashboard</a>
+
+<a
+  href="history.html"
+  class="login-link"
+>
+History
+</a>
+
+<a
+  href="dashboard.html"
+  class="button primary"
+>
+Dashboard
+</a>
+
 </div>
 
 </header>
@@ -503,420 +564,380 @@ body{
 
 <main class="portfolio-page">
 
+
 <div class="page-heading">
 
-    <div class="eyebrow">
-        LIVE PORTFOLIO
-    </div>
+<div class="eyebrow">
+REAL ACCOUNT
+</div>
 
-    <h1>
-        Your Portfolio
-    </h1>
+<h1>
+Portfolio
+</h1>
 
-    <p>
-        Live account balance and open Deriv positions.
-    </p>
+<p>
+Live information from your authenticated Deriv account.
+</p>
 
 </div>
 
 
-<!-- CONNECTION STATUS -->
+<!-- =====================================================
+     CONNECTION
+===================================================== -->
 
-<div class="connection-bar">
+<div class="connection-card">
 
-    <div class="connection-left">
+<div class="connection-left">
 
-        <span
-            id="connectionDot"
-            class="connection-dot"
-        ></span>
+<span
+  id="connectionDot"
+  class="connection-dot"
+></span>
 
-        <span
-            id="connectionText"
-            class="connection-text"
-        >
-            Connecting to Deriv...
-        </span>
+<div class="connection-text">
 
-    </div>
+<strong id="connectionTitle">
+Connecting to Deriv...
+</strong>
 
-    <span
-        id="accountId"
-        class="account-id"
-    >
-        Account: —
-    </span>
+<span id="connectionDescription">
+Checking your real Deriv account connection.
+</span>
+
+</div>
 
 </div>
 
 
-<!-- LIVE ACCOUNT STATS -->
+<button
+  id="connectButton"
+  class="connect-button"
+  type="button"
+>
+Connect Deriv Account
+</button>
+
+</div>
+
+
+<div
+  id="statusMessage"
+  class="status-message"
+></div>
+
+
+<!-- =====================================================
+     ACCOUNT
+===================================================== -->
+
+<div class="account-card">
+
+<div class="account-top">
+
+<div>
+
+<div class="account-label">
+Real Deriv Account
+</div>
+
+<div
+  id="accountBalance"
+  class="account-balance"
+>
+—
+</div>
+
+<div
+  id="accountCurrency"
+  class="account-currency"
+>
+Checking account...
+</div>
+
+</div>
+
+
+<div
+  id="realBadge"
+  class="real-badge"
+>
+REAL ACCOUNT
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     STATS
+===================================================== -->
 
 <section class="portfolio-stats">
 
 
 <div class="portfolio-card">
 
-    <small>
-        Account Balance
-    </small>
+<small>
+Account Balance
+</small>
 
-    <strong id="balanceValue">
-        —
-    </strong>
+<strong id="balanceStat">
+—
+</strong>
 
-    <span id="balanceCurrency">
-        Waiting for Deriv
-    </span>
-
-</div>
-
-
-<div class="portfolio-card">
-
-    <small>
-        Open Positions
-    </small>
-
-    <strong id="openPositions">
-        —
-    </strong>
-
-    <span>
-        Active contracts
-    </span>
+<span>
+Live Deriv balance
+</span>
 
 </div>
 
 
 <div class="portfolio-card">
 
-    <small>
-        Open P/L
-    </small>
+<small>
+Open Positions
+</small>
 
-    <strong id="openProfit">
-        —
-    </strong>
+<strong id="openCount">
+0
+</strong>
 
-    <span>
-        Current unrealised result
-    </span>
+<span>
+Currently open
+</span>
 
 </div>
 
 
 <div class="portfolio-card">
 
-    <small>
-        Account Type
-    </small>
+<small>
+Open P/L
+</small>
 
-    <strong id="accountType">
-        —
-    </strong>
+<strong
+  id="openProfit"
+  class="positive"
+>
+—
+</strong>
 
-    <span id="lastUpdate">
-        Waiting for live data
-    </span>
+<span>
+Current contracts
+</span>
 
 </div>
+
+
+<div class="portfolio-card">
+
+<small>
+Currency
+</small>
+
+<strong id="currencyStat">
+—
+</strong>
+
+<span>
+Deriv account currency
+</span>
+
+</div>
+
 
 </section>
 
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
 
 <section class="portfolio-layout">
 
 
-<!-- PERFORMANCE -->
-
-<div class="panel">
-
-    <h2>
-        Open P/L
-        <span
-            class="live-badge"
-            style="float:right;"
-        >
-            <span class="live-dot"></span>
-            LIVE
-        </span>
-    </h2>
-
-    <div
-        class="performance-chart"
-        id="performanceChart"
-    >
-
-        <svg
-            viewBox="0 0 900 350"
-            preserveAspectRatio="none"
-        >
-
-            <defs>
-
-                <linearGradient
-                    id="portfolioArea"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                >
-
-                    <stop
-                        offset="0%"
-                        stop-color="#786cff"
-                        stop-opacity=".35"
-                    />
-
-                    <stop
-                        offset="100%"
-                        stop-color="#786cff"
-                        stop-opacity="0"
-                    />
-
-                </linearGradient>
-
-            </defs>
-
-            <path
-                id="chartArea"
-                d="M0 175 L900 175 L900 350 L0 350 Z"
-                fill="url(#portfolioArea)"
-            />
-
-            <path
-                id="chartLine"
-                d="M0 175 L900 175"
-                fill="none"
-                stroke="#786cff"
-                stroke-width="4"
-            />
-
-        </svg>
-
-    </div>
-
-</div>
-
-
-<!-- ACCOUNT -->
-
-<div class="panel">
-
-    <h2>
-        Account
-    </h2>
-
-    <div class="account-grid">
-
-        <div class="account-item">
-
-            <small>
-                Login ID
-            </small>
-
-            <strong id="loginId">
-                —
-            </strong>
-
-        </div>
-
-        <div class="account-item">
-
-            <small>
-                Currency
-            </small>
-
-            <strong id="currency">
-                —
-            </strong>
-
-        </div>
-
-        <div class="account-item">
-
-            <small>
-                Balance
-            </small>
-
-            <strong id="accountBalance">
-                —
-            </strong>
-
-        </div>
-
-        <div class="account-item">
-
-            <small>
-                Status
-            </small>
-
-            <strong id="accountStatus">
-                —
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    <h2 style="margin-top:25px;">
-        Allocation
-    </h2>
-
-
-    <div
-        class="allocation"
-        id="allocationBar"
-    >
-
-        <div
-            class="allocation-empty"
-            style="width:100%;"
-        ></div>
-
-    </div>
-
-
-    <div class="allocation-row">
-
-        <span>
-            <span class="dot dot-one"></span>
-            Synthetic
-        </span>
-
-        <strong id="syntheticPercent">
-            0%
-        </strong>
-
-    </div>
-
-
-    <div class="allocation-row">
-
-        <span>
-            <span class="dot dot-two"></span>
-            Forex
-        </span>
-
-        <strong id="forexPercent">
-            0%
-        </strong>
-
-    </div>
-
-
-    <div class="allocation-row">
-
-        <span>
-            <span class="dot dot-three"></span>
-            Crypto
-        </span>
-
-        <strong id="cryptoPercent">
-            0%
-        </strong>
-
-    </div>
-
-
-    <div class="allocation-row">
-
-        <span>
-            <span class="dot dot-four"></span>
-            Cash
-        </span>
-
-        <strong id="cashPercent">
-            —
-        </strong>
-
-    </div>
-
-</div>
-
-</section>
-
-
 <!-- OPEN POSITIONS -->
 
-<section class="panel positions-panel">
+<div class="panel">
 
-    <h2>
-        Open Positions
-    </h2>
-
-
-    <div class="position-header">
-
-        <div>
-            Market
-        </div>
-
-        <div>
-            Stake
-        </div>
-
-        <div>
-            Buy Price
-        </div>
-
-        <div>
-            Current P/L
-        </div>
-
-        <div>
-            Contract
-        </div>
-
-    </div>
+<h2>
+Open Positions
+</h2>
 
 
-    <div id="positionsContainer">
+<div
+  id="positionsContainer"
+  class="positions-table"
+>
 
-        <div class="empty-state">
+<div class="position-header">
 
-            <strong>
-                Loading open positions...
-            </strong>
+<div>
+Contract
+</div>
 
-            <span>
-                Waiting for authenticated Deriv account data.
-            </span>
+<div>
+Stake
+</div>
 
-        </div>
+<div>
+Payout
+</div>
 
-    </div>
+<div>
+Profit/Loss
+</div>
+
+<div>
+Status
+</div>
+
+</div>
 
 
-    <div class="actions">
+<div
+  id="positionsList"
+>
+</div>
 
-        <a
-            href="trade.html"
-            class="button primary"
-        >
-            Open Trading Terminal
-        </a>
+</div>
 
-        <a
-            href="history.html"
-            class="button secondary"
-        >
-            View History
-        </a>
+</div>
 
-    </div>
+
+<!-- ACCOUNT DETAILS -->
+
+<div class="panel">
+
+<h2>
+Account Details
+</h2>
+
+
+<div class="allocation-bar">
+
+<div class="allocation-real"></div>
+
+</div>
+
+
+<div class="info-row">
+
+<span>
+Account
+</span>
+
+<strong id="accountId">
+—
+</strong>
+
+</div>
+
+
+<div class="info-row">
+
+<span>
+Account type
+</span>
+
+<strong>
+Real
+</strong>
+
+</div>
+
+
+<div class="info-row">
+
+<span>
+Currency
+</span>
+
+<strong id="detailsCurrency">
+—
+</strong>
+
+</div>
+
+
+<div class="info-row">
+
+<span>
+Open contracts
+</span>
+
+<strong id="detailsOpen">
+0
+</strong>
+
+</div>
+
+
+<div class="info-row">
+
+<span>
+Connection
+</span>
+
+<strong
+  id="detailsConnection"
+  class="negative"
+>
+Not Connected
+</strong>
+
+</div>
+
+
+</div>
+
 
 </section>
 
 
-<div class="notice">
+<!-- =====================================================
+     ACTIONS
+===================================================== -->
 
-    <strong>Live account data:</strong>
-    This page displays information returned by your authenticated
-    Deriv connection. No sample balance, fake positions, or
-    simulated profit values are inserted by this page.
+<div class="panel">
+
+<h2>
+Trading
+</h2>
+
+<p
+  style="
+    color:#7d879b;
+    font-size:12px;
+    line-height:1.6;
+  "
+>
+Your portfolio is connected to the same real Deriv
+session used by the trading terminal. Prices, balance
+and open-contract information are supplied by Deriv.
+</p>
+
+
+<div class="action-row">
+
+<a
+  href="trade.html"
+  class="button primary"
+>
+Open Trading Terminal
+</a>
+
+
+<a
+  href="history.html"
+  class="button secondary"
+>
+View Trade History
+</a>
+
+</div>
 
 </div>
 
@@ -928,609 +949,170 @@ body{
 
 <div class="brand">
 
-    <span class="brand-icon">P</span>
+<span class="brand-icon">
+P
+</span>
 
-    PELItradershub
+PELItradershub
 
 </div>
 
 <p>
-    Trading involves risk. No profits are guaranteed.
+Trading involves risk. No profits are guaranteed.
 </p>
 
 </footer>
+
+
+<!-- =====================================================
+     REAL DERIV ENGINE
+===================================================== -->
+
+<script src="deriv.js"></script>
 
 
 <script>
 
 "use strict";
 
-/*
-=========================================================
-PELItradershub LIVE PORTFOLIO
-=========================================================
 
-This page is designed to work with the authenticated
-Deriv connection already used by PELItradershub.
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-It supports:
+const connectionDot =
+  document.getElementById(
+    "connectionDot"
+  );
 
-    balance
-    portfolio
-    proposal_open_contract
+const connectionTitle =
+  document.getElementById(
+    "connectionTitle"
+  );
 
-IMPORTANT:
+const connectionDescription =
+  document.getElementById(
+    "connectionDescription"
+  );
 
-No fake/demo values are used.
+const connectButton =
+  document.getElementById(
+    "connectButton"
+  );
 
-If the authenticated Deriv connection cannot be found,
-the page stays empty and tells the user to connect.
+const statusMessage =
+  document.getElementById(
+    "statusMessage"
+  );
 
-=========================================================
-*/
+const accountBalance =
+  document.getElementById(
+    "accountBalance"
+  );
 
+const accountCurrency =
+  document.getElementById(
+    "accountCurrency"
+  );
 
-(function () {
+const balanceStat =
+  document.getElementById(
+    "balanceStat"
+  );
+
+const openCount =
+  document.getElementById(
+    "openCount"
+  );
+
+const openProfit =
+  document.getElementById(
+    "openProfit"
+  );
+
+const currencyStat =
+  document.getElementById(
+    "currencyStat"
+  );
+
+const accountId =
+  document.getElementById(
+    "accountId"
+  );
+
+const detailsCurrency =
+  document.getElementById(
+    "detailsCurrency"
+  );
+
+const detailsOpen =
+  document.getElementById(
+    "detailsOpen"
+  );
+
+const detailsConnection =
+  document.getElementById(
+    "detailsConnection"
+  );
+
+const positionsList =
+  document.getElementById(
+    "positionsList"
+  );
 
 
 /* =====================================================
-   CONFIG
+   STATE
 ===================================================== */
-
-const DERIV_APP_ID =
-    window.PELI_DERIV_APP_ID ||
-    window.DERIV_APP_ID ||
-    localStorage.getItem("PELI_DERIV_APP_ID") ||
-    localStorage.getItem("DERIV_APP_ID") ||
-    "";
-
-const POSSIBLE_TOKEN_KEYS = [
-
-    "PELI_DERIV_TOKEN",
-    "DERIV_TOKEN",
-    "deriv_token",
-    "derivToken",
-    "access_token",
-    "accessToken"
-
-];
-
-const POSSIBLE_ACCOUNT_KEYS = [
-
-    "PELI_DERIV_ACCOUNT",
-    "DERIV_ACCOUNT",
-    "deriv_account",
-    "derivAccount",
-    "loginid",
-    "loginId"
-
-];
-
-
-let ws = null;
-
-let reconnectTimer = null;
-
-let requestId = 100;
 
 let connected = false;
 
-let authenticated = false;
+let currentAccount = null;
 
-let currentCurrency = "";
-
-let currentLoginId = "";
-
-let contracts = [];
-
-let profitHistory = [];
-
-let subscriptions = new Set();
-
-
-/* =====================================================
-   DOM HELPERS
-===================================================== */
-
-function el(id){
-
-    return document.getElementById(id);
-
-}
-
-
-function setText(id,value){
-
-    const node = el(id);
-
-    if(node){
-
-        node.textContent =
-            value == null ? "—" : value;
-
-    }
-
-}
-
-
-function escapeHTML(value){
-
-    return String(value == null ? "" : value)
-
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
-}
+let currentContracts = [];
 
 
 /* =====================================================
    MONEY
 ===================================================== */
 
-function money(value,currency){
-
-    const number =
-        Number(value);
-
-    if(!Number.isFinite(number)){
-
-        return "—";
-
-    }
-
-    const code =
-        currency ||
-        currentCurrency ||
-        "USD";
-
-    try{
-
-        return new Intl.NumberFormat(
-            undefined,
-            {
-                style:"currency",
-                currency:code,
-                minimumFractionDigits:2,
-                maximumFractionDigits:2
-            }
-        ).format(number);
-
-    }
-
-    catch(error){
-
-        return (
-            code +
-            " " +
-            number.toFixed(2)
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   ACCOUNT TYPE
-===================================================== */
-
-function accountType(loginid){
-
-    if(!loginid){
-
-        return "—";
-
-    }
-
-    if(
-        String(loginid)
-            .toUpperCase()
-            .startsWith("CR")
-    ){
-
-        return "Real";
-
-    }
-
-    if(
-        String(loginid)
-            .toUpperCase()
-            .startsWith("VRTC")
-    ){
-
-        return "Demo";
-
-    }
-
-    return "Connected";
-
-}
-
-
-/* =====================================================
-   CONNECTION UI
-===================================================== */
-
-function connectionStatus(
-    text,
-    state
+function money(
+  value,
+  currency = "USD"
 ){
 
-    setText(
-        "connectionText",
-        text
+  const number =
+    Number(value);
+
+  if(
+    !Number.isFinite(number)
+  ){
+
+    return "—";
+
+  }
+
+  try{
+
+    return new Intl.NumberFormat(
+      undefined,
+      {
+        style:"currency",
+        currency:currency,
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    ).format(number);
+
+  }catch{
+
+    return (
+      number.toFixed(2) +
+      " " +
+      currency
     );
 
-    const dot =
-        el("connectionDot");
-
-    if(!dot){
-
-        return;
-
-    }
-
-    dot.classList.remove(
-        "connected",
-        "error"
-    );
-
-    if(state === "connected"){
-
-        dot.classList.add(
-            "connected"
-        );
-
-    }
-
-    if(state === "error"){
-
-        dot.classList.add(
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   STORAGE TOKEN
-===================================================== */
-
-function findStoredToken(){
-
-    for(
-        const key of POSSIBLE_TOKEN_KEYS
-    ){
-
-        try{
-
-            const value =
-                localStorage.getItem(key);
-
-            if(value){
-
-                return value;
-
-            }
-
-        }
-
-        catch(error){}
-
-    }
-
-
-    for(
-        const key of POSSIBLE_TOKEN_KEYS
-    ){
-
-        try{
-
-            const value =
-                sessionStorage.getItem(key);
-
-            if(value){
-
-                return value;
-
-            }
-
-        }
-
-        catch(error){}
-
-    }
-
-
-    return "";
-
-}
-
-
-/* =====================================================
-   STORED ACCOUNT
-===================================================== */
-
-function findStoredAccount(){
-
-    for(
-        const key of POSSIBLE_ACCOUNT_KEYS
-    ){
-
-        try{
-
-            const value =
-                localStorage.getItem(key);
-
-            if(value){
-
-                return value;
-
-            }
-
-        }
-
-        catch(error){}
-
-    }
-
-
-    return "";
-
-}
-
-
-/* =====================================================
-   EXISTING PELI CONNECTION
-===================================================== */
-
-function findExistingConnection(){
-
-    if(
-        window.PELI_DERIV &&
-        typeof window.PELI_DERIV === "object"
-    ){
-
-        return window.PELI_DERIV;
-
-    }
-
-    return null;
-
-}
-
-
-/* =====================================================
-   SEND
-===================================================== */
-
-function send(payload){
-
-    if(
-        !ws ||
-        ws.readyState !== WebSocket.OPEN
-    ){
-
-        return false;
-
-    }
-
-    try{
-
-        ws.send(
-            JSON.stringify(payload)
-        );
-
-        return true;
-
-    }
-
-    catch(error){
-
-        console.error(
-            "PELI PORTFOLIO SEND ERROR:",
-            error
-        );
-
-        return false;
-
-    }
-
-}
-
-
-/* =====================================================
-   REQUEST ID
-===================================================== */
-
-function nextRequest(){
-
-    requestId += 1;
-
-    return requestId;
-
-}
-
-
-/* =====================================================
-   CONNECT USING EXISTING SOCKET
-===================================================== */
-
-function tryExistingSocket(){
-
-    const existing =
-        findExistingConnection();
-
-    if(!existing){
-
-        return false;
-
-    }
-
-
-    /*
-    Some PELI connection implementations expose
-    the WebSocket directly.
-    */
-
-    const possibleSockets = [
-
-        existing.ws,
-        existing.socket,
-        existing.websocket,
-        existing.connection
-
-    ];
-
-
-    for(
-        const candidate of possibleSockets
-    ){
-
-        if(
-            candidate &&
-            typeof candidate.send === "function"
-        ){
-
-            ws = candidate;
-
-            attachSocket();
-
-            return true;
-
-        }
-
-    }
-
-
-    /*
-    Some implementations expose a send method
-    rather than the socket.
-    */
-
-    if(
-        typeof existing.send === "function"
-    ){
-
-        /*
-        We cannot safely attach onmessage to an
-        arbitrary wrapper. Leave the existing
-        connection alone and allow the page to
-        establish its own connection if credentials
-        are available.
-        */
-
-    }
-
-
-    return false;
-
-}
-
-
-/* =====================================================
-   ATTACH SOCKET
-===================================================== */
-
-function attachSocket(){
-
-    if(!ws){
-
-        return;
-
-    }
-
-
-    try{
-
-        ws.addEventListener(
-            "open",
-            handleOpen
-        );
-
-        ws.addEventListener(
-            "message",
-            handleMessage
-        );
-
-        ws.addEventListener(
-            "close",
-            handleClose
-        );
-
-        ws.addEventListener(
-            "error",
-            handleError
-        );
-
-    }
-
-    catch(error){
-
-        /*
-        Socket may already use property handlers.
-        */
-
-        const oldMessage =
-            ws.onmessage;
-
-        ws.onmessage =
-            function(event){
-
-                handleMessage(event);
-
-                if(
-                    typeof oldMessage ===
-                    "function"
-                ){
-
-                    oldMessage(event);
-
-                }
-
-            };
-
-    }
-
-
-    if(
-        ws.readyState ===
-        WebSocket.OPEN
-    ){
-
-        handleOpen();
-
-    }
-
-}
-
-
-/* =====================================================
-   OPEN
-===================================================== */
-
-function handleOpen(){
-
-    connected = true;
-
-    connectionStatus(
-        "Connected to Deriv",
-        "connected"
-    );
-
-    /*
-    Ask for authorization/account information.
-    */
-
-    send({
-        authorize:
-            findStoredToken()
-    });
+  }
 
 }
 
@@ -1539,1439 +1121,171 @@ function handleOpen(){
    MESSAGE
 ===================================================== */
 
-function handleMessage(event){
+function showMessage(
+  text,
+  type = "success"
+){
 
-    let data;
+  statusMessage.textContent =
+    text;
 
-    try{
-
-        data =
-            typeof event.data === "string"
-                ? JSON.parse(event.data)
-                : event.data;
-
-    }
-
-    catch(error){
-
-        return;
-
-    }
-
-
-    if(!data){
-
-        return;
-
-    }
-
-
-    if(data.error){
-
-        console.error(
-            "DERIV API ERROR:",
-            data.error
-        );
-
-        connectionStatus(
-            data.error.message ||
-            "Deriv API error",
-            "error"
-        );
-
-        /*
-        Authorization failure means we should
-        not display fake data.
-        */
-
-        if(
-            data.msg_type === "authorize"
-        ){
-
-            authenticated = false;
-
-            setText(
-                "accountStatus",
-                "Not authenticated"
-            );
-
-        }
-
-        return;
-
-    }
-
-
-    switch(data.msg_type){
-
-        case "authorize":
-
-            handleAuthorize(
-                data.authorize
-            );
-
-            break;
-
-
-        case "balance":
-
-            handleBalance(
-                data.balance
-            );
-
-            break;
-
-
-        case "portfolio":
-
-            handlePortfolio(
-                data.portfolio
-            );
-
-            break;
-
-
-        case "proposal_open_contract":
-
-            handleContractUpdate(
-                data.proposal_open_contract
-            );
-
-            break;
-
-
-        case "forget":
-
-            break;
-
-
-        default:
-
-            break;
-
-    }
+  statusMessage.className =
+    "status-message show " +
+    type;
 
 }
 
 
 /* =====================================================
-   AUTHORIZATION
+   CLEAR MESSAGE
 ===================================================== */
 
-function handleAuthorize(auth){
+function clearMessage(){
 
-    if(!auth){
+  statusMessage.className =
+    "status-message";
 
-        return;
-
-    }
-
-    authenticated = true;
-
-    currentCurrency =
-        auth.currency ||
-        "";
-
-    currentLoginId =
-        auth.loginid ||
-        auth.login_id ||
-        "";
-
-
-    setText(
-        "loginId",
-        currentLoginId || "—"
-    );
-
-    setText(
-        "accountId",
-        currentLoginId
-            ? "Account: " + currentLoginId
-            : "Account: —"
-    );
-
-    setText(
-        "currency",
-        currentCurrency || "—"
-    );
-
-    setText(
-        "accountType",
-        accountType(
-            currentLoginId
-        )
-    );
-
-    setText(
-        "accountStatus",
-        "Authenticated"
-    );
-
-    connectionStatus(
-        "Live Deriv account connected",
-        "connected"
-    );
-
-
-    /*
-    Request current balance.
-    */
-
-    send({
-        balance:1,
-        subscribe:1,
-        req_id:nextRequest()
-    });
-
-
-    /*
-    Request currently open positions.
-    */
-
-    send({
-        portfolio:1,
-        req_id:nextRequest()
-    });
+  statusMessage.textContent =
+    "";
 
 }
 
 
 /* =====================================================
-   BALANCE
+   ACCOUNT UI
 ===================================================== */
 
-function handleBalance(balance){
+function updateAccount(
+  account
+){
 
-    if(!balance){
+  if(!account){
 
-        return;
+    return;
 
-    }
-
-    const value =
-        Number(balance.balance);
-
-    const currency =
-        balance.currency ||
-        currentCurrency;
-
-    currentCurrency =
-        currency;
+  }
 
 
-    setText(
-        "balanceValue",
-        money(
-            value,
-            currency
-        )
-    );
+  currentAccount =
+    account;
 
-    setText(
-        "balanceCurrency",
+
+  const currency =
+    account.currency ||
+    "USD";
+
+
+  const balance =
+    Number(account.balance);
+
+
+  accountCurrency.textContent =
+    currency;
+
+
+  currencyStat.textContent =
+    currency;
+
+
+  detailsCurrency.textContent =
+    currency;
+
+
+  if(
+    Number.isFinite(balance)
+  ){
+
+    const formatted =
+      money(
+        balance,
         currency
-            ? currency + " account"
-            : "Live balance"
-    );
+      );
 
-    setText(
-        "accountBalance",
-        money(
-            value,
-            currency
-        )
-    );
+    accountBalance.textContent =
+      formatted;
 
-    setText(
-        "currency",
-        currency || "—"
-    );
+    balanceStat.textContent =
+      formatted;
 
-    setText(
-        "lastUpdate",
-        "Updated " +
-        new Date().toLocaleTimeString()
-    );
+  }
+
+
+  const id =
+    account.loginid ||
+    account.account_id ||
+    account.id ||
+    "Authenticated";
+
+
+  accountId.textContent =
+    id;
 
 }
 
 
 /* =====================================================
-   PORTFOLIO
+   CONNECTED UI
 ===================================================== */
 
-function handlePortfolio(portfolio){
+function setConnected(){
 
-    if(!portfolio){
+  connected = true;
 
-        return;
+  connectionDot.className =
+    "connection-dot connected";
 
-    }
+  connectionTitle.textContent =
+    "Deriv account connected";
 
+  connectionDescription.textContent =
+    "Live account information is being received from Deriv.";
 
-    contracts =
-        Array.isArray(
-            portfolio.contracts
-        )
-            ? portfolio.contracts
-            : [];
+  connectButton.textContent =
+    "Connected";
 
+  connectButton.disabled =
+    true;
 
-    renderPositions();
+  detailsConnection.textContent =
+    "Connected";
 
-    updateAllocation();
-
-    updateProfit();
-
-
-    /*
-    Subscribe to each open contract for live
-    unrealised P/L where supported.
-    */
-
-    contracts.forEach(
-        subscribeContract
-    );
+  detailsConnection.className =
+    "positive";
 
 }
 
 
 /* =====================================================
-   SUBSCRIBE OPEN CONTRACT
+   DISCONNECTED UI
 ===================================================== */
 
-function subscribeContract(contract){
+function setDisconnected(
+  message
+){
 
-    if(!contract){
+  connected = false;
 
-        return;
+  connectionDot.className =
+    "connection-dot error";
 
-    }
+  connectionTitle.textContent =
+    "Deriv not connected";
 
+  connectionDescription.textContent =
+    message ||
+    "Your real Deriv account is not currently connected.";
 
-    const id =
-        contract.contract_id;
+  connectButton.textContent =
+    "Connect Deriv Account";
 
-    if(!id){
+  connectButton.disabled =
+    false;
 
-        return;
+  detailsConnection.textContent =
+    "Not Connected";
 
-    }
-
-
-    const key =
-        String(id);
-
-
-    if(
-        subscriptions.has(key)
-    ){
-
-        return;
-
-    }
-
-
-    subscriptions.add(key);
-
-
-    send({
-
-        proposal_open_contract:1,
-
-        contract_id:Number(id),
-
-        subscribe:1,
-
-        req_id:nextRequest()
-
-    });
-
-}
-
-
-/* =====================================================
-   CONTRACT UPDATE
-===================================================== */
-
-function handleContractUpdate(contract){
-
-    if(!contract){
-
-        return;
-
-    }
-
-
-    const id =
-        String(
-            contract.contract_id ||
-            ""
-        );
-
-
-    if(!id){
-
-        return;
-
-    }
-
-
-    const index =
-        contracts.findIndex(
-            function(item){
-
-                return String(
-                    item.contract_id
-                ) === id;
-
-            }
-        );
-
-
-    if(index >= 0){
-
-        contracts[index] =
-            Object.assign(
-                {},
-                contracts[index],
-                contract
-            );
-
-    }
-
-    else{
-
-        contracts.push(
-            contract
-        );
-
-    }
-
-
-    renderPositions();
-
-    updateProfit();
-
-    updateAllocation();
-
-}
-
-
-/* =====================================================
-   MARKET NAME
-===================================================== */
-
-function marketName(symbol){
-
-    const names = {
-
-        R_10:
-            "Volatility 10 Index",
-
-        R_25:
-            "Volatility 25 Index",
-
-        R_50:
-            "Volatility 50 Index",
-
-        R_75:
-            "Volatility 75 Index",
-
-        R_100:
-            "Volatility 100 Index",
-
-        R_10_1s:
-            "Volatility 10 (1s) Index",
-
-        R_25_1s:
-            "Volatility 25 (1s) Index",
-
-        R_50_1s:
-            "Volatility 50 (1s) Index",
-
-        R_75_1s:
-            "Volatility 75 (1s) Index",
-
-        R_100_1s:
-            "Volatility 100 (1s) Index",
-
-        frxEURUSD:
-            "EUR/USD",
-
-        frxGBPUSD:
-            "GBP/USD",
-
-        frxUSDJPY:
-            "USD/JPY",
-
-        frxAUDUSD:
-            "AUD/USD",
-
-        frxEURGBP:
-            "EUR/GBP",
-
-        frxGBPJPY:
-            "GBP/JPY",
-
-        frxUSDCAD:
-            "USD/CAD",
-
-        frxUSDCHF:
-            "USD/CHF",
-
-        frxEURJPY:
-            "EUR/JPY",
-
-        frxAUDJPY:
-            "AUD/JPY",
-
-        cryBTCUSD:
-            "BTC/USD",
-
-        cryETHUSD:
-            "ETH/USD",
-
-        cryLTCUSD:
-            "LTC/USD",
-
-        cryXRPUSD:
-            "XRP/USD"
-
-    };
-
-
-    return (
-        names[symbol] ||
-        symbol ||
-        "Unknown Market"
-    );
-
-}
-
-
-/* =====================================================
-   CONTRACT TYPE
-===================================================== */
-
-function contractType(contract){
-
-    return (
-        contract.contract_type ||
-        contract.longcode ||
-        contract.contract_category ||
-        "Contract"
-    );
-
-}
-
-
-/* =====================================================
-   STAKE
-===================================================== */
-
-function contractStake(contract){
-
-    const values = [
-
-        contract.buy_price,
-
-        contract.purchase_price,
-
-        contract.buy_price_display,
-
-        contract.amount
-
-    ];
-
-
-    for(
-        const value of values
-    ){
-
-        if(
-            value !== undefined &&
-            value !== null &&
-            Number.isFinite(
-                Number(value)
-            )
-        ){
-
-            return Number(value);
-
-        }
-
-    }
-
-
-    return NaN;
-
-}
-
-
-/* =====================================================
-   PROFIT
-===================================================== */
-
-function contractProfit(contract){
-
-    const values = [
-
-        contract.profit,
-
-        contract.profit_loss,
-
-        contract.bid_price !== undefined &&
-        contract.buy_price !== undefined
-            ? Number(contract.bid_price) -
-              Number(contract.buy_price)
-            : NaN
-
-    ];
-
-
-    for(
-        const value of values
-    ){
-
-        if(
-            value !== undefined &&
-            value !== null &&
-            Number.isFinite(
-                Number(value)
-            )
-        ){
-
-            return Number(value);
-
-        }
-
-    }
-
-
-    return NaN;
-
-}
-
-
-/* =====================================================
-   CURRENT VALUE
-===================================================== */
-
-function currentValue(contract){
-
-    const values = [
-
-        contract.bid_price,
-
-        contract.current_value,
-
-        contract.sell_price
-
-    ];
-
-
-    for(
-        const value of values
-    ){
-
-        if(
-            value !== undefined &&
-            value !== null &&
-            Number.isFinite(
-                Number(value)
-            )
-        ){
-
-            return Number(value);
-
-        }
-
-    }
-
-
-    return NaN;
-
-}
-
-
-/* =====================================================
-   POSITION RENDER
-===================================================== */
-
-function renderPositions(){
-
-    const container =
-        el("positionsContainer");
-
-    if(!container){
-
-        return;
-
-    }
-
-
-    setText(
-        "openPositions",
-        contracts.length
-    );
-
-
-    if(
-        contracts.length === 0
-    ){
-
-        container.innerHTML = `
-
-            <div class="empty-state">
-
-                <strong>
-                    No open positions
-                </strong>
-
-                <span>
-                    Your Deriv account currently has no active contracts.
-                </span>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        contracts.map(
-            function(contract){
-
-                const symbol =
-                    contract.underlying_symbol ||
-                    contract.symbol ||
-                    "—";
-
-
-                const stake =
-                    contractStake(
-                        contract
-                    );
-
-
-                const profit =
-                    contractProfit(
-                        contract
-                    );
-
-
-                const value =
-                    currentValue(
-                        contract
-                    );
-
-
-                const profitClass =
-                    Number.isFinite(profit)
-                        ? (
-                            profit >= 0
-                                ? "positive"
-                                : "negative"
-                          )
-                        : "";
-
-
-                const type =
-                    contractType(
-                        contract
-                    );
-
-
-                const id =
-                    contract.contract_id ||
-                    "—";
-
-
-                return `
-
-                    <div class="position-row">
-
-                        <div>
-
-                            <span class="position-symbol">
-                                ${escapeHTML(
-                                    marketName(symbol)
-                                )}
-                            </span>
-
-                            <span class="position-type">
-                                ${escapeHTML(
-                                    type
-                                )}
-                            </span>
-
-                        </div>
-
-
-                        <div>
-
-                            <strong>
-                                ${Number.isFinite(stake)
-                                    ? escapeHTML(
-                                        money(
-                                            stake,
-                                            currentCurrency
-                                        )
-                                      )
-                                    : "—"
-                                }
-                            </strong>
-
-                        </div>
-
-
-                        <div>
-
-                            <span class="position-muted">
-                                ${Number.isFinite(value)
-                                    ? escapeHTML(
-                                        money(
-                                            value,
-                                            currentCurrency
-                                        )
-                                      )
-                                    : "—"
-                                }
-                            </span>
-
-                        </div>
-
-
-                        <div>
-
-                            <strong
-                                class="${profitClass}"
-                            >
-
-                                ${Number.isFinite(profit)
-                                    ? escapeHTML(
-                                        (
-                                            profit >= 0
-                                                ? "+"
-                                                : ""
-                                        ) +
-                                        money(
-                                            profit,
-                                            currentCurrency
-                                        )
-                                      )
-                                    : "—"
-                                }
-
-                            </strong>
-
-                        </div>
-
-
-                        <div>
-
-                            <span class="position-muted">
-                                #${escapeHTML(id)}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-        )
-        .join("");
-
-
-}
-
-
-/* =====================================================
-   TOTAL OPEN PROFIT
-===================================================== */
-
-function updateProfit(){
-
-    let total = 0;
-
-    let valid = false;
-
-
-    contracts.forEach(
-        function(contract){
-
-            const profit =
-                contractProfit(
-                    contract
-                );
-
-
-            if(
-                Number.isFinite(profit)
-            ){
-
-                total += profit;
-
-                valid = true;
-
-            }
-
-        }
-    );
-
-
-    if(!valid){
-
-        setText(
-            "openProfit",
-            "—"
-        );
-
-        return;
-
-    }
-
-
-    const node =
-        el("openProfit");
-
-
-    if(node){
-
-        node.textContent =
-            (
-                total >= 0
-                    ? "+"
-                    : ""
-            ) +
-            money(
-                total,
-                currentCurrency
-            );
-
-
-        node.classList.remove(
-            "positive",
-            "negative"
-        );
-
-
-        node.classList.add(
-            total >= 0
-                ? "positive"
-                : "negative"
-        );
-
-    }
-
-
-    addProfitPoint(total);
-
-}
-
-
-/* =====================================================
-   ALLOCATION
-===================================================== */
-
-function updateAllocation(){
-
-    if(
-        contracts.length === 0
-    ){
-
-        setText(
-            "syntheticPercent",
-            "0%"
-        );
-
-        setText(
-            "forexPercent",
-            "0%"
-        );
-
-        setText(
-            "cryptoPercent",
-            "0%"
-        );
-
-        setText(
-            "cashPercent",
-            "—"
-        );
-
-        const bar =
-            el("allocationBar");
-
-        if(bar){
-
-            bar.innerHTML =
-                '<div class="allocation-empty" style="width:100%;"></div>';
-
-        }
-
-        return;
-
-    }
-
-
-    let synthetic = 0;
-
-    let forex = 0;
-
-    let crypto = 0;
-
-
-    contracts.forEach(
-        function(contract){
-
-            const symbol =
-                String(
-                    contract.underlying_symbol ||
-                    contract.symbol ||
-                    ""
-                );
-
-
-            const stake =
-                contractStake(
-                    contract
-                );
-
-
-            const weight =
-                Number.isFinite(stake)
-                    ? Math.abs(stake)
-                    : 1;
-
-
-            if(
-                symbol.startsWith("frx")
-            ){
-
-                forex += weight;
-
-            }
-
-            else if(
-                symbol.startsWith("cry")
-            ){
-
-                crypto += weight;
-
-            }
-
-            else{
-
-                synthetic += weight;
-
-            }
-
-        }
-    );
-
-
-    const total =
-        synthetic +
-        forex +
-        crypto;
-
-
-    if(total <= 0){
-
-        return;
-
-    }
-
-
-    const syntheticPct =
-        synthetic / total * 100;
-
-    const forexPct =
-        forex / total * 100;
-
-    const cryptoPct =
-        crypto / total * 100;
-
-
-    setText(
-        "syntheticPercent",
-        syntheticPct.toFixed(1) + "%"
-    );
-
-    setText(
-        "forexPercent",
-        forexPct.toFixed(1) + "%"
-    );
-
-    setText(
-        "cryptoPercent",
-        cryptoPct.toFixed(1) + "%"
-    );
-
-    setText(
-        "cashPercent",
-        "—"
-    );
-
-
-    const bar =
-        el("allocationBar");
-
-    if(bar){
-
-        bar.innerHTML = `
-
-            ${
-                synthetic > 0
-                    ? `<div
-                        class="allocation synthetic"
-                        style="width:${syntheticPct}%"
-                       ></div>`
-                    : ""
-            }
-
-            ${
-                forex > 0
-                    ? `<div
-                        class="allocation forex"
-                        style="width:${forexPct}%"
-                       ></div>`
-                    : ""
-            }
-
-            ${
-                crypto > 0
-                    ? `<div
-                        class="allocation crypto"
-                        style="width:${cryptoPct}%"
-                       ></div>`
-                    : ""
-            }
-
-        `;
-
-    }
-
-}
-
-
-/* =====================================================
-   SIMPLE LIVE P/L CHART
-===================================================== */
-
-function addProfitPoint(value){
-
-    if(
-        !Number.isFinite(value)
-    ){
-
-        return;
-
-    }
-
-
-    profitHistory.push(
-        value
-    );
-
-
-    if(
-        profitHistory.length > 40
-    ){
-
-        profitHistory.shift();
-
-    }
-
-
-    drawChart();
-
-}
-
-
-/* =====================================================
-   DRAW CHART
-===================================================== */
-
-function drawChart(){
-
-    const line =
-        el("chartLine");
-
-    const area =
-        el("chartArea");
-
-
-    if(
-        !line ||
-        !area
-    ){
-
-        return;
-
-    }
-
-
-    if(
-        profitHistory.length < 2
-    ){
-
-        return;
-
-    }
-
-
-    const width = 900;
-
-    const height = 350;
-
-    const padding = 25;
-
-
-    let min =
-        Math.min(
-            ...profitHistory
-        );
-
-    let max =
-        Math.max(
-            ...profitHistory
-        );
-
-
-    if(min === max){
-
-        min -= 1;
-
-        max += 1;
-
-    }
-
-
-    const range =
-        max - min;
-
-
-    const points =
-        profitHistory.map(
-            function(value,index){
-
-                const x =
-                    profitHistory.length === 1
-                        ? width / 2
-                        : (
-                            index /
-                            (
-                                profitHistory.length - 1
-                            )
-                        ) *
-                        (
-                            width -
-                            padding * 2
-                        ) +
-                        padding;
-
-
-                const y =
-                    height -
-                    padding -
-                    (
-                        (
-                            value - min
-                        ) /
-                        range
-                    ) *
-                    (
-                        height -
-                        padding * 2
-                    );
-
-
-                return {
-                    x:x,
-                    y:y
-                };
-
-            }
-        );
-
-
-    const path =
-        points
-            .map(
-                function(point,index){
-
-                    return (
-                        index === 0
-                            ? "M"
-                            : "L"
-                    ) +
-                    point.x +
-                    " " +
-                    point.y;
-
-                }
-            )
-            .join(" ");
-
-
-    const first =
-        points[0];
-
-    const last =
-        points[points.length - 1];
-
-
-    const areaPath =
-        path +
-        " L " +
-        last.x +
-        " " +
-        height +
-        " L " +
-        first.x +
-        " " +
-        height +
-        " Z";
-
-
-    line.setAttribute(
-        "d",
-        path
-    );
-
-    area.setAttribute(
-        "d",
-        areaPath
-    );
-
-}
-
-
-/* =====================================================
-   CLOSE
-===================================================== */
-
-function handleClose(){
-
-    connected = false;
-
-    authenticated = false;
-
-    connectionStatus(
-        "Deriv connection closed",
-        "error"
-    );
-
-
-    if(
-        reconnectTimer
-    ){
-
-        clearTimeout(
-            reconnectTimer
-        );
-
-    }
-
-
-    reconnectTimer =
-        setTimeout(
-            connect,
-            4000
-        );
-
-}
-
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-function handleError(error){
-
-    console.error(
-        "PELI PORTFOLIO SOCKET ERROR:",
-        error
-    );
-
-    connectionStatus(
-        "Unable to connect to Deriv",
-        "error"
-    );
-
-}
-
-
-/* =====================================================
-   DIRECT CONNECTION
-===================================================== */
-
-function directConnect(){
-
-    const token =
-        findStoredToken();
-
-
-    if(!token){
-
-        return false;
-
-    }
-
-
-    /*
-    Legacy Deriv WebSocket fallback.
-
-    If the rest of PELItradershub already supplies
-    the authenticated socket, that connection is
-    preferred.
-
-    This fallback requires your existing Deriv
-    application ID.
-    */
-
-    if(!DERIV_APP_ID){
-
-        return false;
-
-    }
-
-
-    try{
-
-        ws =
-            new WebSocket(
-                "wss://ws.derivws.com/websockets/v3?app_id=" +
-                encodeURIComponent(
-                    DERIV_APP_ID
-                )
-            );
-
-
-        attachSocket();
-
-        return true;
-
-    }
-
-    catch(error){
-
-        console.error(
-            "DIRECT DERIV CONNECTION ERROR:",
-            error
-        );
-
-        return false;
-
-    }
+  detailsConnection.className =
+    "negative";
 
 }
 
@@ -2980,139 +1294,684 @@ function directConnect(){
    CONNECT
 ===================================================== */
 
-function connect(){
+async function connectDeriv(){
 
-    connectionStatus(
-        "Connecting to Deriv...",
-        ""
+  if(
+    !window.PELI_DERIV
+  ){
+
+    setDisconnected(
+      "deriv.js could not be loaded."
     );
 
-
-    /*
-    First attempt to use the existing PELI
-    connection.
-    */
-
-    if(
-        tryExistingSocket()
-    ){
-
-        return;
-
-    }
-
-
-    /*
-    Then attempt direct connection using the
-    authenticated token already stored by the
-    application.
-    */
-
-    if(
-        directConnect()
-    ){
-
-        return;
-
-    }
-
-
-    /*
-    No authenticated connection found.
-    */
-
-    connectionStatus(
-        "Connect your Deriv account first",
-        "error"
+    showMessage(
+      "The Deriv engine could not be loaded.",
+      "error"
     );
 
+    return;
 
-    setText(
-        "accountStatus",
-        "Not connected"
-    );
-
-    setText(
-        "accountType",
-        "—"
-    );
-
-}
+  }
 
 
-/* =====================================================
-   EXISTING ACCOUNT INFORMATION
-===================================================== */
+  connectButton.disabled =
+    true;
 
-function displayStoredAccount(){
+  connectButton.textContent =
+    "Connecting...";
+
+
+  connectionTitle.textContent =
+    "Connecting to Deriv...";
+
+  connectionDescription.textContent =
+    "Authenticating your real account securely.";
+
+
+  try{
 
     const account =
-        findStoredAccount();
+      await window.PELI_DERIV
+        .connectAuthenticated();
 
 
     if(account){
 
-        setText(
-            "accountId",
-            "Account: " + account
-        );
-
-        setText(
-            "loginId",
-            account
-        );
-
-        setText(
-            "accountType",
-            accountType(
-                account
-            )
-        );
+      updateAccount(
+        account
+      );
 
     }
 
+
+    setConnected();
+
+    clearMessage();
+
+  }catch(error){
+
+    console.error(
+      "Portfolio Deriv connection error:",
+      error
+    );
+
+
+    setDisconnected(
+      error?.message ||
+      "Unable to connect to your real Deriv account."
+    );
+
+
+    showMessage(
+      error?.message ||
+      "Unable to connect to Deriv.",
+      "error"
+    );
+
+  }
+
 }
 
 
 /* =====================================================
-   START
+   CONNECT BUTTON
 ===================================================== */
 
-function start(){
-
-    displayStoredAccount();
-
-    connect();
-
-}
+connectButton.addEventListener(
+  "click",
+  connectDeriv
+);
 
 
 /* =====================================================
-   DOM READY
+   AUTHENTICATED
 ===================================================== */
 
-if(
-    document.readyState ===
-    "loading"
+window.PELI_DERIV.on(
+  "authenticated",
+  account => {
+
+    updateAccount(
+      account
+    );
+
+    setConnected();
+
+  }
+);
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+window.PELI_DERIV.on(
+  "status",
+  status => {
+
+    if(
+      status?.authenticated
+    ){
+
+      setConnected();
+
+      if(
+        status.account
+      ){
+
+        updateAccount(
+          status.account
+        );
+
+      }
+
+      return;
+
+    }
+
+
+    if(
+      status?.connecting
+    ){
+
+      connectionDot.className =
+        "connection-dot";
+
+      connectionTitle.textContent =
+        "Connecting to Deriv...";
+
+      connectionDescription.textContent =
+        "Authenticating your real account.";
+
+      return;
+
+    }
+
+
+    if(
+      status?.connected === false &&
+      connected
+    ){
+
+      setDisconnected(
+        "The Deriv connection was closed."
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   BALANCE
+===================================================== */
+
+window.PELI_DERIV.on(
+  "balance",
+  balance => {
+
+    if(!balance){
+
+      return;
+
+    }
+
+
+    const currency =
+      balance.currency ||
+      currentAccount?.currency ||
+      "USD";
+
+
+    const value =
+      Number(
+        balance.balance
+      );
+
+
+    if(
+      Number.isFinite(value)
+    ){
+
+      const formatted =
+        money(
+          value,
+          currency
+        );
+
+
+      accountBalance.textContent =
+        formatted;
+
+      balanceStat.textContent =
+        formatted;
+
+    }
+
+
+    accountCurrency.textContent =
+      currency;
+
+    currencyStat.textContent =
+      currency;
+
+    detailsCurrency.textContent =
+      currency;
+
+  }
+);
+
+
+/* =====================================================
+   PORTFOLIO
+===================================================== */
+
+window.PELI_DERIV.on(
+  "portfolio",
+  portfolio => {
+
+    const contracts =
+      Array.isArray(
+        portfolio?.contracts
+      )
+        ? portfolio.contracts
+        : [];
+
+
+    currentContracts =
+      contracts;
+
+
+    renderPositions(
+      contracts
+    );
+
+  }
+);
+
+
+/* =====================================================
+   LIVE CONTRACT UPDATES
+===================================================== */
+
+window.PELI_DERIV.on(
+  "contract",
+  contract => {
+
+    if(!contract){
+
+      return;
+
+    }
+
+
+    const id =
+      String(
+        contract.contract_id ||
+        ""
+      );
+
+
+    if(!id){
+
+      return;
+
+    }
+
+
+    const existingIndex =
+      currentContracts.findIndex(
+        item =>
+          String(
+            item.contract_id
+          ) === id
+      );
+
+
+    if(
+      contract.is_sold ||
+      contract.status === "won" ||
+      contract.status === "lost"
+    ){
+
+      if(
+        existingIndex >= 0
+      ){
+
+        currentContracts.splice(
+          existingIndex,
+          1
+        );
+
+      }
+
+    }else{
+
+      if(
+        existingIndex >= 0
+      ){
+
+        currentContracts[
+          existingIndex
+        ] =
+          {
+            ...currentContracts[
+              existingIndex
+            ],
+            ...contract
+          };
+
+      }else{
+
+        currentContracts.push(
+          contract
+        );
+
+      }
+
+    }
+
+
+    renderPositions(
+      currentContracts
+    );
+
+  }
+);
+
+
+/* =====================================================
+   RENDER POSITIONS
+===================================================== */
+
+function renderPositions(
+  contracts
 ){
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        start
+  positionsList.innerHTML =
+    "";
+
+
+  const list =
+    Array.isArray(contracts)
+      ? contracts
+      : [];
+
+
+  openCount.textContent =
+    list.length;
+
+  detailsOpen.textContent =
+    list.length;
+
+
+  let totalProfit = 0;
+
+  let currency =
+    currentAccount?.currency ||
+    "USD";
+
+
+  list.forEach(
+    contract => {
+
+      const profit =
+        Number(
+          contract.profit
+        );
+
+
+      if(
+        Number.isFinite(
+          profit
+        )
+      ){
+
+        totalProfit +=
+          profit;
+
+      }
+
+
+      if(
+        contract.currency
+      ){
+
+        currency =
+          contract.currency;
+
+      }
+
+    }
+  );
+
+
+  openProfit.textContent =
+    money(
+      totalProfit,
+      currency
+    );
+
+
+  openProfit.classList.remove(
+    "positive",
+    "negative"
+  );
+
+
+  if(
+    totalProfit > 0
+  ){
+
+    openProfit.classList.add(
+      "positive"
+    );
+
+  }else if(
+    totalProfit < 0
+  ){
+
+    openProfit.classList.add(
+      "negative"
+    );
+
+  }
+
+
+  if(
+    !list.length
+  ){
+
+    positionsList.innerHTML = `
+      <div class="empty-state">
+        No open positions on your Deriv account.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.forEach(
+    contract => {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+      row.className =
+        "position-row";
+
+
+      const symbol =
+        contract.underlying_symbol ||
+        contract.symbol ||
+        contract.display_name ||
+        "Contract";
+
+
+      const type =
+        contract.contract_type ||
+        contract.contract_type_name ||
+        "Deriv Contract";
+
+
+      const stake =
+        Number(
+          contract.buy_price ??
+          contract.stake ??
+          contract.amount
+        );
+
+
+      const payout =
+        Number(
+          contract.payout
+        );
+
+
+      const profit =
+        Number(
+          contract.profit
+        );
+
+
+      const currency =
+        contract.currency ||
+        currentAccount?.currency ||
+        "USD";
+
+
+      const status =
+        contract.status ||
+        (
+          contract.is_sold
+            ? "Closed"
+            : "Open"
+        );
+
+
+      let profitClass =
+        "";
+
+      if(
+        Number.isFinite(
+          profit
+        )
+      ){
+
+        if(
+          profit > 0
+        ){
+
+          profitClass =
+            "positive";
+
+        }else if(
+          profit < 0
+        ){
+
+          profitClass =
+            "negative";
+
+        }
+
+      }
+
+
+      row.innerHTML = `
+
+        <div>
+
+          <div class="position-symbol">
+            ${escapeHtml(symbol)}
+          </div>
+
+          <div class="position-type">
+            ${escapeHtml(type)}
+          </div>
+
+          <div class="contract-id">
+            Contract #${escapeHtml(
+              String(
+                contract.contract_id ||
+                "—"
+              )
+            )}
+          </div>
+
+        </div>
+
+
+        <div>
+          ${
+            Number.isFinite(stake)
+              ? money(
+                  stake,
+                  currency
+                )
+              : "—"
+          }
+        </div>
+
+
+        <div>
+          ${
+            Number.isFinite(payout)
+              ? money(
+                  payout,
+                  currency
+                )
+              : "—"
+          }
+        </div>
+
+
+        <div
+          class="${profitClass}"
+        >
+          ${
+            Number.isFinite(profit)
+              ? money(
+                  profit,
+                  currency
+                )
+              : "—"
+          }
+        </div>
+
+
+        <div>
+          ${escapeHtml(
+            String(status)
+          )}
+        </div>
+
+      `;
+
+
+      positionsList.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(
+  value
+){
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
     );
 
 }
 
-else{
 
-    start();
+/* =====================================================
+   INITIALIZE
+===================================================== */
 
-}
+(async function(){
 
+  /*
+   * Automatically connect when Portfolio opens.
+   */
+
+  await connectDeriv();
 
 })();
 
 </script>
+
 
 </body>
 </html>
