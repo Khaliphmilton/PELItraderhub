@@ -1,240 +1,316 @@
-export default async function handler(req, res) {
-  try {
-    if (req.method !== "GET") {
-      return res.status(405).json({
-        error: "Method not allowed"
-      });
-    }
+// api/deriv/session.js
+// REAL Options account only.
+// Never falls back to a demo account.
 
-    const cookies = parseCookies(
-      req.headers.cookie || ""
-    );
+const APP_ID =
+  "34aZNrTmY1AZc7hjuxyLv";
+
+export default async function handler(
+  req,
+  res
+) {
+  if (
+    req.method !== "GET"
+  ) {
+    return res
+      .status(405)
+      .json({
+        error:
+          "Method not allowed"
+      });
+  }
+
+  try {
+    const cookies =
+      parseCookies(
+        req.headers.cookie || ""
+      );
 
     const accessToken =
       cookies.deriv_access_token;
 
     if (!accessToken) {
-      return res.status(200).json({
-        connected: false,
-        account: null,
-        ws_url: null
-      });
+      return res
+        .status(401)
+        .json({
+          connected:
+            false,
+
+          account:
+            null,
+
+          ws_url:
+            null,
+
+          error:
+            "Deriv account is not connected."
+        });
     }
 
-    // Get the user's Options accounts
-    const accountsResponse = await fetch(
-      "https://api.derivws.com/trading/v1/options/accounts",
-      {
-        method: "GET",
-        headers: {
-          Authorization:
-            `Bearer ${accessToken}`,
+    const response =
+      await fetch(
+        "https://api.derivws.com/trading/v1/options/accounts",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`,
 
-          "Deriv-App-ID":
-            "34aZNrTmY1AZc7hjuxyLv",
+            "Deriv-App-ID":
+              APP_ID,
 
-          Accept:
-            "application/json"
+            Accept:
+              "application/json"
+          }
         }
-      }
-    );
-
-    const accountsData =
-      await accountsResponse.json();
-
-    if (!accountsResponse.ok) {
-      console.error(
-        "Deriv account lookup failed:",
-        accountsData
       );
 
-      return res.status(200).json({
-        connected: false,
-        account: null,
-        ws_url: null,
-        error:
-          "Unable to validate the Deriv account."
-      });
+    const body =
+      await response.json();
+
+    if (
+      !response.ok
+    ) {
+      console.error(
+        "Deriv accounts failed:",
+        body
+      );
+
+      return res
+        .status(
+          response.status
+        )
+        .json({
+          connected:
+            false,
+
+          account:
+            null,
+
+          ws_url:
+            null,
+
+          error:
+            body?.errors?.[0]
+              ?.message ||
+            body?.error?.message ||
+            "Unable to load Deriv Options accounts."
+        });
     }
 
-    /*
-     * Deriv returns the available Options accounts.
-     *
-     * We prefer a demo account for development/testing.
-     * If no demo account exists, use the first
-     * available account.
-     */
-    const accounts =
-      accountsData?.data?.accounts ||
-      accountsData?.accounts ||
+    const raw =
+      body?.data?.accounts ??
+      body?.data ??
+      body?.accounts ??
       [];
 
-    if (!Array.isArray(accounts) ||
-        accounts.length === 0) {
-      return res.status(200).json({
-        connected: true,
-        account: null,
-        ws_url: null,
-        error:
-          "No Deriv Options trading account was found."
-      });
-    }
+    const accounts =
+      Array.isArray(raw)
+        ? raw
+        : [raw];
 
-    const demoAccount =
+    // REAL ONLY.
+    // There is intentionally NO demo fallback.
+
+    const realAccount =
       accounts.find(
-        (account) =>
+        a =>
           String(
-            account.account_type ||
-            account.type ||
+            a?.account_type ??
+            a?.type ??
             ""
-          ).toLowerCase() === "demo"
+          ).toLowerCase() ===
+          "real"
       );
 
-    const account =
-      demoAccount || accounts[0];
+    if (
+      !realAccount
+    ) {
+      return res
+        .status(200)
+        .json({
+          connected:
+            true,
+
+          real_account_available:
+            false,
+
+          account:
+            null,
+
+          ws_url:
+            null,
+
+          error:
+            "No real Deriv Options account is available for this account."
+        });
+    }
 
     const accountId =
-      account.account_id ||
-      account.id;
+      realAccount.account_id ||
+      realAccount.id;
 
-    if (!accountId) {
-      console.error(
-        "Deriv account has no account ID:",
-        account
-      );
+    if (
+      !accountId
+    ) {
+      return res
+        .status(200)
+        .json({
+          connected:
+            true,
 
-      return res.status(200).json({
-        connected: true,
-        account,
-        ws_url: null,
-        error:
-          "Deriv account ID was not returned."
-      });
+          real_account_available:
+            false,
+
+          account:
+            null,
+
+          ws_url:
+            null,
+
+          error:
+            "Deriv did not return a real Options account ID."
+        });
     }
 
-    /*
-     * Request a short-lived authenticated
-     * WebSocket URL.
-     *
-     * Deriv's OTP endpoint returns:
-     *
-     * data.url
-     *
-     * The returned URL already contains the
-     * one-time authentication credential.
-     */
-    const otpResponse = await fetch(
-      `https://api.derivws.com/trading/v1/options/accounts/${encodeURIComponent(
-        accountId
-      )}/otp`,
-      {
-        method: "POST",
+    const otpResponse =
+      await fetch(
+        `https://api.derivws.com/trading/v1/options/accounts/${encodeURIComponent(
+          accountId
+        )}/otp`,
+        {
+          method:
+            "POST",
 
-        headers: {
-          Authorization:
-            `Bearer ${accessToken}`,
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`,
 
-          "Deriv-App-ID":
-            "34aZNrTmY1AZc7hjuxyLv",
+            "Deriv-App-ID":
+              APP_ID,
 
-          Accept:
-            "application/json"
+            Accept:
+              "application/json"
+          }
         }
-      }
-    );
+      );
 
-    const otpData =
+    const otpBody =
       await otpResponse.json();
 
-    if (!otpResponse.ok) {
+    if (
+      !otpResponse.ok ||
+      !otpBody?.data?.url
+    ) {
       console.error(
-        "Deriv OTP request failed:",
-        otpData
+        "Deriv real OTP failed:",
+        otpBody
       );
 
-      return res.status(200).json({
-        connected: true,
-        account,
-        ws_url: null,
-        error:
-          "Unable to create the authenticated Deriv trading connection."
-      });
+      return res
+        .status(200)
+        .json({
+          connected:
+            true,
+
+          real_account_available:
+            true,
+
+          account: {
+            ...realAccount,
+            account_id:
+              accountId
+          },
+
+          ws_url:
+            null,
+
+          error:
+            otpBody?.errors?.[0]
+              ?.message ||
+            otpBody?.error?.message ||
+            "Unable to create the real Deriv trading connection."
+        });
     }
 
-    const wsUrl =
-      otpData?.data?.url;
+    return res
+      .status(200)
+      .json({
+        connected:
+          true,
 
-    if (!wsUrl) {
-      console.error(
-        "Deriv OTP response did not contain a WebSocket URL:",
-        otpData
-      );
+        real_account_available:
+          true,
 
-      return res.status(200).json({
-        connected: true,
-        account,
-        ws_url: null,
-        error:
-          "Deriv did not return an authenticated WebSocket URL."
+        account: {
+          ...realAccount,
+          account_id:
+            accountId
+        },
+
+        ws_url:
+          otpBody.data.url
       });
-    }
 
-    return res.status(200).json({
-      connected: true,
-
-      account: {
-        ...account,
-        account_id: accountId
-      },
-
-      ws_url: wsUrl
-    });
-
-  } catch (error) {
+  } catch (
+    error
+  ) {
     console.error(
-      "Deriv session error:",
+      "Deriv real session error:",
       error
     );
 
-    return res.status(500).json({
-      connected: false,
-      account: null,
-      ws_url: null,
-      error:
-        "Unable to establish the Deriv session."
-    });
+    return res
+      .status(500)
+      .json({
+        connected:
+          false,
+
+        account:
+          null,
+
+        ws_url:
+          null,
+
+        error:
+          "Unable to establish the real Deriv session."
+      });
   }
 }
 
 
-function parseCookies(cookieHeader) {
-  const cookies = {};
+function parseCookies(
+  header
+) {
+  const result = {};
 
-  cookieHeader
-    .split(";")
-    .forEach((cookie) => {
-      const separator =
-        cookie.indexOf("=");
+  for (
+    const part of
+    header.split(";")
+  ) {
+    const i =
+      part.indexOf("=");
 
-      if (separator === -1) {
-        return;
-      }
+    if (i < 0) {
+      continue;
+    }
 
-      const name =
-        cookie
-          .slice(0, separator)
-          .trim();
+    const name =
+      part
+        .slice(0, i)
+        .trim();
 
-      const value =
-        cookie
-          .slice(separator + 1)
-          .trim();
+    const value =
+      part
+        .slice(i + 1)
+        .trim();
 
-      if (name) {
-        cookies[name] =
-          decodeURIComponent(value);
-      }
-    });
+    if (name) {
+      result[name] =
+        decodeURIComponent(
+          value
+        );
+    }
+  }
 
-  return cookies;
+  return result;
 }
