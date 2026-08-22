@@ -1,383 +1,544 @@
-// api/deriv/session.js
+// api/deriv/callback.js
 // PELItradershub
-// REAL DERIV OPTIONS ACCOUNT ONLY
+// DERIV OAUTH 2.0 CALLBACK
+//
+// IMPORTANT:
+// This file is ONLY the OAuth callback.
+// Do NOT put session.js code here.
+//
+// Flow:
+//
+// Deriv
+//   -> /api/deriv/callback?code=...&state=...
+//   -> verify state
+//   -> exchange code for access token
+//   -> save token in secure HttpOnly cookie
+//   -> redirect back to the app
+//
+// The access token is then used by:
+// /api/deriv/session.js
 
-const APP_ID = "34aZNrTmY1AZc7hjuxyLv";
+
+const APP_ID =
+  "34aZNrTmY1AZc7hjuxyLv";
+
+const TOKEN_URL =
+  "https://auth.deriv.com/oauth2/token";
+
+
+// ------------------------------------------------------------
+// CALLBACK
+// ------------------------------------------------------------
 
 export default async function handler(req, res) {
 
   if (req.method !== "GET") {
-    return res.status(405).json({
-      connected: false,
-      error: "Method not allowed"
-    });
+
+    return res
+      .status(405)
+      .send("Method not allowed");
+
   }
+
 
   try {
 
-    const cookies = parseCookies(
-      req.headers.cookie || ""
-    );
+    // --------------------------------------------------------
+    // READ CALLBACK PARAMETERS
+    // --------------------------------------------------------
+
+    const code =
+      req.query?.code;
+
+    const returnedState =
+      req.query?.state;
+
+    const oauthError =
+      req.query?.error;
+
+    const errorDescription =
+      req.query?.error_description;
+
+
+    // --------------------------------------------------------
+    // DERIV RETURNED AN ERROR
+    // --------------------------------------------------------
+
+    if (oauthError) {
+
+      console.error(
+        "DERIV OAUTH ERROR:",
+        oauthError,
+        errorDescription || ""
+      );
+
+      return res
+        .redirect(
+          `/?deriv=error&message=${encodeURIComponent(
+            errorDescription ||
+            oauthError
+          )}`
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CODE REQUIRED
+    // --------------------------------------------------------
+
+    if (!code) {
+
+      return res
+        .status(400)
+        .send(
+          "Deriv OAuth callback did not contain an authorization code."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // READ COOKIES
+    // --------------------------------------------------------
+
+    const cookies =
+      parseCookies(
+        req.headers.cookie || ""
+      );
+
+
+    const savedState =
+      cookies.deriv_oauth_state ||
+      cookies.oauth_state;
+
+
+    const codeVerifier =
+      cookies.deriv_code_verifier ||
+      cookies.code_verifier;
+
+
+    // --------------------------------------------------------
+    // STATE CHECK
+    // --------------------------------------------------------
+
+    if (
+      !returnedState ||
+      !savedState
+    ) {
+
+      console.error(
+        "DERIV OAUTH STATE MISSING"
+      );
+
+      return res
+        .status(400)
+        .send(
+          "Deriv OAuth state is missing. Please start the connection again."
+        );
+
+    }
+
+
+    if (
+      returnedState !==
+      savedState
+    ) {
+
+      console.error(
+        "DERIV OAUTH STATE MISMATCH"
+      );
+
+      return res
+        .status(400)
+        .send(
+          "Deriv OAuth security check failed. Please start the connection again."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // PKCE VERIFIER REQUIRED
+    // --------------------------------------------------------
+
+    if (!codeVerifier) {
+
+      console.error(
+        "DERIV PKCE CODE VERIFIER MISSING"
+      );
+
+      return res
+        .status(400)
+        .send(
+          "Deriv OAuth code verifier is missing. Please start the connection again."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // REDIRECT URI
+    // --------------------------------------------------------
+    //
+    // This MUST exactly match the redirect URI registered
+    // in your Deriv OAuth application.
+    //
+    // For this file:
+    //
+    // https://YOUR-DOMAIN/api/deriv/callback
+    //
+    // We build it from the current request so you don't have
+    // to hard-code your Vercel domain.
+    //
+
+    const protocol =
+      (
+        req.headers["x-forwarded-proto"] ||
+        "https"
+      )
+        .toString()
+        .split(",")[0]
+        .trim();
+
+
+    const host =
+      req.headers.host;
+
+
+    if (!host) {
+
+      return res
+        .status(500)
+        .send(
+          "Unable to determine callback host."
+        );
+
+    }
+
+
+    const redirectUri =
+      `${protocol}://${host}/api/deriv/callback`;
+
+
+    // --------------------------------------------------------
+    // EXCHANGE AUTHORIZATION CODE FOR ACCESS TOKEN
+    // --------------------------------------------------------
+
+    const tokenResponse =
+      await fetch(
+        TOKEN_URL,
+        {
+
+          method:
+            "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/x-www-form-urlencoded",
+
+            Accept:
+              "application/json"
+
+          },
+
+          body:
+            new URLSearchParams({
+
+              grant_type:
+                "authorization_code",
+
+              client_id:
+                APP_ID,
+
+              code:
+                code,
+
+              code_verifier:
+                codeVerifier,
+
+              redirect_uri:
+                redirectUri
+
+            }).toString()
+
+        }
+      );
+
+
+    const tokenBody =
+      await safeJson(
+        tokenResponse
+      );
+
+
+    // --------------------------------------------------------
+    // TOKEN ERROR
+    // --------------------------------------------------------
+
+    if (
+      !tokenResponse.ok ||
+      !tokenBody?.access_token
+    ) {
+
+      console.error(
+        "DERIV TOKEN EXCHANGE FAILED:",
+        tokenBody
+      );
+
+      return res
+        .status(502)
+        .send(
+          "Deriv authorization failed. Please connect your Deriv account again."
+        );
+
+    }
+
 
     const accessToken =
-      cookies.deriv_access_token;
-
-    if (!accessToken) {
-
-      return res.status(401).json({
-        connected: false,
-        authenticated: false,
-        real_account_available: false,
-        account: null,
-        ws_url: null,
-        error: "No Deriv authorization session was found."
-      });
-
-    }
-
-    // --------------------------------------------------
-    // GET DERIV OPTIONS ACCOUNTS
-    // --------------------------------------------------
-
-    const accountsResponse = await fetch(
-      "https://api.derivws.com/trading/v1/options/accounts",
-      {
-        method: "GET",
-
-        headers: {
-          "Authorization":
-            `Bearer ${accessToken}`,
-
-          "Deriv-App-ID":
-            APP_ID,
-
-          "Accept":
-            "application/json"
-        }
-      }
-    );
-
-    const accountsBody =
-      await accountsResponse.json();
-
-    if (!accountsResponse.ok) {
-
-      console.error(
-        "DERIV ACCOUNTS ERROR:",
-        accountsBody
-      );
-
-      return res.status(accountsResponse.status).json({
-        connected: false,
-        authenticated: false,
-        real_account_available: false,
-        account: null,
-        ws_url: null,
-
-        error:
-          accountsBody?.errors?.[0]?.message ||
-          accountsBody?.error?.message ||
-          "Unable to retrieve Deriv accounts."
-      });
-
-    }
-
-    // --------------------------------------------------
-    // NORMALIZE ACCOUNT RESPONSE
-    // --------------------------------------------------
-
-    const rawAccounts =
-      accountsBody?.data?.accounts ??
-      accountsBody?.data ??
-      accountsBody?.accounts ??
-      [];
-
-    const accounts =
-      Array.isArray(rawAccounts)
-        ? rawAccounts
-        : [rawAccounts];
-
-    console.log(
-      "DERIV OPTIONS ACCOUNTS:",
-      accounts.map(a => ({
-        account_id:
-          a?.account_id ||
-          a?.id,
-
-        account_type:
-          a?.account_type ||
-          a?.type,
-
-        status:
-          a?.status,
-
-        currency:
-          a?.currency
-      }))
-    );
-
-    // --------------------------------------------------
-    // FIND REAL ACCOUNT ONLY
-    // --------------------------------------------------
-
-    const realAccount =
-      accounts.find(account => {
-
-        const type =
-          String(
-            account?.account_type ??
-            account?.type ??
-            ""
-          ).toLowerCase();
-
-        return type === "real";
-
-      });
-
-    if (!realAccount) {
-
-      return res.status(200).json({
-
-        connected: true,
-
-        authenticated: false,
-
-        real_account_available: false,
-
-        account: null,
-
-        ws_url: null,
-
-        error:
-          "Your Deriv authorization is valid, but no REAL Options account was returned."
-      });
-
-    }
-
-    const accountId =
-      realAccount.account_id ||
-      realAccount.id;
-
-    if (!accountId) {
-
-      return res.status(200).json({
-
-        connected: true,
-
-        authenticated: false,
-
-        real_account_available: false,
-
-        account: null,
-
-        ws_url: null,
-
-        error:
-          "Deriv returned a real account without an account ID."
-      });
-
-    }
-
-    // --------------------------------------------------
-    // REQUEST ONE-TIME REAL WEBSOCKET PASSWORD
-    // --------------------------------------------------
-
-    const otpResponse = await fetch(
-
-      `https://api.derivws.com/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`,
-
-      {
-        method: "POST",
-
-        headers: {
-
-          "Authorization":
-            `Bearer ${accessToken}`,
-
-          "Deriv-App-ID":
-            APP_ID,
-
-          "Accept":
-            "application/json"
-        }
-      }
-
-    );
-
-    const otpBody =
-      await otpResponse.json();
-
-    if (
-      !otpResponse.ok ||
-      !otpBody?.data?.url
-    ) {
-
-      console.error(
-        "DERIV OTP ERROR:",
-        otpBody
-      );
-
-      return res.status(502).json({
-
-        connected: true,
-
-        authenticated: false,
-
-        real_account_available: true,
-
-        account: {
-          ...realAccount,
-          account_id: accountId
-        },
-
-        ws_url: null,
-
-        error:
-          otpBody?.errors?.[0]?.message ||
-          otpBody?.error?.message ||
-          "Deriv could not create the real trading WebSocket."
-      });
-
-    }
-
-    const wsUrl =
       String(
-        otpBody.data.url
+        tokenBody.access_token
       );
 
-    // --------------------------------------------------
-    // HARD REAL-ACCOUNT CHECK
-    // --------------------------------------------------
 
-    if (
-      !wsUrl.includes(
-        "/trading/v1/options/ws/real"
-      )
-    ) {
+    // --------------------------------------------------------
+    // SAVE ACCESS TOKEN
+    // --------------------------------------------------------
+    //
+    // HttpOnly:
+    // JavaScript cannot read the token.
+    //
+    // Secure:
+    // Only sent over HTTPS.
+    //
+    // SameSite=Lax:
+    // Works with the OAuth redirect back to the site.
+    //
 
-      console.error(
-        "SECURITY ERROR: DERIV DID NOT RETURN REAL WS URL",
-        wsUrl
-      );
+    const maxAge =
+      Number(
+        tokenBody.expires_in
+      ) > 0
+        ? Number(
+            tokenBody.expires_in
+          )
+        : 3600;
 
-      return res.status(502).json({
 
-        connected: false,
+    const cookie =
+      [
+        `deriv_access_token=${encodeURIComponent(
+          accessToken
+        )}`,
 
-        authenticated: false,
+        `Max-Age=${maxAge}`,
 
-        real_account_available: false,
+        "Path=/",
 
-        account: null,
+        "HttpOnly",
 
-        ws_url: null,
+        "Secure",
 
-        error:
-          "Deriv did not return a REAL trading WebSocket. Trading has been blocked."
-      });
+        "SameSite=Lax"
 
-    }
+      ].join("; ");
 
-    // --------------------------------------------------
+
+    // --------------------------------------------------------
+    // CLEAR ONE-TIME PKCE COOKIES
+    // --------------------------------------------------------
+
+    const clearStateCookie =
+      [
+        "deriv_oauth_state=",
+
+        "Max-Age=0",
+
+        "Path=/",
+
+        "HttpOnly",
+
+        "Secure",
+
+        "SameSite=Lax"
+
+      ].join("; ");
+
+
+    const clearVerifierCookie =
+      [
+        "deriv_code_verifier=",
+
+        "Max-Age=0",
+
+        "Path=/",
+
+        "HttpOnly",
+
+        "Secure",
+
+        "SameSite=Lax"
+
+      ].join("; ");
+
+
+    // --------------------------------------------------------
+    // SEND COOKIES
+    // --------------------------------------------------------
+
+    res.setHeader(
+      "Set-Cookie",
+      [
+        cookie,
+        clearStateCookie,
+        clearVerifierCookie
+      ]
+    );
+
+
+    // --------------------------------------------------------
     // SUCCESS
-    // --------------------------------------------------
+    // --------------------------------------------------------
+    //
+    // Browser returns to your application.
+    //
+    // /api/deriv/session can now read:
+    //
+    // deriv_access_token
+    //
+    // and request the user's Options accounts.
+    //
 
-    return res.status(200).json({
+    return res
+      .redirect(
+        "/?deriv=connected"
+      );
 
-      connected: true,
-
-      authenticated: false,
-
-      real_account_available: true,
-
-      account: {
-
-        ...realAccount,
-
-        account_id: accountId,
-
-        account_type: "real"
-
-      },
-
-      ws_url: wsUrl
-
-    });
 
   } catch (error) {
 
     console.error(
-      "DERIV SESSION ERROR:",
+      "PELI DERIV CALLBACK ERROR:",
       error
     );
 
-    return res.status(500).json({
 
-      connected: false,
-
-      authenticated: false,
-
-      real_account_available: false,
-
-      account: null,
-
-      ws_url: null,
-
-      error:
-        "Unable to establish the real Deriv trading session."
-    });
+    return res
+      .status(500)
+      .send(
+        "Unable to complete Deriv authorization. Please try again."
+      );
 
   }
 
 }
 
 
-// ==================================================
+// ============================================================
+// SAFE JSON
+// ============================================================
+
+async function safeJson(
+  response
+) {
+
+  try {
+
+    return await response.json();
+
+  } catch (_) {
+
+    return {};
+
+  }
+
+}
+
+
+// ============================================================
 // COOKIE PARSER
-// ==================================================
+// ============================================================
 
-function parseCookies(header) {
+function parseCookies(
+  header
+) {
 
-  const result = {};
+  const result =
+    Object.create(null);
+
+
+  if (
+    !header ||
+    typeof header !== "string"
+  ) {
+
+    return result;
+
+  }
+
+
+  const parts =
+    header.split(";");
+
 
   for (
-    const part of header.split(";")
+    const part of parts
   ) {
 
     const index =
       part.indexOf("=");
 
-    if (index === -1) {
+
+    if (
+      index === -1
+    ) {
+
       continue;
+
     }
+
 
     const name =
       part
-        .slice(0, index)
+        .slice(
+          0,
+          index
+        )
         .trim();
+
 
     const value =
       part
-        .slice(index + 1)
+        .slice(
+          index + 1
+        )
         .trim();
 
-    if (name) {
 
-      try {
+    if (!name) {
 
-        result[name] =
-          decodeURIComponent(value);
+      continue;
 
-      } catch {
+    }
 
-        result[name] =
-          value;
 
-      }
+    try {
+
+      result[name] =
+        decodeURIComponent(
+          value
+        );
+
+    } catch (_) {
+
+      result[name] =
+        value;
 
     }
 
   }
+
 
   return result;
 
