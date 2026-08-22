@@ -198,17 +198,19 @@ const derivCookie =
     // --------------------------------------------------
 
     res.setHeader(
-      "Set-Cookie",
-      [
-        clearCookie(
-          "deriv_oauth_state"
-        ),
+  "Set-Cookie",
+  [
+    derivCookie,
 
-        clearCookie(
-          "deriv_code_verifier"
-        )
-      ]
-    );
+    clearCookie(
+      "deriv_oauth_state"
+    ),
+
+    clearCookie(
+      "deriv_code_verifier"
+    )
+  ]
+);
 
     // --------------------------------------------------
     // SUCCESS PAGE
