@@ -3426,6 +3426,433 @@ try{
 }
 
 </script>
+<!-- =========================================================
+     PELI MARKET ROUTING + REAL TRADE TYPE FIX
+     ========================================================= -->
+<script>
+(function () {
+  "use strict";
 
+  /*
+   * Markets page sends:
+   * trade.html?symbol=R_10
+   * trade.html?symbol=R_25
+   * trade.html?symbol=frxEURUSD
+   * trade.html?symbol=cryBTCUSD
+   */
+
+  const params = new URLSearchParams(window.location.search);
+  const requestedSymbol = params.get("symbol");
+
+  const marketSelect =
+    document.getElementById("market");
+
+  const typeButtons =
+    document.getElementById("typeButtons");
+
+  const predictionField =
+    document.getElementById("predictionField");
+
+  if (!marketSelect || !typeButtons) {
+    return;
+  }
+
+  /*
+   * REAL market groups
+   */
+
+  const syntheticSymbols = [
+    "R_10",
+    "R_25",
+    "R_50",
+    "R_75",
+    "R_100",
+    "R_10_1s",
+    "R_25_1s",
+    "R_50_1s",
+    "R_75_1s",
+    "R_100_1s"
+  ];
+
+  const forexSymbols = [
+    "frxEURUSD",
+    "frxGBPUSD",
+    "frxUSDJPY",
+    "frxAUDUSD",
+    "frxEURGBP",
+    "frxGBPJPY",
+    "frxUSDCAD",
+    "frxUSDCHF",
+    "frxAUDJPY",
+    "frxEURJPY"
+  ];
+
+  const cryptoSymbols = [
+    "cryBTCUSD",
+    "cryETHUSD",
+    "cryLTCUSD",
+    "cryXRPUSD"
+  ];
+
+  /*
+   * Make sure Rise / Fall exist.
+   */
+
+  function createTradeButton(type, label) {
+
+    let button =
+      typeButtons.querySelector(
+        '[data-type="' + type + '"]'
+      );
+
+    if (button) {
+      return button;
+    }
+
+    button =
+      document.createElement("button");
+
+    button.type = "button";
+    button.className = "type";
+    button.dataset.type = type;
+    button.textContent = label;
+
+    typeButtons.insertBefore(
+      button,
+      typeButtons.firstChild
+    );
+
+    /*
+     * Connect it to the existing trade.html
+     * type system.
+     */
+
+    button.addEventListener(
+      "click",
+      function () {
+
+        type = type;
+
+      }
+    );
+
+    return button;
+  }
+
+
+  /*
+   * Add Rise / Fall buttons.
+   */
+
+  const riseButton =
+    createTradeButton(
+      "CALL",
+      "Rise"
+    );
+
+  const fallButton =
+    createTradeButton(
+      "PUT",
+      "Fall"
+    );
+
+
+  /*
+   * Add the existing buttons to the
+   * correct event system.
+   */
+
+  function bindTradeButton(button) {
+
+    if (button.dataset.peliBound === "1") {
+      return;
+    }
+
+    button.dataset.peliBound = "1";
+
+    button.addEventListener(
+      "click",
+      function () {
+
+        type =
+          button.dataset.type;
+
+        if (
+          typeof updateTypeUI ===
+          "function"
+        ) {
+          updateTypeUI();
+        }
+
+      }
+    );
+
+  }
+
+
+  document
+    .querySelectorAll(
+      "#typeButtons .type"
+    )
+    .forEach(
+      bindTradeButton
+    );
+
+
+  /*
+   * Select the market supplied by
+   * markets.html.
+   */
+
+  if (
+    requestedSymbol &&
+    marketSelect.querySelector(
+      'option[value="' +
+      requestedSymbol +
+      '"]'
+    )
+  ) {
+
+    marketSelect.value =
+      requestedSymbol;
+
+  }
+
+
+  /*
+   * Determine market category.
+   */
+
+  function getMarketGroup(symbol) {
+
+    if (
+      syntheticSymbols.includes(symbol)
+    ) {
+      return "synthetic";
+    }
+
+    if (
+      forexSymbols.includes(symbol)
+    ) {
+      return "forex";
+    }
+
+    if (
+      cryptoSymbols.includes(symbol)
+    ) {
+      return "crypto";
+    }
+
+    /*
+     * Deriv symbols beginning with R_
+     * are treated as synthetic.
+     */
+
+    if (
+      symbol &&
+      symbol.startsWith("R_")
+    ) {
+      return "synthetic";
+    }
+
+    if (
+      symbol &&
+      symbol.startsWith("frx")
+    ) {
+      return "forex";
+    }
+
+    if (
+      symbol &&
+      symbol.startsWith("cry")
+    ) {
+      return "crypto";
+    }
+
+    return "synthetic";
+  }
+
+
+  /*
+   * Configure available trade types.
+   */
+
+  function configureTradeTypes() {
+
+    const symbol =
+      marketSelect.value;
+
+    const group =
+      getMarketGroup(symbol);
+
+    const digitTypes = [
+      "DIGITMATCH",
+      "DIGITDIFF",
+      "DIGITEVEN",
+      "DIGITODD",
+      "DIGITOVER",
+      "DIGITUNDER"
+    ];
+
+    /*
+     * Rise / Fall are the primary
+     * trading choices.
+     */
+
+    document
+      .querySelectorAll(
+        "#typeButtons .type"
+      )
+      .forEach(
+        button => {
+
+          const buttonType =
+            button.dataset.type;
+
+          if (
+            buttonType === "CALL" ||
+            buttonType === "PUT"
+          ) {
+
+            button.style.display =
+              "";
+
+            return;
+          }
+
+          if (
+            digitTypes.includes(
+              buttonType
+            )
+          ) {
+
+            button.style.display =
+              group === "synthetic"
+                ? ""
+                : "none";
+
+          }
+
+        }
+      );
+
+
+    /*
+     * ALWAYS start on Rise when the
+     * user enters a market.
+     *
+     * This prevents Matches from
+     * being selected automatically.
+     */
+
+    type = "CALL";
+
+    document
+      .querySelectorAll(
+        "#typeButtons .type"
+      )
+      .forEach(
+        button => {
+
+          button.classList.toggle(
+            "active",
+            button.dataset.type ===
+              "CALL"
+          );
+
+        }
+      );
+
+
+    /*
+     * No prediction digit for Rise/Fall.
+     */
+
+    if (predictionField) {
+
+      predictionField.style.display =
+        "none";
+
+    }
+
+
+    /*
+     * Clear old proposal so Deriv
+     * requests a fresh one for the
+     * selected market.
+     */
+
+    if (
+      typeof proposal !==
+      "undefined"
+    ) {
+
+      proposal = null;
+
+    }
+
+    if (
+      typeof lastProposalKey !==
+      "undefined"
+    ) {
+
+      lastProposalKey = "";
+
+    }
+
+    /*
+     * Ask the existing terminal code
+     * for a fresh REAL proposal.
+     */
+
+    if (
+      typeof requestProposalSoon ===
+      "function"
+    ) {
+
+      requestProposalSoon();
+
+    }
+
+  }
+
+
+  /*
+   * When user manually changes market.
+   */
+
+  marketSelect.addEventListener(
+    "change",
+    function () {
+
+      configureTradeTypes();
+
+    }
+  );
+
+
+  /*
+   * Apply selected market from the
+   * Markets page.
+   */
+
+  configureTradeTypes();
+
+
+  /*
+   * If a symbol was supplied, trigger
+   * the existing market-change logic.
+   */
+
+  if (requestedSymbol) {
+
+    marketSelect.dispatchEvent(
+      new Event("change")
+    );
+
+  }
+
+})();
+</script>
 </body>
 </html>
