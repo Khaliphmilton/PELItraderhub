@@ -2,827 +2,854 @@
 <html lang="en">
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-  <title>Dashboard | PELItradershub</title>
+<title>Dashboard | PELItradershub</title>
 
-  <meta
-    name="description"
-    content="PELItradershub trading dashboard for markets, portfolio and strategies."
-  >
+<meta
+  name="description"
+  content="PELItradershub real-time Deriv trading dashboard."
+>
 
-  <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css">
 
-  <style>
+<style>
 
-    .dashboard {
-      max-width: 1400px;
-      margin: auto;
-      padding: 30px 5%;
-    }
+.dashboard {
+  max-width: 1400px;
+  margin: auto;
+  padding: 30px 5%;
+}
 
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
 
-    .dashboard-header h1 {
-      font-size: 38px;
-      margin: 5px 0;
-    }
+.dashboard-header h1 {
+  font-size: 38px;
+  margin: 5px 0;
+}
 
-    .dashboard-header p {
-      color: #7d879b;
-    }
+.dashboard-header p {
+  color: #7d879b;
+}
 
-    .dashboard-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
-    .logout-button {
-      padding: 11px 16px;
-      border-radius: 9px;
-      border: 1px solid #713345;
-      background: #351923;
-      color: #ff7186;
-      font-weight: 700;
-      cursor: pointer;
-    }
+.logout-button {
+  padding: 11px 16px;
+  border-radius: 9px;
+  border: 1px solid #713345;
+  background: #351923;
+  color: #ff7186;
+  font-weight: 700;
+  cursor: pointer;
+}
 
-    .logout-button:hover {
-      opacity: .85;
-    }
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
 
-    .dash-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
-    }
+.dash-card {
+  background: #0d121c;
+  border: 1px solid #202838;
+  border-radius: 16px;
+  padding: 20px;
+}
 
-    .dash-card {
-      background: #0d121c;
-      border: 1px solid #202838;
-      border-radius: 16px;
-      padding: 20px;
-    }
+.dash-label {
+  color: #7d879b;
+  font-size: 13px;
+}
 
-    .dash-label {
-      color: #7d879b;
-      font-size: 13px;
-    }
+.dash-value {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 8px 0;
+}
 
-    .dash-value {
-      font-size: 28px;
-      font-weight: 800;
-      margin: 8px 0;
-    }
+.positive {
+  color: #39d4b6;
+}
 
-    .positive {
-      color: #39d4b6;
-    }
+.negative {
+  color: #ff7186;
+}
 
-    .negative {
-      color: #ff7186;
-    }
+.muted {
+  color: #7d879b;
+}
 
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 15px;
-    }
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+}
 
-    .panel {
-      background: #0d121c;
-      border: 1px solid #202838;
-      border-radius: 16px;
-      padding: 20px;
-    }
+.panel {
+  background: #0d121c;
+  border: 1px solid #202838;
+  border-radius: 16px;
+  padding: 20px;
+}
 
-    .panel h2 {
-      font-size: 18px;
-      margin-bottom: 18px;
-    }
+.panel h2 {
+  font-size: 18px;
+  margin-bottom: 18px;
+}
 
-    .chart-box {
-      height: 350px;
-      background:
-        linear-gradient(
-          180deg,
-          rgba(120,108,255,.08),
-          transparent
-        );
-      border-radius: 12px;
-      overflow: hidden;
-    }
+.chart-box {
+  height: 350px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(120,108,255,.08),
+      transparent
+    );
+  border-radius: 12px;
+  overflow: hidden;
+}
 
-    .chart-box svg {
-      width: 100%;
-      height: 100%;
-    }
+#portfolioChart {
+  width: 100%;
+  height: 100%;
+}
 
-    .market-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 0;
-      border-bottom: 1px solid #202838;
-    }
+.market-row,
+.position {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #202838;
+}
 
-    .market-row:last-child {
-      border-bottom: 0;
-    }
+.market-row:last-child,
+.position:last-child {
+  border-bottom: 0;
+}
 
-    .market-name {
-      font-weight: 700;
-    }
+.market-name {
+  font-weight: 700;
+}
 
-    .market-type {
-      color: #667187;
-      font-size: 11px;
-      display: block;
-      margin-top: 3px;
-    }
+.market-type {
+  color: #667187;
+  font-size: 11px;
+  display: block;
+  margin-top: 3px;
+}
 
-    .dashboard-bottom {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 15px;
-    }
+.market-price {
+  font-weight: 800;
+  text-align: right;
+}
 
-    .position {
-      display: flex;
-      justify-content: space-between;
-      padding: 13px 0;
-      border-bottom: 1px solid #202838;
-    }
+.position-left strong {
+  display: block;
+}
 
-    .position:last-child {
-      border-bottom: 0;
-    }
+.position-left small {
+  color: #667187;
+}
 
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(2,1fr);
-      gap: 10px;
-    }
+.dashboard-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
 
-    .quick-action {
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid #252e40;
-      background: #111722;
-      color: white;
-      text-align: left;
-      cursor: pointer;
-      text-decoration: none;
-    }
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
 
-    .quick-action:hover {
-      border-color: #786cff;
-    }
+.quick-action {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #252e40;
+  background: #111722;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+}
 
-    .user-box {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #667187;
-    }
+.quick-action:hover {
+  border-color: #786cff;
+}
 
-    .user-box span {
-      color: #39d4b6;
-    }
+.quick-action strong {
+  display: block;
+  margin-bottom: 5px;
+}
 
-    @media(max-width:900px) {
+.quick-action small {
+  color: #7d879b;
+}
 
-      .dash-grid {
-        grid-template-columns: repeat(2,1fr);
-      }
+.user-box {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #667187;
+}
 
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
+.user-box span {
+  color: #39d4b6;
+}
 
-    }
+.connection {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
 
-    @media(max-width:600px) {
+.connection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff7186;
+}
 
-      .dashboard {
-        padding: 20px 15px;
-      }
+.connection.live .connection-dot {
+  background: #39d4b6;
+}
 
-      .dashboard-header {
-        align-items: flex-start;
-        flex-direction: column;
-      }
+.account-info {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #111722;
+  border: 1px solid #202838;
+  font-size: 12px;
+}
 
-      .dashboard-header h1 {
-        font-size: 30px;
-      }
+.account-info div {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
 
-      .dash-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+.empty {
+  padding: 20px 0;
+  text-align: center;
+  color: #667187;
+  font-size: 13px;
+}
 
-      .dashboard-bottom {
-        grid-template-columns: 1fr;
-      }
+.error-box {
+  display: none;
+  margin-bottom: 20px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #713345;
+  background: #351923;
+  color: #ff7186;
+  font-size: 13px;
+}
 
-      .dashboard-actions {
-        width: 100%;
-      }
+.real-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(57,212,182,.08);
+  border: 1px solid rgba(57,212,182,.25);
+  color: #39d4b6;
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 8px;
+}
 
-      .dashboard-actions a,
-      .dashboard-actions button {
-        flex: 1;
-      }
+.real-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #39d4b6;
+}
 
-    }
+@media(max-width:900px) {
 
-  </style>
+  .dash-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media(max-width:600px) {
+
+  .dashboard {
+    padding: 20px 15px;
+  }
+
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-header h1 {
+    font-size: 30px;
+  }
+
+  .dash-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-actions {
+    width: 100%;
+  }
+
+  .dashboard-actions a,
+  .dashboard-actions button {
+    flex: 1;
+  }
+
+}
+
+</style>
 
 </head>
 
-
 <body>
-
 
 <header class="navbar">
 
-  <a href="index.html" class="brand">
+<a href="index.html" class="brand">
 
-    <span class="brand-icon">
-      P
-    </span>
+<span class="brand-icon">P</span>
 
-    <span>
-      PELI<span>tradershub</span>
-    </span>
+<span>
+PELI<span>tradershub</span>
+</span>
 
-  </a>
+</a>
 
+<div class="nav-actions">
 
-  <div class="nav-actions">
+<a
+  href="markets.html"
+  class="login-link"
+>
+Markets
+</a>
 
-    <a
-      href="markets.html"
-      class="login-link"
-    >
-      Markets
-    </a>
+<a
+  href="settings.html"
+  class="button secondary"
+>
+⚙
+</a>
 
+<button
+  type="button"
+  onclick="peliLogout()"
+  class="logout-button"
+>
+Log out
+</button>
 
-    <a
-      href="settings.html"
-      class="button secondary"
-    >
-      ⚙
-    </a>
-
-
-    <button
-      type="button"
-      onclick="peliLogout()"
-      class="logout-button"
-    >
-      Log out
-    </button>
-
-  </div>
+</div>
 
 </header>
 
 
-
 <main class="dashboard">
 
+<div class="dashboard-header">
 
-  <div class="dashboard-header">
+<div>
 
-    <div>
+<div class="eyebrow">
+REAL TRADING DASHBOARD
+</div>
 
-      <div class="eyebrow">
-        TRADING DASHBOARD
-      </div>
+<h1 id="welcomeTitle">
+Good day, Trader.
+</h1>
 
+<p>
+Your live Deriv account and real-time market information.
+</p>
 
-      <h1 id="welcomeTitle">
-        Good day, Trader.
-      </h1>
+<div class="user-box">
+Signed in as:
+<span id="userEmail">Loading...</span>
+</div>
 
+<div
+  id="connectionStatus"
+  class="connection"
+>
+<span class="connection-dot"></span>
 
-      <p>
-        Here's what's happening with your workspace.
-      </p>
+<span id="connectionText">
+Connecting to Deriv...
+</span>
 
+</div>
 
-      <div class="user-box">
-        Signed in as:
-        <span id="userEmail">
-          Loading...
-        </span>
-      </div>
+<div class="real-badge">
+<span class="real-badge-dot"></span>
+REAL ACCOUNT DATA
+</div>
 
-    </div>
+</div>
 
 
-    <div class="dashboard-actions">
+<div class="dashboard-actions">
 
-      <a
-        href="trade.html"
-        class="button primary"
-      >
-        Open Terminal
-      </a>
+<a
+  href="trade.html"
+  class="button primary"
+>
+Open Terminal
+</a>
 
+<a
+  href="markets.html"
+  class="button secondary"
+>
+Markets
+</a>
 
-      <a
-        href="markets.html"
-        class="button secondary"
-      >
-        Markets
-      </a>
+</div>
 
-    </div>
+</div>
 
-  </div>
 
+<div
+  id="errorBox"
+  class="error-box"
+></div>
 
 
-  <!-- STATISTICS -->
+<!-- REAL ACCOUNT STATISTICS -->
 
-  <section class="dash-grid">
+<section class="dash-grid">
 
 
-    <div class="dash-card">
+<div class="dash-card">
 
-      <div class="dash-label">
-        Account Balance
-      </div>
+<div class="dash-label">
+Account Balance
+</div>
 
-      <div class="dash-value">
-        $10,000.00
-      </div>
+<div
+  id="balanceValue"
+  class="dash-value"
+>
+—
+</div>
 
-      <span class="positive">
-        Demo account
-      </span>
+<span
+  id="balanceCurrency"
+  class="muted"
+>
+—
+</span>
 
-    </div>
+</div>
 
 
+<div class="dash-card">
 
-    <div class="dash-card">
+<div class="dash-label">
+Today's P/L
+</div>
 
-      <div class="dash-label">
-        Today's P/L
-      </div>
+<div
+  id="todayPL"
+  class="dash-value"
+>
+—
+</div>
 
-      <div class="dash-value positive">
-        +$284.20
-      </div>
+<span
+  id="todayPLPercent"
+  class="muted"
+>
+Loading today's activity
+</span>
 
-      <span class="positive">
-        +2.84%
-      </span>
+</div>
 
-    </div>
 
+<div class="dash-card">
 
+<div class="dash-label">
+Open Positions
+</div>
 
-    <div class="dash-card">
+<div
+  id="openPositions"
+  class="dash-value"
+>
+0
+</div>
 
-      <div class="dash-label">
-        Open Positions
-      </div>
+<span class="muted">
+Live Deriv portfolio
+</span>
 
-      <div class="dash-value">
-        4
-      </div>
+</div>
 
-      <span class="dash-label">
-        Active
-      </span>
 
-    </div>
+<div class="dash-card">
 
+<div class="dash-label">
+Win Rate
+</div>
 
+<div
+  id="winRate"
+  class="dash-value"
+>
+—
+</div>
 
-    <div class="dash-card">
+<span
+  id="winRateDetail"
+  class="muted"
+>
+Loading closed trades
+</span>
 
-      <div class="dash-label">
-        Win Rate
-      </div>
+</div>
 
-      <div class="dash-value">
-        68.4%
-      </div>
+</section>
 
-      <span class="positive">
-        +4.2%
-      </span>
 
-    </div>
+<!-- LIVE MARKET -->
 
-  </section>
+<section class="dashboard-grid">
 
 
+<div class="panel">
 
-  <!-- CHART + WATCHLIST -->
+<h2>
+Live Market
+</h2>
 
-  <section class="dashboard-grid">
+<div class="chart-box">
 
+<svg
+  id="portfolioChart"
+  viewBox="0 0 900 350"
+  preserveAspectRatio="none"
+>
 
-    <div class="panel">
+<defs>
 
-      <h2>
-        Portfolio Performance
-      </h2>
+<linearGradient
+  id="liveArea"
+  x1="0"
+  y1="0"
+  x2="0"
+  y2="1"
+>
 
+<stop
+  offset="0%"
+  stop-color="#786cff"
+  stop-opacity=".35"
+/>
 
-      <div class="chart-box">
+<stop
+  offset="100%"
+  stop-color="#786cff"
+  stop-opacity="0"
+/>
 
-        <svg
-          viewBox="0 0 900 350"
-          preserveAspectRatio="none"
-        >
+</linearGradient>
 
-          <defs>
+</defs>
 
-            <linearGradient
-              id="area"
-              x1="0"
-              y1="0"
-              x2="0"
-              y2="1"
-            >
+<path
+  id="chartArea"
+  d=""
+  fill="url(#liveArea)"
+/>
 
-              <stop
-                offset="0%"
-                stop-color="#786cff"
-                stop-opacity=".35"
-              />
+<path
+  id="chartLine"
+  d=""
+  fill="none"
+  stroke="#786cff"
+  stroke-width="4"
+/>
 
-              <stop
-                offset="100%"
-                stop-color="#786cff"
-                stop-opacity="0"
-              />
+</svg>
 
-            </linearGradient>
+</div>
 
-          </defs>
 
+<div class="account-info">
 
-          <path
-            d="M0 290
-               C70 260 100 275 150 245
-               S240 230 300 250
-               S380 170 440 190
-               S510 220 570 150
-               S650 175 700 115
-               S780 135 900 55
-               L900 350
-               L0 350 Z"
-            fill="url(#area)"
-          />
+<div>
 
+<span>Market</span>
 
-          <path
-            d="M0 290
-               C70 260 100 275 150 245
-               S240 230 300 250
-               S380 170 440 190
-               S510 220 570 150
-               S650 175 700 115
-               S780 135 900 55"
-            fill="none"
-            stroke="#786cff"
-            stroke-width="4"
-          />
+<strong id="chartSymbol">
+R_100
+</strong>
 
-        </svg>
+</div>
 
-      </div>
+<div>
 
-    </div>
+<span>Live Price</span>
 
+<strong id="chartPrice">
+—
+</strong>
 
+</div>
 
-    <div class="panel">
+<div>
 
-      <h2>
-        Watchlist
-      </h2>
+<span>Last Digit</span>
 
+<strong id="chartDigit">
+—
+</strong>
 
-      <div class="market-row">
+</div>
 
-        <div>
+</div>
 
-          <span class="market-name">
-            Volatility 75
-          </span>
+</div>
 
-          <span class="market-type">
-            Synthetic
-          </span>
 
-        </div>
+<!-- WATCHLIST -->
 
-        <strong class="positive">
-          +1.82%
-        </strong>
+<div class="panel">
 
-      </div>
+<h2>
+Live Watchlist
+</h2>
 
+<div id="watchlist">
 
-      <div class="market-row">
+<div class="empty">
+Waiting for live market data...
+</div>
 
-        <div>
+</div>
 
-          <span class="market-name">
-            Volatility 100
-          </span>
+<a
+  href="markets.html"
+  class="button secondary"
+  style="width:100%;margin-top:15px;"
+>
+View All Markets
+</a>
 
-          <span class="market-type">
-            Synthetic
-          </span>
+</div>
 
-        </div>
+</section>
 
-        <strong class="negative">
-          -0.64%
-        </strong>
 
-      </div>
+<!-- POSITIONS -->
 
+<section class="dashboard-bottom">
 
-      <div class="market-row">
 
-        <div>
+<div class="panel">
 
-          <span class="market-name">
-            EUR/USD
-          </span>
+<h2>
+Open Positions
+</h2>
 
-          <span class="market-type">
-            Forex
-          </span>
+<div id="positions">
 
-        </div>
+<div class="empty">
+Loading portfolio...
+</div>
 
-        <strong class="positive">
-          +0.31%
-        </strong>
+</div>
 
-      </div>
+<a
+  href="portfolio.html"
+  class="button secondary"
+  style="width:100%;margin-top:15px;"
+>
+View Portfolio
+</a>
 
+</div>
 
-      <div class="market-row">
 
-        <div>
+<!-- QUICK ACTIONS -->
 
-          <span class="market-name">
-            Volatility 25
-          </span>
+<div class="panel">
 
-          <span class="market-type">
-            Synthetic
-          </span>
+<h2>
+Quick Actions
+</h2>
 
-        </div>
+<div class="quick-actions">
 
-        <strong class="positive">
-          +0.92%
-        </strong>
+<a
+  href="trade.html"
+  class="quick-action"
+>
 
-      </div>
+<strong>
+📈 Trade
+</strong>
 
+<small>
+Open real trading terminal
+</small>
 
-      <a
-        href="markets.html"
-        class="button secondary"
-        style="width:100%;margin-top:15px;"
-      >
-        View All Markets
-      </a>
+</a>
 
-    </div>
 
-  </section>
+<a
+  href="strategies.html"
+  class="quick-action"
+>
 
+<strong>
+🤖 Strategy
+</strong>
 
+<small>
+Manage strategies
+</small>
 
-  <!-- LOWER PANELS -->
+</a>
 
-  <section class="dashboard-bottom">
 
+<a
+  href="history.html"
+  class="quick-action"
+>
 
-    <div class="panel">
+<strong>
+◷ History
+</strong>
 
-      <h2>
-        Open Positions
-      </h2>
+<small>
+View real transactions
+</small>
 
+</a>
 
-      <div class="position">
 
-        <span>
-          Volatility 75
-        </span>
+<a
+  href="settings.html"
+  class="quick-action"
+>
 
-        <span class="positive">
-          +$42.00
-        </span>
+<strong>
+⚙ Settings
+</strong>
 
-      </div>
+<small>
+Account configuration
+</small>
 
+</a>
 
-      <div class="position">
+</div>
 
-        <span>
-          EUR/USD
-        </span>
+</div>
 
-        <span class="positive">
-          +$18.40
-        </span>
+</section>
 
-      </div>
 
+<!-- ACCOUNT INFORMATION -->
 
-      <div class="position">
+<div
+  id="accountInfo"
+  class="account-info"
+  style="margin-top:20px;"
+>
 
-        <span>
-          Volatility 100
-        </span>
+<div>
 
-        <span class="negative">
-          -$12.00
-        </span>
+<span>Deriv Account</span>
 
-      </div>
+<strong id="derivAccount">
+Not connected
+</strong>
 
+</div>
 
-      <div class="position">
+<div>
 
-        <span>
-          Volatility 25
-        </span>
+<span>Account Type</span>
 
-        <span class="positive">
-          +$31.60
-        </span>
+<strong id="derivType">
+—
+</strong>
 
-      </div>
+</div>
 
+<div>
 
-      <a
-        href="portfolio.html"
-        class="button secondary"
-        style="width:100%;margin-top:15px;"
-      >
-        View Portfolio
-      </a>
+<span>Currency</span>
 
-    </div>
+<strong id="derivCurrency">
+—
+</strong>
 
+</div>
 
-
-    <div class="panel">
-
-      <h2>
-        Quick Actions
-      </h2>
-
-
-      <div class="quick-actions">
-
-
-        <a
-          href="trade.html"
-          class="quick-action"
-        >
-
-          <strong>
-            📈 Trade
-          </strong>
-
-          <small>
-            Open trading terminal
-          </small>
-
-        </a>
-
-
-        <a
-          href="strategies.html"
-          class="quick-action"
-        >
-
-          <strong>
-            🤖 Strategy
-          </strong>
-
-          <small>
-            Manage strategies
-          </small>
-
-        </a>
-
-
-        <a
-          href="history.html"
-          class="quick-action"
-        >
-
-          <strong>
-            ◷ History
-          </strong>
-
-          <small>
-            View transactions
-          </small>
-
-        </a>
-
-
-        <a
-          href="settings.html"
-          class="quick-action"
-        >
-
-          <strong>
-            ⚙ Settings
-          </strong>
-
-          <small>
-            Configure account
-          </small>
-
-        </a>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-  <div style="
-    margin-top:20px;
-    padding:15px;
-    border:1px solid #30294e;
-    background:#121122;
-    border-radius:12px;
-    color:#aaa5ff;
-    font-size:13px;
-  ">
-
-    <strong>Demo mode:</strong>
-
-    The values shown on this dashboard are demonstration data.
-    Real Deriv account data will only appear after the secure API
-    connection is implemented.
-
-  </div>
+</div>
 
 
 </main>
 
 
-
 <footer>
 
-  <div class="brand">
+<div class="brand">
 
-    <span class="brand-icon">
-      P
-    </span>
+<span class="brand-icon">
+P
+</span>
 
-    PELItradershub
+PELItradershub
 
-  </div>
+</div>
 
-
-  <p>
-    Trading involves risk. No profits are guaranteed.
-  </p>
+<p>
+Trading involves risk. No profits are guaranteed.
+</p>
 
 </footer>
-
 
 
 <!-- SUPABASE -->
@@ -831,13 +858,1270 @@
 
 <script src="supabase.js"></script>
 
+<!-- REAL DERIV ENGINE -->
 
+<script src="deriv-engine.js"></script>
 
-<!-- AUTHENTICATION -->
 
 <script>
 
-(async function () {
+"use strict";
+
+
+const $ = id =>
+  document.getElementById(id);
+
+
+let balance = null;
+
+let currency = "USD";
+
+let chartPrices = [];
+
+let todayProfit = 0;
+
+let todayLoss = 0;
+
+
+/* =========================================================
+   MONEY
+========================================================= */
+
+function money(value) {
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "—";
+  }
+
+  try {
+
+    return new Intl.NumberFormat(
+      undefined,
+      {
+        style: "currency",
+        currency: currency || "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    ).format(number);
+
+  } catch {
+
+    return (
+      currency +
+      " " +
+      number.toFixed(2)
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function showError(message) {
+
+  const box =
+    $("errorBox");
+
+  if (!box) return;
+
+  box.textContent =
+    message ||
+    "Unable to load real Deriv account data.";
+
+  box.style.display =
+    "block";
+
+}
+
+
+/* =========================================================
+   CONNECTION
+========================================================= */
+
+function setConnection(
+  live,
+  text
+) {
+
+  const box =
+    $("connectionStatus");
+
+  const label =
+    $("connectionText");
+
+  if (!box || !label) return;
+
+  box.classList.toggle(
+    "live",
+    Boolean(live)
+  );
+
+  label.textContent =
+    text;
+
+}
+
+
+/* =========================================================
+   ACCOUNT
+========================================================= */
+
+function updateAccount(account) {
+
+  if (!account) return;
+
+
+  currency =
+    account.currency ||
+    currency;
+
+
+  if (
+    account.balance !== undefined
+  ) {
+
+    const value =
+      Number(
+        account.balance
+      );
+
+    if (
+      Number.isFinite(value)
+    ) {
+
+      balance =
+        value;
+
+    }
+
+  }
+
+
+  $("derivAccount").textContent =
+    account.account_id ||
+    account.loginid ||
+    account.id ||
+    "Connected";
+
+
+  $("derivType").textContent =
+    account.account_type ||
+    "real";
+
+
+  $("derivCurrency").textContent =
+    currency;
+
+
+  $("balanceCurrency").textContent =
+    currency;
+
+
+  if (
+    Number.isFinite(balance)
+  ) {
+
+    $("balanceValue").textContent =
+      money(balance);
+
+  }
+
+}
+
+
+/* =========================================================
+   REAL BALANCE STREAM
+========================================================= */
+
+PELI_DERIV.on(
+  "balance",
+  data => {
+
+    if (!data) return;
+
+
+    const value =
+      Number(
+        data.balance
+      );
+
+
+    if (
+      !Number.isFinite(value)
+    ) {
+
+      return;
+
+    }
+
+
+    balance =
+      value;
+
+
+    if (
+      data.currency
+    ) {
+
+      currency =
+        data.currency;
+
+    }
+
+
+    $("balanceValue").textContent =
+      money(balance);
+
+
+    $("balanceCurrency").textContent =
+      currency;
+
+
+    updateTodayPLDisplay();
+
+  }
+);
+
+
+/* =========================================================
+   TODAY'S REAL P/L
+========================================================= */
+
+function updateTodayPLDisplay() {
+
+  const pl =
+    todayProfit +
+    todayLoss;
+
+
+  $("todayPL").textContent =
+    money(pl);
+
+
+  $("todayPL").className =
+    "dash-value " +
+    (
+      pl >= 0
+        ? "positive"
+        : "negative"
+    );
+
+
+  if (
+    balance !== null &&
+    Number.isFinite(balance)
+  ) {
+
+    const startingBalance =
+      balance -
+      pl;
+
+
+    if (
+      startingBalance !== 0
+    ) {
+
+      const percentage =
+        (
+          pl /
+          startingBalance
+        ) *
+        100;
+
+
+      $("todayPLPercent").textContent =
+        (
+          pl >= 0
+            ? "+"
+            : ""
+        ) +
+        percentage.toFixed(2) +
+        "% today";
+
+      $("todayPLPercent").className =
+        pl >= 0
+          ? "positive"
+          : "negative";
+
+      return;
+
+    }
+
+  }
+
+
+  $("todayPLPercent").textContent =
+    "Today's closed trading result";
+
+}
+
+
+/* =========================================================
+   REAL PORTFOLIO
+========================================================= */
+
+PELI_DERIV.on(
+  "portfolio",
+  data => {
+
+    const contracts =
+      Array.isArray(
+        data?.contracts
+      )
+        ? data.contracts
+        : [];
+
+
+    $("openPositions").textContent =
+      contracts.length;
+
+
+    renderPositions(
+      contracts
+    );
+
+  }
+);
+
+
+/* =========================================================
+   POSITION DISPLAY
+========================================================= */
+
+function renderPositions(
+  contracts
+) {
+
+  const container =
+    $("positions");
+
+
+  if (
+    !contracts.length
+  ) {
+
+    container.innerHTML =
+      '<div class="empty">No open positions.</div>';
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    contracts.map(
+      contract => {
+
+        const symbol =
+          contract.underlying_symbol ||
+          contract.symbol ||
+          contract.display_name ||
+          "Contract";
+
+
+        const id =
+          contract.contract_id ||
+          contract.id ||
+          "—";
+
+
+        const profit =
+          Number(
+            contract.profit
+          );
+
+
+        const profitText =
+          Number.isFinite(profit)
+            ? money(profit)
+            : "—";
+
+
+        const profitClass =
+          profit >= 0
+            ? "positive"
+            : "negative";
+
+
+        return `
+
+<div class="position">
+
+  <div class="position-left">
+
+    <strong>
+      ${escapeHTML(symbol)}
+    </strong>
+
+    <small>
+      Contract #${escapeHTML(String(id))}
+    </small>
+
+  </div>
+
+  <strong class="${profitClass}">
+    ${profitText}
+  </strong>
+
+</div>
+
+`;
+
+      }
+    ).join("");
+
+}
+
+
+/* =========================================================
+   REAL PROFIT TABLE
+========================================================= */
+
+PELI_DERIV.on(
+  "profitTable",
+  data => {
+
+    const trades =
+      Array.isArray(
+        data?.transactions
+      )
+        ? data.transactions
+        : Array.isArray(
+            data?.contracts
+          )
+          ? data.contracts
+          : [];
+
+
+    calculateWinRate(
+      trades
+    );
+
+
+    calculateTodayProfit(
+      trades
+    );
+
+  }
+);
+
+
+/* =========================================================
+   WIN RATE
+========================================================= */
+
+function calculateWinRate(
+  trades
+) {
+
+  let wins = 0;
+
+  let losses = 0;
+
+
+  trades.forEach(
+    trade => {
+
+      const profit =
+        Number(
+          trade.profit
+        );
+
+
+      if (
+        !Number.isFinite(profit)
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        profit > 0
+      ) {
+
+        wins++;
+
+      } else if (
+        profit < 0
+      ) {
+
+        losses++;
+
+      }
+
+    }
+  );
+
+
+  const completed =
+    wins +
+    losses;
+
+
+  if (
+    completed === 0
+  ) {
+
+    $("winRate").textContent =
+      "—";
+
+    $("winRateDetail").textContent =
+      "No closed trades found";
+
+    return;
+
+  }
+
+
+  const rate =
+    (
+      wins /
+      completed
+    ) *
+    100;
+
+
+  $("winRate").textContent =
+    rate.toFixed(1) +
+    "%";
+
+
+  $("winRateDetail").textContent =
+    `${wins} wins / ${completed} closed`;
+
+}
+
+
+/* =========================================================
+   TODAY'S PROFIT FROM REAL CLOSED TRADES
+========================================================= */
+
+function calculateTodayProfit(
+  trades
+) {
+
+  todayProfit = 0;
+
+  todayLoss = 0;
+
+
+  const now =
+    new Date();
+
+
+  const start =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
+
+
+  const startEpoch =
+    Math.floor(
+      start.getTime() /
+      1000
+    );
+
+
+  trades.forEach(
+    trade => {
+
+      const profit =
+        Number(
+          trade.profit
+        );
+
+
+      if (
+        !Number.isFinite(profit)
+      ) {
+
+        return;
+
+      }
+
+
+      const epoch =
+        Number(
+          trade.sell_time ||
+          trade.close_time ||
+          trade.exit_time ||
+          trade.date ||
+          0
+        );
+
+
+      if (
+        epoch &&
+        epoch >= startEpoch
+      ) {
+
+        if (
+          profit >= 0
+        ) {
+
+          todayProfit +=
+            profit;
+
+        } else {
+
+          todayLoss +=
+            profit;
+
+        }
+
+      }
+
+    }
+  );
+
+
+  updateTodayPLDisplay();
+
+}
+
+
+/* =========================================================
+   LIVE TICK
+========================================================= */
+
+PELI_DERIV.on(
+  "tick",
+  tick => {
+
+    if (!tick) return;
+
+
+    const quote =
+      Number(
+        tick.quote
+      );
+
+
+    if (
+      !Number.isFinite(quote)
+    ) {
+
+      return;
+
+    }
+
+
+    $("chartPrice").textContent =
+      quote;
+
+
+    $("chartDigit").textContent =
+      tick.lastDigit ??
+      "—";
+
+
+    $("chartSymbol").textContent =
+      PELI_DERIV.symbol;
+
+
+    chartPrices.push(
+      quote
+    );
+
+
+    if (
+      chartPrices.length >
+      100
+    ) {
+
+      chartPrices =
+        chartPrices.slice(
+          -100
+        );
+
+    }
+
+
+    updateCurrentWatchlistPrice(
+      PELI_DERIV.symbol,
+      quote
+    );
+
+
+    drawChart();
+
+  }
+);
+
+
+/* =========================================================
+   WATCHLIST PRICE
+========================================================= */
+
+function updateCurrentWatchlistPrice(
+  symbol,
+  price
+) {
+
+  const element =
+    document.getElementById(
+      "price-" + symbol
+    );
+
+
+  if (!element) return;
+
+
+  element.textContent =
+    price;
+
+}
+
+
+/* =========================================================
+   LIVE CHART
+========================================================= */
+
+function drawChart() {
+
+  if (
+    chartPrices.length < 2
+  ) {
+
+    return;
+
+  }
+
+
+  const width = 900;
+
+  const height = 350;
+
+  const padding = 20;
+
+
+  const min =
+    Math.min(
+      ...chartPrices
+    );
+
+
+  const max =
+    Math.max(
+      ...chartPrices
+    );
+
+
+  const range =
+    max - min || 1;
+
+
+  const points =
+    chartPrices.map(
+      (price, index) => {
+
+        const x =
+          padding +
+          (
+            index /
+            (
+              chartPrices.length - 1
+            )
+          ) *
+          (
+            width -
+            padding * 2
+          );
+
+
+        const y =
+          height -
+          padding -
+          (
+            (
+              price -
+              min
+            ) /
+            range
+          ) *
+          (
+            height -
+            padding * 2
+          );
+
+
+        return `${x},${y}`;
+
+      }
+    );
+
+
+  const line =
+    "M" +
+    points.join(
+      " L"
+    );
+
+
+  const area =
+    line +
+    ` L${width - padding},${height - padding}` +
+    ` L${padding},${height - padding} Z`;
+
+
+  $("chartLine")
+    .setAttribute(
+      "d",
+      line
+    );
+
+
+  $("chartArea")
+    .setAttribute(
+      "d",
+      area
+    );
+
+}
+
+
+/* =========================================================
+   REAL SYMBOLS
+========================================================= */
+
+PELI_DERIV.on(
+  "symbols",
+  symbols => {
+
+    if (
+      !Array.isArray(symbols)
+    ) {
+
+      return;
+
+    }
+
+
+    const wanted = [
+
+      "R_25",
+      "R_50",
+      "R_75",
+      "R_100"
+
+    ];
+
+
+    const available =
+      symbols.filter(
+        item => {
+
+          const symbol =
+            item.underlying_symbol ||
+            item.symbol;
+
+          return wanted.includes(
+            symbol
+          );
+
+        }
+      );
+
+
+    const container =
+      $("watchlist");
+
+
+    if (
+      !available.length
+    ) {
+
+      container.innerHTML =
+        '<div class="empty">No live markets returned.</div>';
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      available.map(
+        item => {
+
+          const symbol =
+            item.underlying_symbol ||
+            item.symbol;
+
+
+          const name =
+            item.display_name ||
+            symbol;
+
+
+          return `
+
+<div
+  class="market-row"
+  data-symbol="${escapeHTML(symbol)}"
+>
+
+  <div>
+
+    <span class="market-name">
+      ${escapeHTML(name)}
+    </span>
+
+    <span class="market-type">
+      Deriv Synthetic
+    </span>
+
+  </div>
+
+  <div
+    class="market-price"
+    id="price-${escapeHTML(symbol)}"
+  >
+    —
+  </div>
+
+</div>
+
+`;
+
+        }
+      ).join("");
+
+
+    /*
+     * Start an independent live stream for every
+     * watchlist symbol.
+     */
+
+    startWatchlistStreams(
+      available
+    );
+
+  }
+);
+
+
+/* =========================================================
+   WATCHLIST LIVE STREAMS
+========================================================= */
+
+const watchSockets = {};
+
+
+function startWatchlistStreams(
+  symbols
+) {
+
+  symbols.forEach(
+    item => {
+
+      const symbol =
+        item.underlying_symbol ||
+        item.symbol;
+
+
+      if (
+        !symbol ||
+        watchSockets[symbol]
+      ) {
+
+        return;
+
+      }
+
+
+      try {
+
+        const ws =
+          new WebSocket(
+            "wss://api.derivws.com/trading/v1/options/ws/public"
+          );
+
+
+        watchSockets[symbol] =
+          ws;
+
+
+        ws.onopen =
+          () => {
+
+            ws.send(
+              JSON.stringify({
+
+                ticks:
+                  symbol,
+
+                subscribe:
+                  1
+
+              })
+            );
+
+          };
+
+
+        ws.onmessage =
+          event => {
+
+            try {
+
+              const message =
+                JSON.parse(
+                  event.data
+                );
+
+
+              if (
+                message.msg_type ===
+                "tick"
+              ) {
+
+                const quote =
+                  Number(
+                    message.tick?.quote
+                  );
+
+
+                if (
+                  Number.isFinite(
+                    quote
+                  )
+                ) {
+
+                  updateCurrentWatchlistPrice(
+                    symbol,
+                    quote
+                  );
+
+                }
+
+              }
+
+            } catch {}
+
+          };
+
+
+        ws.onclose =
+          () => {
+
+            delete watchSockets[
+              symbol
+            ];
+
+          };
+
+
+        ws.onerror =
+          () => {
+
+            try {
+              ws.close();
+            } catch {}
+
+          };
+
+      } catch {}
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   AUTHENTICATED
+========================================================= */
+
+PELI_DERIV.on(
+  "authenticated",
+  account => {
+
+    setConnection(
+      true,
+      "REAL DERIV ACCOUNT CONNECTED"
+    );
+
+
+    updateAccount(
+      account
+    );
+
+
+    loadAccountData();
+
+  }
+);
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+PELI_DERIV.on(
+  "status",
+  status => {
+
+    if (
+      status?.authenticated
+    ) {
+
+      setConnection(
+        true,
+        "REAL DERIV ACCOUNT CONNECTED"
+      );
+
+      return;
+
+    }
+
+
+    if (
+      status?.connecting
+    ) {
+
+      setConnection(
+        false,
+        "CONNECTING TO REAL DERIV..."
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   AUTH ERRORS
+========================================================= */
+
+PELI_DERIV.on(
+  "error",
+  error => {
+
+    console.error(
+      "PELI DERIV:",
+      error
+    );
+
+
+    const message =
+      error?.message ||
+      error?.code ||
+      (
+        typeof error === "string"
+          ? error
+          : ""
+      );
+
+
+    if (
+      message
+    ) {
+
+      showError(
+        message
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   LOAD REAL ACCOUNT DATA
+========================================================= */
+
+async function loadAccountData() {
+
+  try {
+
+    await PELI_DERIV.getPortfolio();
+
+  } catch (error) {
+
+    console.error(
+      "Portfolio:",
+      error
+    );
+
+  }
+
+
+  try {
+
+    await PELI_DERIV.getProfitTable({
+
+      limit: 100
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Profit table:",
+      error
+    );
+
+  }
+
+
+  try {
+
+    await PELI_DERIV.getStatement({
+
+      limit: 100,
+
+      description: 1
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Statement:",
+      error
+    );
+
+  }
+
+
+  try {
+
+    await PELI_DERIV.subscribeBalance();
+
+  } catch (error) {
+
+    console.error(
+      "Balance:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SUPABASE AUTH
+========================================================= */
+
+(async function initDashboard() {
 
   try {
 
@@ -845,7 +2129,9 @@
       data,
       error
     } =
-      await supabaseClient.auth.getSession();
+      await supabaseClient
+        .auth
+        .getSession();
 
 
     if (error) {
@@ -856,8 +2142,6 @@
     const session =
       data.session;
 
-
-    /* No session = no dashboard */
 
     if (!session) {
 
@@ -870,35 +2154,14 @@
     }
 
 
-    /* Current user */
-
     window.PELI_USER =
       session.user;
 
 
-    console.log(
-      "Logged in as:",
-      session.user.email
-    );
+    $("userEmail").textContent =
+      session.user.email ||
+      "Authenticated user";
 
-
-    /* User email */
-
-    const userEmail =
-      document.getElementById(
-        "userEmail"
-      );
-
-
-    if (userEmail) {
-
-      userEmail.textContent =
-        session.user.email;
-
-    }
-
-
-    /* User name */
 
     const fullName =
       session.user
@@ -906,16 +2169,7 @@
         ?.full_name;
 
 
-    const welcomeTitle =
-      document.getElementById(
-        "welcomeTitle"
-      );
-
-
-    if (
-      welcomeTitle &&
-      fullName
-    ) {
+    if (fullName) {
 
       const firstName =
         fullName
@@ -923,7 +2177,7 @@
           .split(/\s+/)[0];
 
 
-      welcomeTitle.textContent =
+      $("welcomeTitle").textContent =
         "Good day, " +
         firstName +
         ".";
@@ -931,10 +2185,20 @@
     }
 
 
+    /*
+     * deriv-engine.js already starts
+     * the public live market stream.
+     *
+     * Now connect the user's
+     * REAL Deriv account.
+     */
+
+    await connectRealAccount();
+
   } catch (error) {
 
     console.error(
-      "Authentication error:",
+      "Dashboard initialization:",
       error
     );
 
@@ -948,19 +2212,129 @@
 })();
 
 
+/* =========================================================
+   CONNECT REAL DERIV
+========================================================= */
 
-/* =========================
+async function connectRealAccount() {
+
+  try {
+
+    setConnection(
+      false,
+      "CONNECTING TO REAL DERIV..."
+    );
+
+
+    const account =
+      await PELI_DERIV
+        .connectAuthenticated();
+
+
+    updateAccount(
+      account
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "REAL DERIV CONNECTION:",
+      error
+    );
+
+
+    setConnection(
+      false,
+      "REAL DERIV NOT CONNECTED"
+    );
+
+
+    showError(
+      error.message ||
+      "Unable to connect to the REAL Deriv account."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(
+  value
+) {
+
+  return String(
+    value
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================================================
    LOGOUT
-========================= */
+========================================================= */
 
 async function peliLogout() {
 
   try {
 
+    if (
+      window.PELI_DERIV
+    ) {
+
+      PELI_DERIV
+        .disconnectAuthenticated();
+
+      PELI_DERIV
+        .disconnect();
+
+    }
+
+
+    Object.values(
+      watchSockets
+    ).forEach(
+      ws => {
+
+        try {
+          ws.close();
+        } catch {}
+
+      }
+    );
+
+
     const {
       error
     } =
-      await supabaseClient.auth.signOut();
+      await supabaseClient
+        .auth
+        .signOut();
 
 
     if (error) {
@@ -972,11 +2346,10 @@ async function peliLogout() {
       "login.html"
     );
 
-
   } catch (error) {
 
     console.error(
-      "Logout error:",
+      "Logout:",
       error
     );
 
@@ -991,7 +2364,5 @@ async function peliLogout() {
 
 </script>
 
-
 </body>
-
 </html>
