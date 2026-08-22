@@ -1,44 +1,29 @@
 // api/deriv/session.js
 // PELItradershub
-// REAL DERIV OPTIONS SESSION
+// Deriv Options authenticated session
+// Supports REAL and DEMO accounts.
 //
-// Replace the entire contents of:
-// api/deriv/session.js
+// The browser never receives the OAuth access token.
+// The token remains in the secure cookie created by callback.js.
 
 const APP_ID = "34aZNrTmY1AZc7hjuxyLv";
-
-const DERIV_API =
-  "https://api.derivws.com";
+const API_BASE = "https://api.derivws.com";
 
 export default async function handler(req, res) {
 
-  // --------------------------------------------------
-  // ONLY GET
-  // --------------------------------------------------
-
   if (req.method !== "GET") {
-
     return res.status(405).json({
       connected: false,
       authenticated: false,
-      real_account_available: false,
-      account: null,
-      ws_url: null,
       error: "Method not allowed"
     });
-
   }
 
   try {
 
-    // ------------------------------------------------
-    // READ DERIV ACCESS TOKEN
-    // ------------------------------------------------
-
-    const cookies =
-      parseCookies(
-        req.headers.cookie || ""
-      );
+    const cookies = parseCookies(
+      req.headers.cookie || ""
+    );
 
     const accessToken =
       cookies.deriv_access_token;
@@ -46,31 +31,44 @@ export default async function handler(req, res) {
     if (!accessToken) {
 
       return res.status(401).json({
-
         connected: false,
-
         authenticated: false,
-
         real_account_available: false,
-
+        demo_account_available: false,
         account: null,
-
         ws_url: null,
-
         error:
-          "No Deriv authorization session was found. Please connect your Deriv account first."
-
+          "No Deriv authorization session was found."
       });
 
     }
 
-    // ------------------------------------------------
-    // GET ALL OPTIONS ACCOUNTS
-    // ------------------------------------------------
+    /*
+     * ?mode=real
+     * ?mode=demo
+     */
+
+    const requestedMode =
+      String(
+        req.query?.mode || "real"
+      )
+        .toLowerCase()
+        .trim();
+
+    const mode =
+      requestedMode === "demo"
+        ? "demo"
+        : "real";
+
+    /*
+     * ------------------------------------------
+     * GET OPTIONS ACCOUNTS
+     * ------------------------------------------
+     */
 
     const accountsResponse =
       await fetch(
-        `${DERIV_API}/trading/v1/options/accounts`,
+        `${API_BASE}/trading/v1/options/accounts`,
         {
           method: "GET",
 
@@ -91,14 +89,12 @@ export default async function handler(req, res) {
       );
 
     const accountsBody =
-      await readJson(
-        accountsResponse
-      );
+      await safeJson(accountsResponse);
 
     if (!accountsResponse.ok) {
 
       console.error(
-        "DERIV OPTIONS ACCOUNTS ERROR:",
+        "DERIV ACCOUNTS ERROR:",
         accountsBody
       );
 
@@ -110,184 +106,188 @@ export default async function handler(req, res) {
 
         authenticated: false,
 
-        real_account_available: false,
+        real_account_available:
+          false,
+
+        demo_account_available:
+          false,
 
         account: null,
 
         ws_url: null,
 
         error:
-          derivError(
-            accountsBody
+          extractError(
+            accountsBody,
+            "Unable to retrieve Deriv accounts."
           )
 
       });
 
     }
 
-    // ------------------------------------------------
-    // NORMALIZE DERIV RESPONSE
-    //
-    // Normally:
-    //
-    // {
-    //   data: [
-    //     {...},
-    //     {...}
-    //   ]
-    // }
-    //
-    // ------------------------------------------------
+    /*
+     * ------------------------------------------
+     * NORMALIZE ACCOUNTS
+     * ------------------------------------------
+     */
 
-    let accounts =
-      accountsBody?.data;
+    const rawAccounts =
+      accountsBody?.data?.accounts ??
+      accountsBody?.data ??
+      accountsBody?.accounts ??
+      [];
 
-    if (!Array.isArray(accounts)) {
+    let accounts = [];
 
-      if (
-        accounts &&
-        typeof accounts === "object"
-      ) {
+    if (Array.isArray(rawAccounts)) {
 
-        accounts = [
-          accounts
-        ];
+      accounts =
+        rawAccounts;
 
-      } else {
+    } else if (
+      rawAccounts &&
+      typeof rawAccounts === "object"
+    ) {
 
-        accounts = [];
-
-      }
+      accounts =
+        Object.values(
+          rawAccounts
+        );
 
     }
 
-    // ------------------------------------------------
-    // LOG ONLY SAFE ACCOUNT INFORMATION
-    // ------------------------------------------------
+    accounts =
+      accounts.filter(
+        account =>
+          account &&
+          typeof account === "object"
+      );
 
-    console.log(
-      "PELI Deriv Options accounts:",
-      accounts.map(
-        account => ({
-          account_id:
-            account?.account_id ||
-            account?.id ||
-            null,
+    /*
+     * ------------------------------------------
+     * IDENTIFY REAL / DEMO
+     * ------------------------------------------
+     */
 
-          account_type:
-            account?.account_type ||
-            account?.type ||
-            null,
+    const classifyAccount =
+      account => {
 
-          group:
-            account?.group ||
-            null,
+        const type =
+          String(
+            account?.account_type ??
+            account?.type ??
+            ""
+          )
+            .toLowerCase()
+            .trim();
 
-          status:
-            account?.status ||
-            null,
+        const loginid =
+          String(
+            account?.loginid ??
+            account?.login_id ??
+            ""
+          )
+            .toLowerCase()
+            .trim();
 
-          currency:
-            account?.currency ||
-            null
-        })
-      )
-    );
+        const isVirtual =
+          account?.is_virtual === true;
 
-    // ------------------------------------------------
-    // FIND REAL ACCOUNT
-    //
-    // IMPORTANT:
-    // We do NOT turn a demo account into a real account.
-    //
-    // Deriv's account response tells us the account type.
-    // ------------------------------------------------
+        if (
+          type === "demo" ||
+          type === "virtual" ||
+          isVirtual ||
+          loginid.startsWith("vrtc")
+        ) {
+
+          return "demo";
+
+        }
+
+        if (
+          type === "real" ||
+          loginid.startsWith("cr") ||
+          loginid.startsWith("ml")
+        ) {
+
+          return "real";
+
+        }
+
+        return null;
+
+      };
 
     const realAccount =
       accounts.find(
-        account => {
-
-          const accountType =
-            String(
-              account?.account_type ??
-              account?.type ??
-              ""
-            )
-              .trim()
-              .toLowerCase();
-
-          return (
-            accountType === "real"
-          );
-
-        }
+        account =>
+          classifyAccount(account) ===
+          "real"
       );
 
-    // ------------------------------------------------
-    // NO REAL OPTIONS ACCOUNT
-    // ------------------------------------------------
+    const demoAccount =
+      accounts.find(
+        account =>
+          classifyAccount(account) ===
+          "demo"
+      );
 
-    if (!realAccount) {
+    /*
+     * ------------------------------------------
+     * SELECT REQUESTED ACCOUNT
+     * ------------------------------------------
+     */
 
-  return res.status(200).json({
+    const selectedAccount =
+      mode === "demo"
+        ? demoAccount
+        : realAccount;
 
-    connected: true,
+    if (!selectedAccount) {
 
-    authenticated: false,
+      return res.status(200).json({
 
-    real_account_available: false,
+        connected: true,
 
-    account: null,
+        authenticated: false,
 
-    ws_url: null,
+        requested_mode:
+          mode,
 
-    error:
-      "Deriv returned Options accounts, but no REAL account was found.",
+        real_account_available:
+          !!realAccount,
 
-    debug_accounts:
-      accounts.map(account => ({
-        account_id:
-          account?.account_id ??
-          account?.id ??
-          null,
+        demo_account_available:
+          !!demoAccount,
 
-        account_type:
-          account?.account_type ??
-          account?.type ??
-          null,
+        account: null,
 
-        status:
-          account?.status ??
-          null,
+        ws_url: null,
 
-        currency:
-          account?.currency ??
-          null,
+        error:
+          mode === "demo"
+            ? "No DEMO Options account was returned by Deriv."
+            : "No REAL Options account was returned by Deriv."
 
-        group:
-          account?.group ??
-          null
-      }))
+      });
 
-  });
+    }
 
-}
-
-    // ------------------------------------------------
-    // ACCOUNT ID
-    // ------------------------------------------------
+    /*
+     * ------------------------------------------
+     * ACCOUNT ID
+     * ------------------------------------------
+     */
 
     const accountId =
-      realAccount.account_id ||
-      realAccount.id ||
+      selectedAccount.account_id ??
+      selectedAccount.id ??
+      selectedAccount.loginid ??
+      selectedAccount.login_id ??
       null;
 
     if (!accountId) {
-
-      console.error(
-        "REAL ACCOUNT WITHOUT ACCOUNT ID:",
-        realAccount
-      );
 
       return res.status(502).json({
 
@@ -295,48 +295,43 @@ export default async function handler(req, res) {
 
         authenticated: false,
 
-        real_account_available: true,
+        requested_mode:
+          mode,
+
+        real_account_available:
+          !!realAccount,
+
+        demo_account_available:
+          !!demoAccount,
 
         account: null,
 
         ws_url: null,
 
         error:
-          "Deriv returned a REAL Options account, but no account ID was provided."
+          "Deriv returned an account without an account ID."
 
       });
 
     }
 
-    // ------------------------------------------------
-    // NORMALIZED REAL ACCOUNT
-    // ------------------------------------------------
-
-    const account = {
-
-      ...realAccount,
-
-      account_id:
-        String(accountId),
-
-      account_type:
-        "real"
-
-    };
-
-    // ------------------------------------------------
-    // REQUEST ONE-TIME REAL WEBSOCKET URL
-    // ------------------------------------------------
-
-    const otpUrl =
-      `${DERIV_API}/trading/v1/options/accounts/` +
-      `${encodeURIComponent(accountId)}/otp`;
+    /*
+     * ------------------------------------------
+     * REQUEST ONE-TIME WS OTP
+     * ------------------------------------------
+     */
 
     const otpResponse =
       await fetch(
-        otpUrl,
+
+        `${API_BASE}/trading/v1/options/accounts/${encodeURIComponent(
+          accountId
+        )}/otp`,
+
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
 
@@ -348,112 +343,106 @@ export default async function handler(req, res) {
 
             Accept:
               "application/json"
+
           },
 
           cache:
             "no-store"
+
         }
+
       );
 
     const otpBody =
-      await readJson(
+      await safeJson(
         otpResponse
       );
 
-    if (!otpResponse.ok) {
+    if (
+      !otpResponse.ok ||
+      !otpBody?.data?.url
+    ) {
 
       console.error(
-        "DERIV REAL OTP ERROR:",
+        "DERIV OTP ERROR:",
         otpBody
       );
 
-      return res.status(
-        otpResponse.status
-      ).json({
+      return res.status(502).json({
 
         connected: true,
 
         authenticated: false,
 
-        real_account_available: true,
+        requested_mode:
+          mode,
 
-        account,
+        real_account_available:
+          !!realAccount,
+
+        demo_account_available:
+          !!demoAccount,
+
+        account: {
+
+          ...selectedAccount,
+
+          account_id:
+            String(accountId),
+
+          account_type:
+            mode
+
+        },
 
         ws_url: null,
 
         error:
-          derivError(
-            otpBody
+          extractError(
+            otpBody,
+            "Deriv could not create the trading WebSocket."
           )
 
       });
 
     }
 
-    // ------------------------------------------------
-    // GET OTP WEBSOCKET URL
-    // ------------------------------------------------
-
     const wsUrl =
-      otpBody?.data?.url ||
-      otpBody?.url ||
-      null;
-
-    if (!wsUrl) {
-
-      console.error(
-        "DERIV OTP RESPONSE HAS NO URL:",
-        otpBody
+      String(
+        otpBody.data.url
       );
 
-      return res.status(502).json({
+    /*
+     * ------------------------------------------
+     * SECURITY CHECK
+     * ------------------------------------------
+     */
 
-        connected: true,
-
-        authenticated: false,
-
-        real_account_available: true,
-
-        account,
-
-        ws_url: null,
-
-        error:
-          "Deriv created the account session but did not return a WebSocket URL."
-
-      });
-
-    }
-
-    // ------------------------------------------------
-    // VALIDATE URL
-    // ------------------------------------------------
-
-    let parsedUrl;
+    let parsed;
 
     try {
 
-      parsedUrl =
-        new URL(
-          String(wsUrl)
-        );
+      parsed =
+        new URL(wsUrl);
 
-    } catch (error) {
-
-      console.error(
-        "INVALID DERIV WS URL:",
-        wsUrl
-      );
+    } catch {
 
       return res.status(502).json({
 
-        connected: true,
+        connected: false,
 
         authenticated: false,
 
-        real_account_available: true,
+        requested_mode:
+          mode,
 
-        account,
+        real_account_available:
+          false,
+
+        demo_account_available:
+          false,
+
+        account: null,
 
         ws_url: null,
 
@@ -464,39 +453,31 @@ export default async function handler(req, res) {
 
     }
 
-    // ------------------------------------------------
-    // HARD REAL-ACCOUNT SECURITY CHECK
-    // ------------------------------------------------
-
-    const pathname =
-      parsedUrl.pathname;
-
-    const realPath =
-      "/trading/v1/options/ws/real";
-
-    const demoPath =
-      "/trading/v1/options/ws/demo";
+    const path =
+      parsed.pathname;
 
     const isReal =
-      pathname === realPath ||
-      pathname.endsWith(realPath);
+      path.includes(
+        "/trading/v1/options/ws/real"
+      );
 
     const isDemo =
-      pathname === demoPath ||
-      pathname.endsWith(demoPath);
+      path.includes(
+        "/trading/v1/options/ws/demo"
+      );
 
-    // NEVER allow demo.
+    /*
+     * Never allow account-mode mismatch.
+     */
 
     if (
-      isDemo ||
+      mode === "real" &&
       !isReal
     ) {
 
       console.error(
-        "PELI SECURITY BLOCK:",
-        {
-          pathname
-        }
+        "SECURITY BLOCK: requested REAL but Deriv returned:",
+        path
       );
 
       return res.status(502).json({
@@ -505,34 +486,34 @@ export default async function handler(req, res) {
 
         authenticated: false,
 
-        real_account_available: true,
+        requested_mode:
+          mode,
 
-        account,
+        real_account_available:
+          false,
+
+        demo_account_available:
+          !!demoAccount,
+
+        account: null,
 
         ws_url: null,
 
         error:
-          "Security check failed. Deriv did not return a REAL trading WebSocket. Trading has been blocked."
+          "Security check failed. Deriv did not return a REAL trading session."
 
       });
 
     }
 
-    // ------------------------------------------------
-    // MAKE SURE OTP EXISTS
-    //
-    // The URL should contain the short-lived OTP.
-    // ------------------------------------------------
-
-    const otp =
-      parsedUrl.searchParams.get(
-        "otp"
-      );
-
-    if (!otp) {
+    if (
+      mode === "demo" &&
+      !isDemo
+    ) {
 
       console.error(
-        "DERIV REAL WS URL HAS NO OTP"
+        "SECURITY BLOCK: requested DEMO but Deriv returned:",
+        path
       );
 
       return res.status(502).json({
@@ -541,51 +522,70 @@ export default async function handler(req, res) {
 
         authenticated: false,
 
-        real_account_available: true,
+        requested_mode:
+          mode,
 
-        account,
+        real_account_available:
+          !!realAccount,
+
+        demo_account_available:
+          false,
+
+        account: null,
 
         ws_url: null,
 
         error:
-          "Deriv returned a REAL WebSocket URL without an authentication OTP."
+          "Security check failed. Deriv did not return a DEMO trading session."
 
       });
 
     }
 
-    // ------------------------------------------------
-    // SUCCESS
-    //
-    // IMPORTANT:
-    // Return the exact URL generated by Deriv.
-    //
-    // Do NOT rebuild it.
-    // Do NOT replace /real with /demo.
-    // ------------------------------------------------
+    /*
+     * ------------------------------------------
+     * SUCCESS
+     * ------------------------------------------
+     */
 
     return res.status(200).json({
 
-      connected: true,
+      connected:
+        true,
 
-      authenticated: true,
+      authenticated:
+        true,
 
-      real_account_available: true,
+      requested_mode:
+        mode,
 
-      account,
+      real_account_available:
+        !!realAccount,
 
-      account_type:
-        "real",
+      demo_account_available:
+        !!demoAccount,
+
+      account: {
+
+        ...selectedAccount,
+
+        account_id:
+          String(accountId),
+
+        account_type:
+          mode
+
+      },
 
       ws_url:
-        String(wsUrl)
+        wsUrl
 
     });
 
   } catch (error) {
 
     console.error(
-      "PELI REAL DERIV SESSION ERROR:",
+      "DERIV SESSION ERROR:",
       error
     );
 
@@ -595,7 +595,11 @@ export default async function handler(req, res) {
 
       authenticated: false,
 
-      real_account_available: false,
+      real_account_available:
+        false,
+
+      demo_account_available:
+        false,
 
       account: null,
 
@@ -603,7 +607,7 @@ export default async function handler(req, res) {
 
       error:
         error?.message ||
-        "Unable to establish the REAL Deriv trading session."
+        "Unable to establish Deriv trading session."
 
     });
 
@@ -612,17 +616,19 @@ export default async function handler(req, res) {
 }
 
 
-// ==================================================
-// SAFE JSON READER
-// ==================================================
+/*
+ * ------------------------------------------
+ * SAFE JSON
+ * ------------------------------------------
+ */
 
-async function readJson(response) {
+async function safeJson(response) {
 
   try {
 
     return await response.json();
 
-  } catch (error) {
+  } catch {
 
     return {};
 
@@ -631,65 +637,36 @@ async function readJson(response) {
 }
 
 
-// ==================================================
-// DERIV ERROR
-// ==================================================
+/*
+ * ------------------------------------------
+ * ERROR
+ * ------------------------------------------
+ */
 
-function derivError(body) {
-
-  if (
-    Array.isArray(
-      body?.errors
-    ) &&
-    body.errors.length > 0
-  ) {
-
-    return (
-      body.errors[0]?.message ||
-      "Deriv API request failed."
-    );
-
-  }
-
-  if (
-    body?.error?.message
-  ) {
-
-    return body.error.message;
-
-  }
-
-  if (
-    typeof body?.error ===
-    "string"
-  ) {
-
-    return body.error;
-
-  }
-
-  if (
-    body?.message
-  ) {
-
-    return body.message;
-
-  }
+function extractError(
+  body,
+  fallback
+) {
 
   return (
-    "Deriv API request failed."
+    body?.errors?.[0]?.message ||
+    body?.error?.message ||
+    body?.message ||
+    fallback
   );
 
 }
 
 
-// ==================================================
-// COOKIE PARSER
-// ==================================================
+/*
+ * ------------------------------------------
+ * COOKIE PARSER
+ * ------------------------------------------
+ */
 
 function parseCookies(header) {
 
-  const cookies =
+  const result =
     Object.create(null);
 
   if (
@@ -697,15 +674,12 @@ function parseCookies(header) {
     typeof header !== "string"
   ) {
 
-    return cookies;
+    return result;
 
   }
 
-  const parts =
-    header.split(";");
-
   for (
-    const part of parts
+    const part of header.split(";")
   ) {
 
     const index =
@@ -742,20 +716,20 @@ function parseCookies(header) {
 
     try {
 
-      cookies[name] =
+      result[name] =
         decodeURIComponent(
           value
         );
 
-    } catch (error) {
+    } catch {
 
-      cookies[name] =
+      result[name] =
         value;
 
     }
 
   }
 
-  return cookies;
+  return result;
 
 }
