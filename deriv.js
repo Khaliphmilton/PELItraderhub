@@ -1,10 +1,13 @@
 // PELItradershub — REAL DERIV ENGINE
-// Replace the entire existing Deriv engine file.
+// FULL REPLACEMENT
+// Live ticks + price movement corrected.
+// Does not modify the UI/appearance.
 
 (() => {
   "use strict";
 
   const SESSION_URL = "/api/deriv/session";
+
   const PUBLIC_WS =
     "wss://api.derivws.com/trading/v1/options/ws/public";
 
@@ -16,17 +19,21 @@
     connecting: false,
 
     account: null,
+
     symbol: "R_100",
 
     pipSize: 0.01,
 
     lastQuote: null,
     lastDigit: null,
+
     previousQuote: null,
     previousDigit: null,
+
     lastEpoch: null,
 
     digits: Array(10).fill(0),
+
     recentDigits: [],
     recentTicks: [],
 
@@ -42,7 +49,10 @@
     publicReconnectAttempts: 0,
 
     manualPublicClose: false,
-    manualAuthClose: false
+    manualAuthClose: false,
+
+    liveSubscribed: false,
+    historyLoaded: false
   };
 
 
@@ -53,6 +63,7 @@
   const listeners = {};
 
   function on(event, callback) {
+
     if (!listeners[event]) {
       listeners[event] = [];
     }
@@ -60,23 +71,34 @@
     listeners[event].push(callback);
 
     return () => {
+
       listeners[event] =
         (listeners[event] || [])
           .filter(fn => fn !== callback);
+
     };
   }
 
+
   function emit(event, data) {
+
     (listeners[event] || []).forEach(callback => {
+
       try {
+
         callback(data);
+
       } catch (error) {
+
         console.error(
           `PELI_DERIV event error: ${event}`,
           error
         );
+
       }
+
     });
+
   }
 
 
@@ -85,8 +107,11 @@
   // ============================================================
 
   function nextReqId() {
+
     state.reqId += 1;
+
     return state.reqId;
+
   }
 
 
@@ -95,40 +120,54 @@
   // ============================================================
 
   function getDigit(quote) {
+
     const number = Number(quote);
 
     if (!Number.isFinite(number)) {
       return null;
     }
 
-    const pip = Number(state.pipSize);
+    const pip =
+      Number(state.pipSize);
 
     if (
       Number.isFinite(pip) &&
       pip > 0 &&
       pip < 1
     ) {
-      const decimals = Math.max(
-        0,
-        Math.round(-Math.log10(pip))
-      );
+
+      const decimals =
+        Math.max(
+          0,
+          Math.round(
+            -Math.log10(pip)
+          )
+        );
 
       const multiplier =
-        Math.pow(10, decimals);
+        Math.pow(
+          10,
+          decimals
+        );
 
       return (
         Math.round(
-          Math.abs(number) * multiplier
+          Math.abs(number) *
+          multiplier
         ) % 10
       );
+
     }
 
     const match =
-      String(quote).match(/(\d)\s*$/);
+      String(quote).match(
+        /(\d)\s*$/
+      );
 
     return match
       ? Number(match[1])
       : null;
+
   }
 
 
@@ -137,23 +176,50 @@
   // ============================================================
 
   function resetStats() {
-    state.digits = Array(10).fill(0);
+
+    state.digits =
+      Array(10).fill(0);
+
     state.recentDigits = [];
+
     state.recentTicks = [];
 
     state.lastQuote = null;
     state.lastDigit = null;
+
     state.previousQuote = null;
     state.previousDigit = null;
+
     state.lastEpoch = null;
+
+    state.historyLoaded = false;
+    state.liveSubscribed = false;
+
   }
 
 
   // ============================================================
-  // TICK
+  // RESET ONLY STATISTICS
+  // IMPORTANT:
+  // Does NOT erase the current live quote.
+  // ============================================================
+
+  function resetDigitStatsOnly() {
+
+    state.digits =
+      Array(10).fill(0);
+
+    state.recentDigits = [];
+
+  }
+
+
+  // ============================================================
+  // TICK PROCESSOR
   // ============================================================
 
   function processTick(tick) {
+
     if (
       !tick ||
       tick.quote === undefined
@@ -161,13 +227,15 @@
       return;
     }
 
-    const quote = Number(tick.quote);
+    const quote =
+      Number(tick.quote);
 
     if (!Number.isFinite(quote)) {
       return;
     }
 
-    const digit = getDigit(quote);
+    const digit =
+      getDigit(quote);
 
     state.previousQuote =
       state.lastQuote;
@@ -175,39 +243,73 @@
     state.previousDigit =
       state.lastDigit;
 
-    state.lastQuote = quote;
-    state.lastDigit = digit;
+    state.lastQuote =
+      quote;
+
+    state.lastDigit =
+      digit;
 
     state.lastEpoch =
       tick.epoch || null;
 
+
     if (digit !== null) {
+
       state.digits[digit]++;
-      state.recentDigits.push(digit);
+
+      state.recentDigits.push(
+        digit
+      );
+
     }
+
 
     state.recentTicks.push({
+
       quote,
+
       digit,
-      epoch: tick.epoch || null
+
+      epoch:
+        tick.epoch || null
+
     });
 
-    if (state.recentDigits.length > 500) {
+
+    if (
+      state.recentDigits.length >
+      500
+    ) {
+
       state.recentDigits =
-        state.recentDigits.slice(-500);
+        state.recentDigits.slice(
+          -500
+        );
+
     }
 
-    if (state.recentTicks.length > 500) {
+
+    if (
+      state.recentTicks.length >
+      500
+    ) {
+
       state.recentTicks =
-        state.recentTicks.slice(-500);
+        state.recentTicks.slice(
+          -500
+        );
+
     }
+
 
     emit("tick", {
+
       ...tick,
 
       quote,
 
-      lastDigit: digit,
+      lastDigit:
+        digit,
 
       previousQuote:
         state.previousQuote,
@@ -222,8 +324,13 @@
         state.recentDigits.length,
 
       pipSize:
-        state.pipSize
+        state.pipSize,
+
+      live:
+        true
+
     });
+
   }
 
 
@@ -231,152 +338,355 @@
   // PUBLIC SOCKET
   // ============================================================
 
-  function connect(symbol = state.symbol) {
+  function connect(
+    symbol = state.symbol
+  ) {
 
-    state.symbol = symbol;
-    state.manualPublicClose = false;
+    state.symbol =
+      symbol;
+
+    state.manualPublicClose =
+      false;
+
+    state.historyLoaded =
+      false;
+
+    state.liveSubscribed =
+      false;
+
 
     if (state.publicWs) {
+
       try {
         state.publicWs.close();
       } catch {}
+
     }
+
 
     resetStats();
 
+
     emit("status", {
-      publicConnecting: true,
-      publicConnected: false,
+
+      publicConnecting:
+        true,
+
+      publicConnected:
+        false,
+
       authenticated:
         state.authenticated,
-      symbol: state.symbol
+
+      symbol:
+        state.symbol
+
     });
 
-    const ws = new WebSocket(PUBLIC_WS);
 
-    state.publicWs = ws;
+    let ws;
+
+    try {
+
+      ws =
+        new WebSocket(
+          PUBLIC_WS
+        );
+
+    } catch (error) {
+
+      emit("error", {
+
+        message:
+          error.message ||
+          "Unable to open Deriv market connection."
+
+      });
+
+      reconnectPublic();
+
+      return null;
+
+    }
+
+
+    state.publicWs =
+      ws;
+
+
+    // ==========================================================
+    // SOCKET OPEN
+    // ==========================================================
 
     ws.onopen = () => {
 
-      state.publicReconnectAttempts = 0;
+      state.publicReconnectAttempts =
+        0;
+
 
       emit("status", {
-        publicConnecting: false,
-        publicConnected: true,
+
+        publicConnecting:
+          false,
+
+        publicConnected:
+          true,
+
         authenticated:
           state.authenticated,
-        symbol: state.symbol
+
+        symbol:
+          state.symbol
+
       });
+
 
       try {
 
-        sendPublic({
-          active_symbols: "brief"
-        });
+        // ------------------------------------------------------
+        // GET MARKET INFORMATION
+        // ------------------------------------------------------
 
         sendPublic({
+
+          active_symbols:
+            "brief"
+
+        });
+
+
+        // ------------------------------------------------------
+        // REQUEST RECENT REAL MARKET HISTORY
+        // ------------------------------------------------------
+
+        sendPublic({
+
           ticks_history:
             state.symbol,
 
-          end: "latest",
+          end:
+            "latest",
 
-          style: "ticks",
+          style:
+            "ticks",
 
-          count: 200,
+          count:
+            200,
 
-          adjust_start_time: 1
+          adjust_start_time:
+            1
+
         });
 
+
+        // ------------------------------------------------------
+        // IMPORTANT:
+        // SUBSCRIBE TO LIVE TICKS IMMEDIATELY.
+        //
+        // Do NOT wait for history.
+        // This prevents the terminal from appearing frozen
+        // while the history response is being returned.
+        // ------------------------------------------------------
+
         sendPublic({
+
           ticks:
             state.symbol,
 
-          subscribe: 1
+          subscribe:
+            1
+
         });
+
+
+        state.liveSubscribed =
+          true;
+
+
+        emit(
+          "liveSubscribed",
+          {
+            symbol:
+              state.symbol
+          }
+        );
+
 
       } catch (error) {
 
         emit("error", {
-          message: error.message
+
+          message:
+            error.message
+
         });
-      }
-    };
 
-    ws.onmessage = event => {
-
-      let message;
-
-      try {
-        message =
-          JSON.parse(event.data);
-      } catch {
-        return;
       }
 
-      handlePublicMessage(message);
     };
+
+
+    // ==========================================================
+    // SOCKET MESSAGE
+    // ==========================================================
+
+    ws.onmessage =
+      event => {
+
+        let message;
+
+        try {
+
+          message =
+            JSON.parse(
+              event.data
+            );
+
+        } catch {
+
+          return;
+
+        }
+
+
+        handlePublicMessage(
+          message
+        );
+
+      };
+
+
+    // ==========================================================
+    // SOCKET ERROR
+    // ==========================================================
 
     ws.onerror = () => {
 
       emit("error", {
+
         message:
           "Live Deriv market connection error."
+
       });
+
     };
+
+
+    // ==========================================================
+    // SOCKET CLOSED
+    // ==========================================================
 
     ws.onclose = () => {
 
+      state.liveSubscribed =
+        false;
+
+
       emit("status", {
-        publicConnecting: false,
-        publicConnected: false,
+
+        publicConnecting:
+          false,
+
+        publicConnected:
+          false,
+
         authenticated:
           state.authenticated
+
       });
 
-      if (!state.manualPublicClose) {
+
+      if (
+        !state.manualPublicClose
+      ) {
+
         reconnectPublic();
+
       }
+
     };
 
+
     return ws;
+
   }
 
 
-  function sendPublic(payload) {
+  // ============================================================
+  // PUBLIC SEND
+  // ============================================================
+
+  function sendPublic(
+    payload
+  ) {
 
     if (
       !state.publicWs ||
       state.publicWs.readyState !==
         WebSocket.OPEN
     ) {
+
       throw new Error(
         "Deriv market is not connected."
       );
+
     }
 
+
     const message = {
+
       ...payload,
-      req_id: nextReqId()
+
+      req_id:
+        nextReqId()
+
     };
 
+
     state.publicWs.send(
-      JSON.stringify(message)
+      JSON.stringify(
+        message
+      )
     );
 
+
     return message.req_id;
+
   }
 
 
-  function handlePublicMessage(message) {
+  // ============================================================
+  // PUBLIC MESSAGE HANDLER
+  // ============================================================
+
+  function handlePublicMessage(
+    message
+  ) {
 
     if (!message) {
       return;
     }
 
+
+    // ----------------------------------------------------------
+    // ERROR
+    // ----------------------------------------------------------
+
     if (message.error) {
-      emit("error", message.error);
+
+      emit(
+        "error",
+        message.error
+      );
+
       return;
+
     }
+
+
+    // ----------------------------------------------------------
+    // ACTIVE SYMBOLS
+    // ----------------------------------------------------------
 
     if (
       message.msg_type ===
@@ -390,24 +700,44 @@
           ? message.active_symbols
           : [];
 
+
       const selected =
-        symbols.find(item =>
-          (
-            item.underlying_symbol ||
-            item.symbol
-          ) === state.symbol
+        symbols.find(
+          item =>
+            (
+              item.underlying_symbol ||
+              item.symbol
+            ) ===
+            state.symbol
         );
+
 
       if (
         selected &&
-        Number(selected.pip_size) > 0
+        Number(
+          selected.pip_size
+        ) > 0
       ) {
+
         state.pipSize =
-          Number(selected.pip_size);
+          Number(
+            selected.pip_size
+          );
+
       }
 
-      emit("symbols", symbols);
+
+      emit(
+        "symbols",
+        symbols
+      );
+
     }
+
+
+    // ----------------------------------------------------------
+    // HISTORY
+    // ----------------------------------------------------------
 
     if (
       message.msg_type ===
@@ -421,41 +751,203 @@
           ? message.history.prices
           : [];
 
-      resetStats();
 
-      prices.forEach(price => {
+      /*
+       * IMPORTANT:
+       *
+       * Do NOT call resetStats() here.
+       *
+       * Live ticks may already have arrived.
+       *
+       * Clearing state here was the reason the terminal could
+       * lose the current price / digit information.
+       */
 
-        const digit =
-          getDigit(price);
+      resetDigitStatsOnly();
 
-        if (digit !== null) {
-          state.digits[digit]++;
-          state.recentDigits.push(digit);
+
+      prices.forEach(
+        price => {
+
+          const number =
+            Number(price);
+
+          if (
+            !Number.isFinite(
+              number
+            )
+          ) {
+            return;
+          }
+
+
+          const digit =
+            getDigit(number);
+
+
+          if (
+            digit !== null
+          ) {
+
+            state.digits[digit]++;
+
+            state.recentDigits.push(
+              digit
+            );
+
+          }
+
         }
-      });
+      );
 
-      if (state.recentDigits.length > 500) {
+
+      if (
+        state.recentDigits.length >
+        500
+      ) {
+
         state.recentDigits =
-          state.recentDigits.slice(-500);
+          state.recentDigits.slice(
+            -500
+          );
+
       }
 
+
+      state.historyLoaded =
+        true;
+
+
+      // --------------------------------------------------------
+      // Display the latest historical price immediately IF
+      // a live tick has not already arrived.
+      // --------------------------------------------------------
+
+      if (
+        prices.length > 0 &&
+        state.lastQuote === null
+      ) {
+
+        const latestPrice =
+          Number(
+            prices[
+              prices.length - 1
+            ]
+          );
+
+
+        if (
+          Number.isFinite(
+            latestPrice
+          )
+        ) {
+
+          const latestDigit =
+            getDigit(
+              latestPrice
+            );
+
+
+          state.lastQuote =
+            latestPrice;
+
+          state.lastDigit =
+            latestDigit;
+
+
+          emit("tick", {
+
+            quote:
+              latestPrice,
+
+            lastDigit:
+              latestDigit,
+
+            previousQuote:
+              null,
+
+            previousDigit:
+              null,
+
+            epoch:
+              null,
+
+            counts:
+              [...state.digits],
+
+            sampleSize:
+              state.recentDigits.length,
+
+            pipSize:
+              state.pipSize,
+
+            historical:
+              true,
+
+            live:
+              false
+
+          });
+
+        }
+
+      }
+
+
       emit("history", {
+
         prices,
+
         counts:
           [...state.digits],
+
         sampleSize:
           state.recentDigits.length
+
       });
+
+
+      emit(
+        "ready",
+        {
+          symbol:
+            state.symbol,
+
+          price:
+            state.lastQuote,
+
+          digit:
+            state.lastDigit,
+
+          live:
+            state.liveSubscribed
+        }
+      );
+
     }
+
+
+    // ----------------------------------------------------------
+    // LIVE TICK
+    // ----------------------------------------------------------
 
     if (
       message.msg_type ===
       "tick"
     ) {
-      processTick(message.tick);
+
+      processTick(
+        message.tick
+      );
+
     }
+
   }
 
+
+  // ============================================================
+  // PUBLIC RECONNECT
+  // ============================================================
 
   function reconnectPublic() {
 
@@ -463,43 +955,75 @@
       state.publicReconnectTimer
     );
 
+
     const attempt =
       Math.min(
         state.publicReconnectAttempts,
         6
       );
 
+
     const delay =
       Math.min(
         10000,
+
         1000 *
-        Math.pow(2, attempt)
+        Math.pow(
+          2,
+          attempt
+        )
+
       );
+
 
     state.publicReconnectAttempts++;
 
+
     state.publicReconnectTimer =
-      setTimeout(() => {
-        connect(state.symbol);
-      }, delay);
+      setTimeout(
+        () => {
+
+          connect(
+            state.symbol
+          );
+
+        },
+        delay
+      );
+
   }
 
 
+  // ============================================================
+  // PUBLIC DISCONNECT
+  // ============================================================
+
   function disconnect() {
 
-    state.manualPublicClose = true;
+    state.manualPublicClose =
+      true;
+
 
     clearTimeout(
       state.publicReconnectTimer
     );
 
+
     if (state.publicWs) {
+
       try {
         state.publicWs.close();
       } catch {}
+
     }
 
-    state.publicWs = null;
+
+    state.publicWs =
+      null;
+
+    state.liveSubscribed =
+      false;
+
   }
 
 
@@ -513,65 +1037,97 @@
       await fetch(
         SESSION_URL,
         {
-          method: "GET",
-          credentials: "same-origin",
-          cache: "no-store",
+
+          method:
+            "GET",
+
+          credentials:
+            "same-origin",
+
+          cache:
+            "no-store",
+
           headers: {
+
             Accept:
               "application/json"
+
           }
+
         }
       );
 
+
     let data;
 
+
     try {
+
       data =
         await response.json();
+
     } catch {
+
       throw new Error(
         "Invalid response from Deriv session."
       );
+
     }
 
+
     if (!response.ok) {
+
       throw new Error(
         data?.error ||
         "Unable to connect to Deriv."
       );
+
     }
+
 
     if (
       data.account?.account_type !==
       "real"
     ) {
+
       throw new Error(
         "REAL Deriv account required."
       );
+
     }
 
+
     if (!data.ws_url) {
+
       throw new Error(
         "Deriv did not return a trading WebSocket."
       );
+
     }
 
+
     if (
-      !String(data.ws_url).includes(
+      !String(
+        data.ws_url
+      ).includes(
         "/trading/v1/options/ws/real"
       )
     ) {
+
       throw new Error(
         "Security check failed: non-real Deriv WebSocket."
       );
+
     }
 
+
     return data;
+
   }
 
 
   // ============================================================
-  // CONNECT REAL ACCOUNT
+  // REAL ACCOUNT CONNECTION
   // ============================================================
 
   async function connectAuthenticated() {
@@ -582,166 +1138,324 @@
       state.authWs.readyState ===
         WebSocket.OPEN
     ) {
+
       return state.account;
+
     }
 
-    state.connecting = true;
+
+    state.connecting =
+      true;
+
 
     emit("status", {
-      connecting: true,
-      authenticated: false
+
+      connecting:
+        true,
+
+      authenticated:
+        false
+
     });
 
-    const session =
-      await getSession();
+
+    let session;
+
+
+    try {
+
+      session =
+        await getSession();
+
+    } catch (error) {
+
+      state.connecting =
+        false;
+
+      emit("status", {
+
+        connecting:
+          false,
+
+        authenticated:
+          false
+
+      });
+
+      throw error;
+
+    }
+
 
     state.account =
       session.account;
 
-    state.manualAuthClose = false;
+
+    state.manualAuthClose =
+      false;
+
 
     if (state.authWs) {
+
       try {
         state.authWs.close();
       } catch {}
+
     }
+
 
     const ws =
       new WebSocket(
         session.ws_url
       );
 
-    state.authWs = ws;
+
+    state.authWs =
+      ws;
+
 
     await new Promise(
-      (resolve, reject) => {
+      (
+        resolve,
+        reject
+      ) => {
 
-        let finished = false;
+        let finished =
+          false;
+
 
         const timer =
-          setTimeout(() => {
+          setTimeout(
+            () => {
+
+              if (finished) {
+                return;
+              }
+
+              finished =
+                true;
+
+
+              try {
+                ws.close();
+              } catch {}
+
+
+              reject(
+                new Error(
+                  "Timed out connecting to REAL Deriv."
+                )
+              );
+
+            },
+            15000
+          );
+
+
+        ws.onopen =
+          () => {
 
             if (finished) {
               return;
             }
 
-            finished = true;
+
+            finished =
+              true;
+
+
+            clearTimeout(
+              timer
+            );
+
+
+            state.authenticated =
+              true;
+
+            state.connecting =
+              false;
+
+
+            emit(
+              "authenticated",
+              state.account
+            );
+
+
+            emit(
+              "status",
+              {
+
+                connecting:
+                  false,
+
+                connected:
+                  true,
+
+                authenticated:
+                  true,
+
+                account:
+                  state.account
+
+              }
+            );
+
 
             try {
-              ws.close();
-            } catch {}
+
+              authSend({
+
+                balance:
+                  1,
+
+                subscribe:
+                  1
+
+              });
+
+
+              authSend({
+
+                portfolio:
+                  1
+
+              });
+
+            } catch (error) {
+
+              emit(
+                "error",
+                {
+                  message:
+                    error.message
+                }
+              );
+
+            }
+
+
+            resolve();
+
+          };
+
+
+        ws.onerror =
+          () => {
+
+            if (finished) {
+              return;
+            }
+
+
+            finished =
+              true;
+
+
+            clearTimeout(
+              timer
+            );
+
+
+            state.connecting =
+              false;
+
 
             reject(
               new Error(
-                "Timed out connecting to REAL Deriv."
+                "Could not connect to REAL Deriv."
               )
             );
 
-          }, 15000);
+          };
 
-        ws.onopen = () => {
-
-          if (finished) {
-            return;
-          }
-
-          finished = true;
-
-          clearTimeout(timer);
-
-          state.authenticated = true;
-          state.connecting = false;
-
-          emit(
-            "authenticated",
-            state.account
-          );
-
-          emit("status", {
-            connecting: false,
-            connected: true,
-            authenticated: true,
-            account: state.account
-          });
-
-          /*
-           * REAL BALANCE
-           */
-          authSend({
-            balance: 1,
-            subscribe: 1
-          });
-
-          /*
-           * REAL OPEN POSITIONS
-           */
-          authSend({
-            portfolio: 1
-          });
-
-          resolve();
-        };
-
-        ws.onerror = () => {
-
-          if (finished) {
-            return;
-          }
-
-          finished = true;
-
-          clearTimeout(timer);
-
-          reject(
-            new Error(
-              "Could not connect to REAL Deriv."
-            )
-          );
-        };
       }
     );
 
-    ws.onmessage = event => {
 
-      let message;
+    ws.onmessage =
+      event => {
 
-      try {
-        message =
-          JSON.parse(event.data);
-      } catch {
-        return;
-      }
+        let message;
 
-      handleAuthMessage(message);
-    };
 
-    ws.onerror = () => {
+        try {
 
-      emit("error", {
-        message:
-          "REAL Deriv connection error."
-      });
-    };
+          message =
+            JSON.parse(
+              event.data
+            );
 
-    ws.onclose = () => {
+        } catch {
 
-      state.authenticated = false;
-      state.authWs = null;
+          return;
 
-      emit("status", {
-        connected: false,
-        authenticated: false
-      });
+        }
 
-      if (!state.manualAuthClose) {
-        emit(
-          "authDisconnected",
-          true
+
+        handleAuthMessage(
+          message
         );
-      }
-    };
+
+      };
+
+
+    ws.onerror =
+      () => {
+
+        emit(
+          "error",
+          {
+
+            message:
+              "REAL Deriv connection error."
+
+          }
+        );
+
+      };
+
+
+    ws.onclose =
+      () => {
+
+        state.authenticated =
+          false;
+
+        state.authWs =
+          null;
+
+
+        emit(
+          "status",
+          {
+
+            connected:
+              false,
+
+            authenticated:
+              false
+
+          }
+        );
+
+
+        if (
+          !state.manualAuthClose
+        ) {
+
+          emit(
+            "authDisconnected",
+            true
+          );
+
+        }
+
+      };
+
 
     return state.account;
+
   }
 
 
@@ -749,13 +1463,20 @@
   // AUTH MESSAGE
   // ============================================================
 
-  function handleAuthMessage(message) {
+  function handleAuthMessage(
+    message
+  ) {
 
     if (!message) {
       return;
     }
 
-    emit("message", message);
+
+    emit(
+      "message",
+      message
+    );
+
 
     if (message.error) {
 
@@ -764,6 +1485,7 @@
         message.error
       );
 
+
       if (message.req_id) {
 
         const pending =
@@ -771,23 +1493,30 @@
             message.req_id
           );
 
+
         if (pending) {
 
           pending.reject(
             message.error
           );
 
+
           state.pending.delete(
             message.req_id
           );
+
         }
+
       }
 
+
       return;
+
     }
 
 
     // BALANCE
+
     if (
       message.msg_type ===
       "balance"
@@ -797,10 +1526,12 @@
         "balance",
         message.balance
       );
+
     }
 
 
     // PROPOSAL
+
     if (
       message.msg_type ===
       "proposal"
@@ -810,14 +1541,17 @@
         message.proposal ||
         null;
 
+
       emit(
         "proposal",
         state.proposal
       );
+
     }
 
 
     // BUY
+
     if (
       message.msg_type ===
       "buy"
@@ -827,22 +1561,38 @@
         message.buy ||
         null;
 
-      if (buy?.contract_id) {
+
+      if (
+        buy?.contract_id
+      ) {
 
         state.currentContract =
           buy;
 
+
         state.openContracts.set(
-          String(buy.contract_id),
+
+          String(
+            buy.contract_id
+          ),
+
           buy
+
         );
+
       }
 
-      emit("buy", buy);
+
+      emit(
+        "buy",
+        buy
+      );
+
     }
 
 
-    // CONTRACT
+    // OPEN CONTRACT
+
     if (
       message.msg_type ===
       "proposal_open_contract"
@@ -852,19 +1602,28 @@
         message.proposal_open_contract ||
         null;
 
-      if (contract?.contract_id) {
+
+      if (
+        contract?.contract_id
+      ) {
 
         const id =
           String(
             contract.contract_id
           );
 
+
         state.currentContract =
           contract;
 
-        if (contract.is_sold) {
 
-          state.openContracts.delete(id);
+        if (
+          contract.is_sold
+        ) {
+
+          state.openContracts.delete(
+            id
+          );
 
         } else {
 
@@ -872,17 +1631,22 @@
             id,
             contract
           );
+
         }
+
       }
+
 
       emit(
         "contract",
         contract
       );
+
     }
 
 
     // PORTFOLIO
+
     if (
       message.msg_type ===
       "portfolio"
@@ -895,27 +1659,46 @@
           ? message.portfolio.contracts
           : [];
 
-      contracts.forEach(contract => {
 
-        if (contract?.contract_id) {
+      contracts.forEach(
+        contract => {
 
-          state.openContracts.set(
-            String(
-              contract.contract_id
-            ),
-            contract
-          );
+          if (
+            contract?.contract_id
+          ) {
+
+            state.openContracts.set(
+
+              String(
+                contract.contract_id
+              ),
+
+              contract
+
+            );
+
+          }
+
         }
-      });
+      );
 
-      emit("portfolio", {
-        ...message.portfolio,
-        contracts
-      });
+
+      emit(
+        "portfolio",
+        {
+
+          ...message.portfolio,
+
+          contracts
+
+        }
+      );
+
     }
 
 
     // STATEMENT
+
     if (
       message.msg_type ===
       "statement"
@@ -925,10 +1708,12 @@
         "statement",
         message.statement
       );
+
     }
 
 
     // PROFIT TABLE
+
     if (
       message.msg_type ===
       "profit_table"
@@ -938,10 +1723,12 @@
         "profitTable",
         message.profit_table
       );
+
     }
 
 
     // SELL
+
     if (
       message.msg_type ===
       "sell"
@@ -951,10 +1738,12 @@
         "sell",
         message.sell
       );
+
     }
 
 
     // CONTRACT UPDATE
+
     if (
       message.msg_type ===
       "contract_update"
@@ -964,26 +1753,37 @@
         "contractUpdate",
         message.contract_update
       );
+
     }
 
 
     // REQUEST RESOLUTION
-    if (message.req_id) {
+
+    if (
+      message.req_id
+    ) {
 
       const pending =
         state.pending.get(
           message.req_id
         );
 
+
       if (pending) {
 
-        pending.resolve(message);
+        pending.resolve(
+          message
+        );
+
 
         state.pending.delete(
           message.req_id
         );
+
       }
+
     }
+
   }
 
 
@@ -991,30 +1791,48 @@
   // AUTH SEND
   // ============================================================
 
-  function authSend(payload) {
+  function authSend(
+    payload
+  ) {
 
     if (
       !state.authWs ||
       state.authWs.readyState !==
         WebSocket.OPEN
     ) {
+
       throw new Error(
         "REAL Deriv account is not connected."
       );
+
     }
 
+
     const message = {
+
       ...payload,
-      req_id: nextReqId()
+
+      req_id:
+        nextReqId()
+
     };
 
+
     state.authWs.send(
-      JSON.stringify(message)
+      JSON.stringify(
+        message
+      )
     );
 
+
     return message.req_id;
+
   }
 
+
+  // ============================================================
+  // AUTH REQUEST
+  // ============================================================
 
   function authRequest(
     payload,
@@ -1022,13 +1840,17 @@
   ) {
 
     return new Promise(
-      (resolve, reject) => {
+      (
+        resolve,
+        reject
+      ) => {
 
         if (
           !state.authWs ||
           state.authWs.readyState !==
             WebSocket.OPEN
         ) {
+
           reject(
             new Error(
               "REAL Deriv account is not connected."
@@ -1036,64 +1858,103 @@
           );
 
           return;
+
         }
+
 
         const req_id =
           nextReqId();
 
+
         const timer =
-          setTimeout(() => {
+          setTimeout(
+            () => {
 
-            state.pending.delete(
-              req_id
-            );
+              state.pending.delete(
+                req_id
+              );
 
-            reject(
-              new Error(
-                "Deriv request timed out."
-              )
-            );
 
-          }, timeout);
+              reject(
+                new Error(
+                  "Deriv request timed out."
+                )
+              );
+
+            },
+            timeout
+          );
+
 
         state.pending.set(
           req_id,
           {
-            resolve: value => {
 
-              clearTimeout(timer);
-              resolve(value);
-            },
+            resolve:
+              value => {
 
-            reject: error => {
+                clearTimeout(
+                  timer
+                );
 
-              clearTimeout(timer);
-              reject(error);
-            }
+                resolve(
+                  value
+                );
+
+              },
+
+
+            reject:
+              error => {
+
+                clearTimeout(
+                  timer
+                );
+
+                reject(
+                  error
+                );
+
+              }
+
           }
         );
+
 
         try {
 
           state.authWs.send(
             JSON.stringify({
+
               ...payload,
+
               req_id
+
             })
           );
 
+
         } catch (error) {
 
-          clearTimeout(timer);
+          clearTimeout(
+            timer
+          );
+
 
           state.pending.delete(
             req_id
           );
 
-          reject(error);
+
+          reject(
+            error
+          );
+
         }
+
       }
     );
+
   }
 
 
@@ -1103,26 +1964,48 @@
 
   function disconnectAuthenticated() {
 
-    state.manualAuthClose = true;
-    state.authenticated = false;
-    state.account = null;
+    state.manualAuthClose =
+      true;
+
+    state.authenticated =
+      false;
+
+    state.account =
+      null;
+
 
     state.openContracts.clear();
-    state.currentContract = null;
+
+    state.currentContract =
+      null;
+
 
     if (state.authWs) {
 
       try {
         state.authWs.close();
       } catch {}
+
     }
 
-    state.authWs = null;
 
-    emit("status", {
-      connected: false,
-      authenticated: false
-    });
+    state.authWs =
+      null;
+
+
+    emit(
+      "status",
+      {
+
+        connected:
+          false,
+
+        authenticated:
+          false
+
+      }
+    );
+
   }
 
 
@@ -1133,9 +2016,15 @@
   function subscribeBalance() {
 
     return authRequest({
-      balance: 1,
-      subscribe: 1
+
+      balance:
+        1,
+
+      subscribe:
+        1
+
     });
+
   }
 
 
@@ -1143,56 +2032,80 @@
   // PROPOSAL
   // ============================================================
 
-  async function getProposal(params = {}) {
+  async function getProposal(
+    params = {}
+  ) {
 
     if (!state.authenticated) {
+
       throw new Error(
         "Connect your REAL Deriv account first."
       );
+
     }
 
+
     const amount =
-      Number(params.amount);
+      Number(
+        params.amount
+      );
+
 
     const duration =
-      Number(params.duration);
+      Number(
+        params.duration
+      );
+
 
     const contractType =
       String(
-        params.contractType || ""
+        params.contractType ||
+        ""
       );
+
 
     const symbol =
       params.symbol ||
       state.symbol;
 
+
     if (
       !Number.isFinite(amount) ||
       amount <= 0
     ) {
+
       throw new Error(
         "Invalid stake."
       );
+
     }
+
 
     if (
       !Number.isFinite(duration) ||
       duration <= 0
     ) {
+
       throw new Error(
         "Invalid duration."
       );
+
     }
 
+
     if (!contractType) {
+
       throw new Error(
         "Contract type is required."
       );
+
     }
+
 
     const request = {
 
-      proposal: 1,
+      proposal:
+        1,
 
       amount,
 
@@ -1216,37 +2129,51 @@
 
       underlying_symbol:
         symbol
+
     };
 
+
     if (
-      params.barrier !== undefined &&
-      params.barrier !== null &&
-      params.barrier !== ""
+      params.barrier !==
+        undefined &&
+      params.barrier !==
+        null &&
+      params.barrier !==
+        ""
     ) {
 
       request.barrier =
         String(
           params.barrier
         );
+
     }
+
 
     const response =
       await authRequest(
         request
       );
 
-    if (response.proposal) {
+
+    if (
+      response.proposal
+    ) {
 
       state.proposal =
         response.proposal;
+
 
       emit(
         "proposal",
         state.proposal
       );
+
     }
 
+
     return response;
+
   }
 
 
@@ -1260,36 +2187,49 @@
   ) {
 
     if (!state.authenticated) {
+
       throw new Error(
         "Connect your REAL Deriv account first."
       );
+
     }
 
+
     if (!proposalId) {
+
       throw new Error(
         "Missing proposal ID."
       );
+
     }
+
 
     const amount =
       Number(price);
+
 
     if (
       !Number.isFinite(amount) ||
       amount <= 0
     ) {
+
       throw new Error(
         "Invalid contract price."
       );
+
     }
 
+
     return authRequest({
+
       buy:
         String(proposalId),
 
       price:
         amount
+
     });
+
   }
 
 
@@ -1302,27 +2242,40 @@
   ) {
 
     if (!state.authenticated) {
+
       throw new Error(
-        "REAL Deriv account is not connected."
+        "Connect your REAL Deriv account first."
       );
+
     }
+
 
     const id =
       Number(contractId);
 
+
     if (!Number.isFinite(id)) {
+
       throw new Error(
         "Invalid contract ID."
       );
+
     }
 
+
     return authRequest({
-      proposal_open_contract: 1,
 
-      contract_id: id,
+      proposal_open_contract:
+        1,
 
-      subscribe: 1
+      contract_id:
+        id,
+
+      subscribe:
+        1
+
     });
+
   }
 
 
@@ -1336,36 +2289,55 @@
   ) {
 
     if (!state.authenticated) {
+
       throw new Error(
-        "REAL Deriv account is not connected."
+        "Connect your REAL Deriv account first."
       );
+
     }
+
 
     const id =
       Number(contractId);
 
+
     if (!Number.isFinite(id)) {
+
       throw new Error(
         "Invalid contract ID."
       );
+
     }
+
 
     const sellPrice =
       Number(price);
 
+
     if (
-      !Number.isFinite(sellPrice) ||
+      !Number.isFinite(
+        sellPrice
+      ) ||
       sellPrice < 0
     ) {
+
       throw new Error(
         "Invalid sell price."
       );
+
     }
 
+
     return authRequest({
-      sell: id,
-      price: sellPrice
+
+      sell:
+        id,
+
+      price:
+        sellPrice
+
     });
+
   }
 
 
@@ -1376,14 +2348,21 @@
   function getPortfolio() {
 
     if (!state.authenticated) {
+
       throw new Error(
-        "REAL Deriv account is not connected."
+        "Connect your REAL Deriv account first."
       );
+
     }
 
+
     return authRequest({
-      portfolio: 1
+
+      portfolio:
+        1
+
     });
+
   }
 
 
@@ -1391,55 +2370,81 @@
   // STATEMENT
   // ============================================================
 
-  function getStatement(options = {}) {
+  function getStatement(
+    options = {}
+  ) {
 
     if (!state.authenticated) {
+
       throw new Error(
-        "REAL Deriv account is not connected."
+        "Connect your REAL Deriv account first."
       );
+
     }
+
 
     const request = {
 
-      statement: 1,
+      statement:
+        1,
 
       limit:
         Number(
-          options.limit || 100
+          options.limit ||
+          100
         ),
 
       description:
-        options.description === undefined
+        options.description ===
+          undefined
           ? 1
           : Number(
               options.description
             )
+
     };
 
+
     if (
-      options.dateFrom !== undefined
+      options.dateFrom !==
+        undefined
     ) {
+
       request.date_from =
         Number(
           options.dateFrom
         );
+
     }
 
+
     if (
-      options.dateTo !== undefined
+      options.dateTo !==
+        undefined
     ) {
+
       request.date_to =
         Number(
           options.dateTo
         );
+
     }
 
-    if (options.actionType) {
+
+    if (
+      options.actionType
+    ) {
+
       request.action_type =
         options.actionType;
+
     }
 
-    return authRequest(request);
+
+    return authRequest(
+      request
+    );
+
   }
 
 
@@ -1447,48 +2452,73 @@
   // PROFIT TABLE
   // ============================================================
 
-  function getProfitTable(options = {}) {
+  function getProfitTable(
+    options = {}
+  ) {
 
     if (!state.authenticated) {
+
       throw new Error(
-        "REAL Deriv account is not connected."
+        "Connect your REAL Deriv account first."
       );
+
     }
+
 
     const request = {
 
-      profit_table: 1,
+      profit_table:
+        1,
 
       limit:
         Number(
-          options.limit || 100
+          options.limit ||
+          100
         )
+
     };
 
+
     if (
-      options.dateFrom !== undefined
+      options.dateFrom !==
+        undefined
     ) {
+
       request.date_from =
         Number(
           options.dateFrom
         );
+
     }
 
+
     if (
-      options.dateTo !== undefined
+      options.dateTo !==
+        undefined
     ) {
+
       request.date_to =
         Number(
           options.dateTo
         );
+
     }
 
-    if (options.contractType) {
+
+    if (
+      options.contractType
+    ) {
+
       request.contract_type =
         options.contractType;
+
     }
 
-    return authRequest(request);
+
+    return authRequest(
+      request
+    );
+
   }
 
 
@@ -1498,15 +2528,27 @@
 
   function getActiveSymbols() {
 
-    if (state.authenticated) {
+    if (
+      state.authenticated
+    ) {
+
       return authRequest({
-        active_symbols: "brief"
+
+        active_symbols:
+          "brief"
+
       });
+
     }
 
+
     return sendPublic({
-      active_symbols: "brief"
+
+      active_symbols:
+        "brief"
+
     });
+
   }
 
 
@@ -1515,24 +2557,40 @@
   // ============================================================
 
   function getContractsFor(
-    symbol = state.symbol
+    symbol =
+      state.symbol
   ) {
 
     if (!symbol) {
+
       throw new Error(
         "Market symbol required."
       );
+
     }
 
-    if (state.authenticated) {
+
+    if (
+      state.authenticated
+    ) {
+
       return authRequest({
-        contracts_for: symbol
+
+        contracts_for:
+          symbol
+
       });
+
     }
+
 
     return sendPublic({
-      contracts_for: symbol
+
+      contracts_for:
+        symbol
+
     });
+
   }
 
 
@@ -1540,28 +2598,41 @@
   // CHANGE MARKET
   // ============================================================
 
-  function changeSymbol(symbol) {
+  function changeSymbol(
+    symbol
+  ) {
 
     if (!symbol) {
+
       throw new Error(
         "Market symbol required."
       );
+
     }
 
-    state.symbol = symbol;
-    state.proposal = null;
 
-    connect(symbol);
+    state.symbol =
+      symbol;
+
+    state.proposal =
+      null;
+
+
+    connect(
+      symbol
+    );
+
 
     emit(
       "symbolChanged",
       symbol
     );
+
   }
 
 
   // ============================================================
-  // STATS
+  // DIGIT STATISTICS
   // ============================================================
 
   function getDigitStats() {
@@ -1569,16 +2640,22 @@
     const total =
       state.recentDigits.length;
 
+
     return {
 
       counts:
         [...state.digits],
 
       percentages:
-        state.digits.map(count =>
-          total
-            ? (count / total) * 100
-            : 0
+        state.digits.map(
+          count =>
+            total
+              ? (
+                  count /
+                  total
+                ) *
+                100
+              : 0
         ),
 
       total,
@@ -1588,26 +2665,46 @@
 
       previousDigit:
         state.previousDigit
+
     };
+
   }
 
 
+  // ============================================================
+  // RECENT TICKS
+  // ============================================================
+
   function getRecentTicks() {
+
     return [
       ...state.recentTicks
     ];
+
   }
 
 
+  // ============================================================
+  // OPEN CONTRACTS
+  // ============================================================
+
   function getOpenContracts() {
+
     return Array.from(
       state.openContracts.values()
     );
+
   }
 
 
+  // ============================================================
+  // CURRENT CONTRACT
+  // ============================================================
+
   function getCurrentContract() {
+
     return state.currentContract;
+
   }
 
 
@@ -1639,17 +2736,31 @@
             WebSocket.OPEN
         ),
 
+      liveSubscribed:
+        state.liveSubscribed,
+
+      historyLoaded:
+        state.historyLoaded,
+
       account:
         state.account,
 
       symbol:
-        state.symbol
+        state.symbol,
+
+      lastQuote:
+        state.lastQuote,
+
+      lastDigit:
+        state.lastDigit
+
     };
+
   }
 
 
   // ============================================================
-  // RECONNECT
+  // RECONNECT AUTHENTICATED
   // ============================================================
 
   async function reconnectAuthenticated() {
@@ -1657,6 +2768,7 @@
     disconnectAuthenticated();
 
     return connectAuthenticated();
+
   }
 
 
@@ -1670,20 +2782,26 @@
 
     disconnectAuthenticated();
 
+
     state.pending.forEach(
       pending => {
 
         try {
+
           pending.reject(
             new Error(
               "Deriv engine destroyed."
             )
           );
+
         } catch {}
+
       }
     );
 
+
     state.pending.clear();
+
   }
 
 
@@ -1696,67 +2814,113 @@
     on,
 
     connect,
+
     disconnect,
+
     changeSymbol,
 
+
     getActiveSymbols,
+
     getContractsFor,
 
+
     connectAuthenticated,
+
     reconnectAuthenticated,
+
     disconnectAuthenticated,
+
 
     subscribeBalance,
 
+
     getProposal,
+
     buyContract,
+
     monitorContract,
+
     sellContract,
 
+
     getPortfolio,
+
     getStatement,
+
     getProfitTable,
 
+
     getDigitStats,
+
     getRecentTicks,
+
     getOpenContracts,
+
     getCurrentContract,
+
 
     getConnectionInfo,
 
+
     destroy,
 
+
     get authenticated() {
+
       return state.authenticated;
+
     },
+
 
     get account() {
+
       return state.account;
+
     },
+
 
     get symbol() {
+
       return state.symbol;
+
     },
+
 
     get lastQuote() {
+
       return state.lastQuote;
+
     },
+
 
     get lastDigit() {
+
       return state.lastDigit;
+
     },
+
 
     get proposal() {
+
       return state.proposal;
+
     },
+
 
     get currentContract() {
+
       return state.currentContract;
+
     },
 
+
     get state() {
+
       return state;
+
     }
+
   };
 
 
@@ -1764,6 +2928,8 @@
   // START LIVE MARKET
   // ============================================================
 
-  connect(state.symbol);
+  connect(
+    state.symbol
+  );
 
 })();
