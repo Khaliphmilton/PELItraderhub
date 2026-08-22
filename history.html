@@ -1,9 +1,16 @@
+history.html
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>Trade History | PELItradershub</title>
 
@@ -39,7 +46,7 @@
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:15px;
+  gap:20px;
   padding:16px 18px;
   margin-bottom:20px;
   background:#0d121c;
@@ -58,7 +65,7 @@
   height:9px;
   border-radius:50%;
   background:#ff647c;
-  box-shadow:0 0 10px rgba(255,100,124,.45);
+  box-shadow:0 0 10px rgba(255,100,124,.35);
 }
 
 .connection-dot.connected{
@@ -84,7 +91,7 @@
 
 .account-balance strong{
   display:block;
-  font-size:16px;
+  font-size:17px;
 }
 
 .account-balance span{
@@ -127,6 +134,11 @@
   border-color:#786cff;
 }
 
+.history-actions{
+  display:flex;
+  gap:8px;
+}
+
 .history-search{
   width:280px;
   padding:12px 14px;
@@ -139,6 +151,26 @@
 
 .history-search:focus{
   border-color:#786cff;
+}
+
+.refresh-button{
+  border:1px solid #252e40;
+  background:#121826;
+  color:white;
+  padding:10px 15px;
+  border-radius:9px;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:700;
+}
+
+.refresh-button:hover{
+  border-color:#786cff;
+}
+
+.refresh-button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
 }
 
 .history-panel{
@@ -216,7 +248,14 @@
 
 .loading{
   text-align:center;
-  padding:55px 20px;
+  padding:55px 20px !important;
+  color:#7d879b;
+}
+
+.empty{
+  display:none;
+  text-align:center;
+  padding:50px;
   color:#7d879b;
 }
 
@@ -237,50 +276,13 @@
   color:#ff7186;
 }
 
-.empty{
-  display:none;
-  text-align:center;
-  padding:50px;
-  color:#7d879b;
-}
-
-.refresh-button{
-  border:1px solid #252e40;
-  background:#121826;
-  color:white;
-  padding:9px 14px;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:11px;
-  font-weight:700;
-}
-
-.refresh-button:hover{
-  border-color:#786cff;
-}
-
-.real-label{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
+.real-badge{
+  display:inline-block;
   margin-left:8px;
   padding:4px 7px;
   border-radius:5px;
   background:#102c28;
   color:#39d4b6;
-  font-size:9px;
-  font-weight:800;
-}
-
-.demo-label{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  margin-left:8px;
-  padding:4px 7px;
-  border-radius:5px;
-  background:#302817;
-  color:#ffcf6b;
   font-size:9px;
   font-weight:800;
 }
@@ -309,8 +311,13 @@
     flex:1;
   }
 
+  .history-actions{
+    width:100%;
+  }
+
   .history-search{
     width:100%;
+    flex:1;
   }
 
   .history-panel{
@@ -327,29 +334,62 @@
 
 </head>
 
+
 <body>
+
 
 <header class="navbar">
 
-<a href="index.html" class="brand">
-  <span class="brand-icon">P</span>
-  <span>PELI<span>tradershub</span></span>
+<a
+  href="index.html"
+  class="brand"
+>
+
+  <span class="brand-icon">
+    P
+  </span>
+
+  <span>
+    PELI<span>tradershub</span>
+  </span>
+
 </a>
 
+
 <nav>
-  <a href="dashboard.html">Dashboard</a>
-  <a href="markets.html">Markets</a>
-  <a href="trade.html">Trade</a>
-  <a href="strategies.html">Strategies</a>
+
+<a href="dashboard.html">
+  Dashboard
+</a>
+
+<a href="markets.html">
+  Markets
+</a>
+
+<a href="trade.html">
+  Trade
+</a>
+
+<a href="strategies.html">
+  Strategies
+</a>
+
 </nav>
+
 
 <div class="nav-actions">
 
-<a href="portfolio.html" class="login-link">
+<a
+  href="portfolio.html"
+  class="login-link"
+>
   Portfolio
 </a>
 
-<a href="dashboard.html" class="button primary">
+<a
+  href="dashboard.html"
+  class="button primary"
+>
   Dashboard
 </a>
 
@@ -358,7 +398,9 @@
 </header>
 
 
+
 <main class="history-page">
+
 
 <div class="page-heading">
 
@@ -371,13 +413,17 @@
 </h1>
 
 <p>
-  Your actual completed Deriv trading activity.
+  Your real completed Deriv trading activity.
 </p>
 
 </div>
 
 
-<div id="errorBox" class="error-box">
+
+<div
+  id="errorBox"
+  class="error-box"
+>
 
 <strong id="errorTitle">
   Unable to load trading history
@@ -388,7 +434,9 @@
 </div>
 
 
+
 <div class="account-bar">
+
 
 <div class="account-left">
 
@@ -397,19 +445,21 @@
   class="connection-dot"
 ></div>
 
+
 <div class="account-info">
 
 <strong id="accountText">
   Connecting to Deriv...
 </strong>
 
-<span id="accountType">
-  Authenticating account
+<span id="accountStatus">
+  Authenticating your real trading account
 </span>
 
 </div>
 
 </div>
+
 
 
 <div class="account-balance">
@@ -424,30 +474,33 @@
 
 </div>
 
+
 </div>
 
 
+
 <div class="history-toolbar">
+
 
 <div class="filters">
 
 <button
   class="filter active"
-  onclick="filterHistory('all',this)"
+  onclick="filterHistory('all', this)"
 >
   All
 </button>
 
 <button
   class="filter"
-  onclick="filterHistory('win',this)"
+  onclick="filterHistory('win', this)"
 >
   Wins
 </button>
 
 <button
   class="filter"
-  onclick="filterHistory('loss',this)"
+  onclick="filterHistory('loss', this)"
 >
   Losses
 </button>
@@ -455,7 +508,8 @@
 </div>
 
 
-<div style="display:flex;gap:8px;">
+
+<div class="history-actions">
 
 <input
   id="historySearch"
@@ -474,7 +528,9 @@
 
 </div>
 
+
 </div>
+
 
 
 <div class="history-panel">
@@ -516,13 +572,15 @@
 
 <tbody id="historyBody">
 
-<tr id="loadingRow">
+<tr>
 
 <td
   colspan="6"
   class="loading"
 >
-  Loading real trading history...
+
+  Connecting to your real Deriv account...
+
 </td>
 
 </tr>
@@ -536,8 +594,9 @@
   id="empty"
   class="empty"
 >
-  No matching trades found.
+  No completed trades found.
 </div>
+
 
 </div>
 
@@ -545,15 +604,19 @@
 </main>
 
 
+
 <footer>
 
 <div class="brand">
 
-<span class="brand-icon">P</span>
+<span class="brand-icon">
+  P
+</span>
 
 PELItradershub
 
 </div>
+
 
 <p>
   Trading involves risk. No profits are guaranteed.
@@ -562,59 +625,47 @@ PELItradershub
 </footer>
 
 
+
+<!-- ======================================================
+     YOUR EXISTING REAL DERIV ENGINE
+     ====================================================== -->
+
+<script src="deriv.js"></script>
+
+
+
 <script>
 
 "use strict";
 
-/*
-=========================================================
-PELItradershub REAL DERIV TRADE HISTORY
-=========================================================
-
-This page DOES NOT use sample/demo trades.
-
-It reads the authenticated Deriv session already created
-by the platform and requests the real account profit table.
-
-Expected authentication storage:
-
-sessionStorage:
-    auth_info.access_token
-
-localStorage:
-    active_loginid
-    account_type
-
-The authenticated WebSocket URL is obtained from Deriv's
-current OTP flow.
-
-=========================================================
-*/
-
 
 /*
----------------------------------------------------------
-DERIV APP ID
----------------------------------------------------------
+===========================================================
+PELItradershub REAL TRADE HISTORY
+===========================================================
 
-Use the same Deriv App ID used by your existing login/trade
-integration.
+IMPORTANT:
 
-If your existing platform stores it in localStorage,
-the code will try that first.
+This page does NOT create another Deriv authentication
+system.
 
-Otherwise put your App ID here.
----------------------------------------------------------
+It uses your existing deriv.js engine.
+
+deriv.js provides:
+
+PELI_DERIV.connectAuthenticated()
+
+PELI_DERIV.getProfitTable()
+
+PELI_DERIV.subscribeBalance()
+
+PELI_DERIV.account
+
+PELI_DERIV.getConnectionInfo()
+
+===========================================================
 */
 
-const DEFAULT_DERIV_APP_ID = "";
-
-
-/*
----------------------------------------------------------
-STATE
----------------------------------------------------------
-*/
 
 let historyData = [];
 
@@ -622,646 +673,135 @@ let activeFilter = "all";
 
 let currency = "USD";
 
-let socket = null;
 
-
-/*
----------------------------------------------------------
-DOM
----------------------------------------------------------
-*/
 
 const historyBody =
-  document.getElementById("historyBody");
+  document.getElementById(
+    "historyBody"
+  );
+
 
 const empty =
-  document.getElementById("empty");
+  document.getElementById(
+    "empty"
+  );
+
 
 const search =
-  document.getElementById("historySearch");
+  document.getElementById(
+    "historySearch"
+  );
 
-const errorBox =
-  document.getElementById("errorBox");
-
-const errorTitle =
-  document.getElementById("errorTitle");
-
-const errorMessage =
-  document.getElementById("errorMessage");
-
-const accountText =
-  document.getElementById("accountText");
-
-const accountType =
-  document.getElementById("accountType");
-
-const balanceText =
-  document.getElementById("balanceText");
-
-const connectionDot =
-  document.getElementById("connectionDot");
 
 const refreshButton =
-  document.getElementById("refreshButton");
+  document.getElementById(
+    "refreshButton"
+  );
 
 
-/*
----------------------------------------------------------
-GET APP ID
----------------------------------------------------------
-*/
-
-function getAppId(){
-
-  const candidates = [
-
-    localStorage.getItem("deriv_app_id"),
-
-    localStorage.getItem("derivAppId"),
-
-    localStorage.getItem("app_id"),
-
-    sessionStorage.getItem("deriv_app_id"),
-
-    sessionStorage.getItem("derivAppId"),
-
-    DEFAULT_DERIV_APP_ID
-
-  ];
-
-  for(const value of candidates){
-
-    if(
-      value &&
-      String(value).trim()
-    ){
-
-      return String(value).trim();
-
-    }
-
-  }
-
-  return "";
-
-}
+const errorBox =
+  document.getElementById(
+    "errorBox"
+  );
 
 
-/*
----------------------------------------------------------
-GET AUTH INFO
----------------------------------------------------------
-*/
-
-function getAuthInfo(){
-
-  const raw =
-    sessionStorage.getItem("auth_info");
-
-  if(raw){
-
-    try{
-
-      const info =
-        JSON.parse(raw);
-
-      if(
-        info &&
-        info.access_token
-      ){
-
-        return info;
-
-      }
-
-    }catch(error){
-
-      console.warn(
-        "Invalid auth_info:",
-        error
-      );
-
-    }
-
-  }
+const errorTitle =
+  document.getElementById(
+    "errorTitle"
+  );
 
 
-  /*
-  Legacy fallback used by some Deriv integrations.
-  */
-
-  const legacyKeys = [
-
-    "authToken",
-    "deriv_token",
-    "derivToken",
-    "deriv_access_token",
-    "access_token"
-
-  ];
+const errorMessage =
+  document.getElementById(
+    "errorMessage"
+  );
 
 
-  for(const key of legacyKeys){
-
-    const token =
-      localStorage.getItem(key) ||
-      sessionStorage.getItem(key);
-
-    if(token){
-
-      return {
-        access_token: token
-      };
-
-    }
-
-  }
+const connectionDot =
+  document.getElementById(
+    "connectionDot"
+  );
 
 
-  return null;
+const accountText =
+  document.getElementById(
+    "accountText"
+  );
 
-}
+
+const accountStatus =
+  document.getElementById(
+    "accountStatus"
+  );
+
+
+const balanceText =
+  document.getElementById(
+    "balanceText"
+  );
+
 
 
 /*
----------------------------------------------------------
-GET ACTIVE ACCOUNT
----------------------------------------------------------
+===========================================================
+HTML ESCAPE
+===========================================================
 */
 
-function getAccountId(){
-
-  const candidates = [
-
-    localStorage.getItem("active_loginid"),
-
-    localStorage.getItem("activeLoginId"),
-
-    localStorage.getItem("loginid"),
-
-    sessionStorage.getItem("active_loginid")
-
-  ];
-
-
-  for(const value of candidates){
-
-    if(
-      value &&
-      String(value).trim()
-    ){
-
-      return String(value).trim();
-
-    }
-
-  }
-
-
-  /*
-  Try accounts saved by the OAuth flow.
-  */
-
-  const stored =
-    sessionStorage.getItem("deriv_accounts");
-
-  if(stored){
-
-    try{
-
-      const accounts =
-        JSON.parse(stored);
-
-      if(
-        Array.isArray(accounts) &&
-        accounts.length
-      ){
-
-        return accounts[0].account_id || "";
-
-      }
-
-    }catch(error){
-
-      console.warn(
-        "Could not read deriv_accounts:",
-        error
-      );
-
-    }
-
-  }
-
-
-  return "";
-
-}
-
-
-/*
----------------------------------------------------------
-GET ACCOUNT TYPE
----------------------------------------------------------
-*/
-
-function getAccountType(accountId){
-
-  const stored =
-    localStorage.getItem("account_type");
-
-  if(stored){
-
-    return stored.toLowerCase();
-
-  }
-
-
-  /*
-  Deriv virtual accounts normally begin with VRT.
-  */
-
-  if(
-    accountId &&
-    accountId.toUpperCase().startsWith("VRT")
-  ){
-
-    return "demo";
-
-  }
-
-
-  return "real";
-
-}
-
-
-/*
----------------------------------------------------------
-GET AUTHENTICATED WEBSOCKET URL
----------------------------------------------------------
-*/
-
-async function getAuthenticatedSocketUrl(){
-
-  const auth =
-    getAuthInfo();
-
-  const accountId =
-    getAccountId();
-
-  const appId =
-    getAppId();
-
-
-  if(!auth || !auth.access_token){
-
-    throw new Error(
-      "No authenticated Deriv session was found. Connect your Deriv account first."
-    );
-
-  }
-
-
-  if(!accountId){
-
-    throw new Error(
-      "No active Deriv trading account was found."
-    );
-
-  }
-
-
-  if(!appId){
-
-    throw new Error(
-      "Deriv App ID is missing. Use the same App ID configured by your Trade page."
-    );
-
-  }
-
-
-  const response =
-    await fetch(
-      "https://api.derivws.com/trading/v1/options/accounts/" +
-      encodeURIComponent(accountId) +
-      "/otp",
-      {
-
-        method:"POST",
-
-        headers:{
-
-          "Content-Type":
-            "application/json",
-
-          "Deriv-App-ID":
-            appId,
-
-          "Authorization":
-            "Bearer " + auth.access_token
-
-        }
-
-      }
-    );
-
-
-  let data = null;
-
-  try{
-
-    data =
-      await response.json();
-
-  }catch(error){
-
-    throw new Error(
-      "Deriv returned an invalid authentication response."
-    );
-
-  }
-
-
-  if(!response.ok){
-
-    const message =
-      data?.errors?.[0]?.message ||
-      "Deriv authentication failed.";
-
-    throw new Error(message);
-
-  }
-
-
-  /*
-  Current Deriv API returns a ready-to-use
-  authenticated WebSocket URL.
-  */
-
-  const socketUrl =
-    data?.data?.websocket_url ||
-    data?.websocket_url ||
-    data?.url;
-
-
-  if(!socketUrl){
-
-    throw new Error(
-      "Deriv did not return an authenticated WebSocket URL."
-    );
-
-  }
-
-
-  return socketUrl;
-
-}
-
-
-/*
----------------------------------------------------------
-OPEN AUTHENTICATED SOCKET
----------------------------------------------------------
-*/
-
-function openSocket(url){
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      let settled = false;
-
-
-      socket =
-        new WebSocket(url);
-
-
-      const timeout =
-        setTimeout(
-          ()=>{
-
-            if(!settled){
-
-              settled = true;
-
-              try{
-                socket.close();
-              }catch(error){}
-
-              reject(
-                new Error(
-                  "Timed out connecting to Deriv."
-                )
-              );
-
-            }
-
-          },
-          15000
-        );
-
-
-      socket.onopen =
-        ()=>{
-
-          if(settled){
-            return;
-          }
-
-          settled = true;
-
-          clearTimeout(timeout);
-
-          connectionDot
-            .classList.add("connected");
-
-          resolve(socket);
-
-        };
-
-
-      socket.onerror =
-        ()=>{
-
-          if(settled){
-            return;
-          }
-
-          settled = true;
-
-          clearTimeout(timeout);
-
-          reject(
-            new Error(
-              "Unable to connect to Deriv."
-            )
-          );
-
-        };
-
-
-      socket.onclose =
-        ()=>{
-
-          connectionDot
-            .classList.remove("connected");
-
-        };
-
-    }
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  )
+  .replaceAll(
+    "&",
+    "&amp;"
+  )
+  .replaceAll(
+    "<",
+    "&lt;"
+  )
+  .replaceAll(
+    ">",
+    "&gt;"
+  )
+  .replaceAll(
+    '"',
+    "&quot;"
+  )
+  .replaceAll(
+    "'",
+    "&#039;"
   );
 
 }
 
 
-/*
----------------------------------------------------------
-SEND REQUEST AND WAIT FOR RESPONSE
----------------------------------------------------------
-*/
-
-function requestSocket(payload){
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      if(
-        !socket ||
-        socket.readyState !== WebSocket.OPEN
-      ){
-
-        reject(
-          new Error(
-            "Deriv connection is not open."
-          )
-        );
-
-        return;
-
-      }
-
-
-      const requestId =
-        Date.now() +
-        Math.floor(Math.random()*100000);
-
-
-      payload.req_id =
-        requestId;
-
-
-      const timeout =
-        setTimeout(
-          ()=>{
-
-            cleanup();
-
-            reject(
-              new Error(
-                "Deriv request timed out."
-              )
-            );
-
-          },
-          15000
-        );
-
-
-      function cleanup(){
-
-        clearTimeout(timeout);
-
-        socket.removeEventListener(
-          "message",
-          handler
-        );
-
-      }
-
-
-      function handler(event){
-
-        let response;
-
-        try{
-
-          response =
-            JSON.parse(event.data);
-
-        }catch(error){
-
-          return;
-
-        }
-
-
-        if(
-          response.req_id !== requestId
-        ){
-
-          return;
-
-        }
-
-
-        cleanup();
-
-
-        if(response.error){
-
-          reject(
-            new Error(
-              response.error.message ||
-              "Deriv returned an error."
-            )
-          );
-
-          return;
-
-        }
-
-
-        resolve(response);
-
-      }
-
-
-      socket.addEventListener(
-        "message",
-        handler
-      );
-
-
-      socket.send(
-        JSON.stringify(payload)
-      );
-
-    }
-  );
-
-}
-
 
 /*
----------------------------------------------------------
-FORMAT MONEY
----------------------------------------------------------
+===========================================================
+MONEY
+===========================================================
 */
 
-function formatMoney(value){
+function formatNumber(
+  value
+){
 
   const number =
     Number(value);
 
-  if(!Number.isFinite(number)){
-    return "—";
+
+  if(
+    !Number.isFinite(number)
+  ){
+
+    return "0.00";
+
   }
 
 
-  return (
-    number >= 0 ? "+" : ""
-  ) +
-  number.toLocaleString(
+  return number.toLocaleString(
     undefined,
     {
       minimumFractionDigits:2,
@@ -1272,17 +812,33 @@ function formatMoney(value){
 }
 
 
+
 /*
----------------------------------------------------------
-FORMAT DATE
----------------------------------------------------------
+===========================================================
+DATE
+===========================================================
 */
 
-function formatDate(epoch){
+function formatDate(
+  epoch
+){
+
+  const timestamp =
+    Number(epoch);
+
+
+  if(
+    !Number.isFinite(timestamp)
+  ){
+
+    return "—";
+
+  }
+
 
   const date =
     new Date(
-      Number(epoch) * 1000
+      timestamp * 1000
     );
 
 
@@ -1311,72 +867,132 @@ function formatDate(epoch){
 }
 
 
+
 /*
----------------------------------------------------------
-GET MARKET NAME
----------------------------------------------------------
+===========================================================
+MARKET NAME
+===========================================================
 */
 
-function getMarketName(contract){
+function getMarket(
+  trade
+){
 
   return (
-    contract.underlying_symbol ||
-    contract.display_name ||
-    contract.symbol ||
-    contract.underlying ||
-    contract.shortcode ||
+    trade.display_name ||
+    trade.underlying_symbol ||
+    trade.symbol ||
+    trade.underlying ||
+    trade.market ||
     "Deriv Contract"
   );
 
 }
 
 
+
 /*
----------------------------------------------------------
-GET CONTRACT TYPE
----------------------------------------------------------
+===========================================================
+CONTRACT TYPE
+===========================================================
 */
 
-function getContractType(contract){
+function getType(
+  trade
+){
 
   return (
-    contract.contract_type ||
-    contract.contract_category ||
-    contract.contract_display ||
+    trade.contract_type ||
+    trade.contract_display ||
+    trade.contract_category ||
+    trade.type ||
     "Contract"
   );
 
 }
 
 
+
 /*
----------------------------------------------------------
-GET STAKE
----------------------------------------------------------
+===========================================================
+DIRECTION
+===========================================================
 */
 
-function getStake(contract){
+function getDirection(
+  trade
+){
 
-  /*
-  buy_price is the amount actually paid for
-  the contract.
-  */
+  const type =
+    String(
+      trade.contract_type ||
+      ""
+    ).toUpperCase();
+
+
+  const map = {
+
+    CALL:"UP",
+
+    PUT:"DOWN",
+
+    RISE:"UP",
+
+    FALL:"DOWN",
+
+    HIGHER:"UP",
+
+    LOWER:"DOWN"
+
+  };
+
+
+  if(map[type]){
+
+    return map[type];
+
+  }
+
+
+  return (
+    trade.contract_type ||
+    "—"
+  );
+
+}
+
+
+
+/*
+===========================================================
+STAKE
+===========================================================
+*/
+
+function getStake(
+  trade
+){
 
   const values = [
 
-    contract.buy_price,
+    trade.buy_price,
 
-    contract.purchase_price,
+    trade.purchase_price,
 
-    contract.buy_price_display
+    trade.buy_amount,
+
+    trade.stake
 
   ];
 
 
-  for(const value of values){
+  for(
+    const value of values
+  ){
 
     const number =
       Number(value);
+
 
     if(
       Number.isFinite(number)
@@ -1394,29 +1010,40 @@ function getStake(contract){
 }
 
 
+
 /*
----------------------------------------------------------
-GET PROFIT / LOSS
----------------------------------------------------------
+===========================================================
+PROFIT / LOSS
+
+Deriv's profit table supplies the contract profit.
+
+We prefer the explicit profit value instead of trying
+to calculate it ourselves.
+===========================================================
 */
 
-function getProfit(contract){
+function getProfit(
+  trade
+){
 
   const values = [
 
-    contract.profit,
+    trade.profit,
 
-    contract.sell_profit,
+    trade.sell_profit,
 
-    contract.profit_loss
+    trade.profit_loss
 
   ];
 
 
-  for(const value of values){
+  for(
+    const value of values
+  ){
 
     const number =
       Number(value);
+
 
     if(
       Number.isFinite(number)
@@ -1429,99 +1056,122 @@ function getProfit(contract){
   }
 
 
-  /*
-  Some profit-table responses provide
-  sell_price and buy_price rather than
-  an explicit profit field.
-  */
+  return 0;
 
-  const sell =
-    Number(
-      contract.sell_price
-    );
+}
 
-  const buy =
-    Number(
-      contract.buy_price
-    );
+
+
+/*
+===========================================================
+RESULT
+===========================================================
+*/
+
+function getResult(
+  profit
+){
+
+  if(
+    profit > 0
+  ){
+
+    return "win";
+
+  }
 
 
   if(
-    Number.isFinite(sell) &&
-    Number.isFinite(buy)
+    profit < 0
   ){
 
-    return sell - buy;
-
-  }
-
-
-  return 0;
-
-}
-
-
-/*
----------------------------------------------------------
-GET RESULT
----------------------------------------------------------
-*/
-
-function getResult(profit){
-
-  if(profit > 0){
-    return "win";
-  }
-
-  if(profit < 0){
     return "loss";
+
   }
+
 
   return "pending";
 
 }
 
 
+
 /*
----------------------------------------------------------
-NORMALIZE CONTRACT
----------------------------------------------------------
+===========================================================
+DATE FROM DERIV CONTRACT
+===========================================================
 */
 
-function normalizeContract(contract){
+function getTradeDate(
+  trade
+){
+
+  return (
+    trade.sell_time ||
+    trade.exit_time ||
+    trade.close_time ||
+    trade.purchase_time ||
+    trade.transaction_time ||
+    trade.start_time ||
+    trade.date
+  );
+
+}
+
+
+
+/*
+===========================================================
+NORMALIZE REAL DERIV TRADE
+===========================================================
+*/
+
+function normalizeTrade(
+  trade
+){
 
   const profit =
-    getProfit(contract);
-
-  const stake =
-    getStake(contract);
-
-  const result =
-    getResult(profit);
+    getProfit(
+      trade
+    );
 
 
   return {
 
-    raw:contract,
+    raw:trade,
 
     market:
-      getMarketName(contract),
+      getMarket(
+        trade
+      ),
 
     type:
-      getContractType(contract),
+      getType(
+        trade
+      ),
 
-    stake,
+    direction:
+      getDirection(
+        trade
+      ),
+
+    stake:
+      getStake(
+        trade
+      ),
 
     profit,
 
-    result,
+    result:
+      getResult(
+        profit
+      ),
 
     date:
       formatDate(
-        contract.sell_time ||
-        contract.exit_time ||
-        contract.purchase_time ||
-        contract.transaction_time
+        getTradeDate(
+          trade
+        )
       )
 
   };
@@ -1529,10 +1179,74 @@ function normalizeContract(contract){
 }
 
 
+
 /*
----------------------------------------------------------
-RENDER HISTORY
----------------------------------------------------------
+===========================================================
+EXTRACT PROFIT TABLE ROWS
+
+Your deriv.js returns the actual response from the
+Deriv profit_table request.
+===========================================================
+*/
+
+function extractTrades(
+  response
+){
+
+  const table =
+    response?.profit_table;
+
+
+  if(!table){
+
+    return [];
+
+  }
+
+
+  if(
+    Array.isArray(
+      table.transactions
+    )
+  ){
+
+    return table.transactions;
+
+  }
+
+
+  if(
+    Array.isArray(
+      table.profit_table
+    )
+  ){
+
+    return table.profit_table;
+
+  }
+
+
+  if(
+    Array.isArray(
+      table.contracts
+    )
+  ){
+
+    return table.contracts;
+
+  }
+
+
+  return [];
+
+}
+
+
+
+/*
+===========================================================
+RENDER
+===========================================================
 */
 
 function renderHistory(){
@@ -1545,29 +1259,35 @@ function renderHistory(){
 
   const filtered =
     historyData.filter(
-      item => {
+      trade => {
 
-        const searchText =
-          (
-            item.market +
-            " " +
-            item.type +
-            " " +
-            item.stake +
-            " " +
-            item.profit +
-            " " +
-            item.date
-          ).toLowerCase();
+        const text = (
+
+          trade.market +
+          " " +
+          trade.type +
+          " " +
+          trade.direction +
+          " " +
+          trade.stake +
+          " " +
+          trade.profit +
+          " " +
+          trade.date
+
+        ).toLowerCase();
 
 
         const matchesSearch =
-          searchText.includes(query);
+          text.includes(
+            query
+          );
 
 
         const matchesFilter =
           activeFilter === "all" ||
-          item.result === activeFilter;
+          trade.result ===
+            activeFilter;
 
 
         return (
@@ -1579,10 +1299,13 @@ function renderHistory(){
     );
 
 
-  historyBody.innerHTML = "";
+  historyBody.innerHTML =
+    "";
 
 
-  if(!filtered.length){
+  if(
+    filtered.length === 0
+  ){
 
     empty.style.display =
       "block";
@@ -1597,55 +1320,61 @@ function renderHistory(){
 
 
   filtered.forEach(
-    item => {
+    trade => {
 
       const row =
-        document.createElement("tr");
+        document.createElement(
+          "tr"
+        );
 
 
-      const resultLabel =
-        item.result === "win"
+      const resultText =
+        trade.result === "win"
           ? "WON"
-          : item.result === "loss"
-            ? "LOST"
-            : "PENDING";
-
-
-      const resultClass =
-        item.result;
+          :
+        trade.result === "loss"
+          ? "LOST"
+          :
+          "PENDING";
 
 
       const profitClass =
-        item.profit >= 0
+        trade.profit > 0
           ? "positive"
-          : "negative";
-
-
-      const profitText =
-        item.profit >= 0
-          ? "+" +
-            Math.abs(item.profit)
-              .toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits:2,
-                  maximumFractionDigits:2
-                }
-              )
           :
-            "-" +
-            Math.abs(item.profit)
-              .toLocaleString(
-                undefined,
-                {
-                  minimumFractionDigits:2,
-                  maximumFractionDigits:2
-                }
-              );
+        trade.profit < 0
+          ? "negative"
+          :
+          "";
 
 
-      row.dataset.result =
-        item.result;
+      let profitText =
+        "0.00";
+
+
+      if(
+        trade.profit > 0
+      ){
+
+        profitText =
+          "+" +
+          formatNumber(
+            trade.profit
+          );
+
+      }else if(
+        trade.profit < 0
+      ){
+
+        profitText =
+          "-" +
+          formatNumber(
+            Math.abs(
+              trade.profit
+            )
+          );
+
+      }
 
 
       row.innerHTML = `
@@ -1653,56 +1382,78 @@ function renderHistory(){
         <td>
 
           <span class="symbol">
-            ${escapeHtml(item.market)}
+
+            ${escapeHtml(
+              trade.market
+            )}
+
           </span>
 
           <span class="type">
-            ${escapeHtml(item.type)}
-          </span>
 
-        </td>
-
-        <td>
-          ${escapeHtml(
-            getDirection(
-              item.raw
-            )
-          )}
-        </td>
-
-        <td>
-          ${escapeHtml(
-            currency
-          )}
-          ${Number(item.stake)
-            .toLocaleString(
-              undefined,
-              {
-                minimumFractionDigits:2,
-                maximumFractionDigits:2
-              }
+            ${escapeHtml(
+              trade.type
             )}
-        </td>
 
-        <td>
-
-          <span class="badge ${resultClass}">
-            ${resultLabel}
           </span>
 
         </td>
 
-        <td class="${profitClass}">
+
+        <td>
+
+          ${escapeHtml(
+            trade.direction
+          )}
+
+        </td>
+
+
+        <td>
 
           ${escapeHtml(
             currency
           )}
+
+          ${formatNumber(
+            trade.stake
+          )}
+
+        </td>
+
+
+        <td>
+
+          <span
+            class="badge ${trade.result}"
+          >
+
+            ${resultText}
+
+          </span>
+
+        </td>
+
+
+        <td
+          class="${profitClass}"
+        >
+
+          ${escapeHtml(
+            currency
+          )}
+
           ${profitText}
 
         </td>
 
+
         <td>
-          ${escapeHtml(item.date)}
+
+          ${escapeHtml(
+            trade.date
+          )}
+
         </td>
 
       `;
@@ -1718,81 +1469,13 @@ function renderHistory(){
 }
 
 
-/*
----------------------------------------------------------
-GET DIRECTION
----------------------------------------------------------
-*/
-
-function getDirection(contract){
-
-  const type =
-    String(
-      contract.contract_type ||
-      ""
-    ).toUpperCase();
-
-
-  const directionMap = {
-
-    CALL:"UP",
-
-    PUT:"DOWN",
-
-    RISE:"UP",
-
-    FALL:"DOWN",
-
-    HIGHER:"UP",
-
-    LOWER:"DOWN",
-
-    ACCUMULATOR:"ACCUMULATOR",
-
-    TURBOS:"TURBO"
-
-  };
-
-
-  if(
-    directionMap[type]
-  ){
-
-    return directionMap[type];
-
-  }
-
-
-  return (
-    contract.contract_type ||
-    "—"
-  );
-
-}
-
 
 /*
----------------------------------------------------------
-ESCAPE HTML
----------------------------------------------------------
-*/
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-
-}
-
-
-/*
----------------------------------------------------------
+===========================================================
 LOAD BALANCE
----------------------------------------------------------
+
+Use the SAME authenticated PELI_DERIV engine.
+===========================================================
 */
 
 async function loadBalance(){
@@ -1800,38 +1483,35 @@ async function loadBalance(){
   try{
 
     const response =
-      await requestSocket(
-        {
-          balance:1
-        }
-      );
+      await window.PELI_DERIV
+        .subscribeBalance();
 
 
     const balance =
       response?.balance;
 
 
-    if(balance){
+    if(!balance){
 
-      currency =
-        balance.currency ||
-        currency;
-
-
-      balanceText.textContent =
-        currency +
-        " " +
-        Number(
-          balance.balance
-        ).toLocaleString(
-          undefined,
-          {
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
-          }
-        );
+      return;
 
     }
+
+
+    currency =
+      balance.currency ||
+      window.PELI_DERIV.account
+        ?.currency ||
+      "USD";
+
+
+    balanceText.textContent =
+      currency +
+      " " +
+      formatNumber(
+        balance.balance
+      );
+
 
   }catch(error){
 
@@ -1845,68 +1525,11 @@ async function loadBalance(){
 }
 
 
-/*
----------------------------------------------------------
-LOAD REAL PROFIT TABLE
----------------------------------------------------------
-*/
-
-async function loadProfitTable(){
-
-  const response =
-    await requestSocket(
-      {
-        profit_table:1,
-
-        description:1,
-
-        limit:500,
-
-        offset:0,
-
-        sort:"DESC"
-
-      }
-    );
-
-
-  const table =
-    response?.profit_table;
-
-
-  if(!table){
-
-    throw new Error(
-      "Deriv returned no trading history."
-    );
-
-  }
-
-
-  const contracts =
-    table.transactions ||
-    table.profit_table ||
-    table.contracts ||
-    [];
-
-
-  historyData =
-    Array.isArray(contracts)
-      ? contracts.map(
-          normalizeContract
-        )
-      : [];
-
-
-  renderHistory();
-
-}
-
 
 /*
----------------------------------------------------------
-LOAD EVERYTHING
----------------------------------------------------------
+===========================================================
+LOAD REAL HISTORY
+===========================================================
 */
 
 async function loadHistory(){
@@ -1922,6 +1545,10 @@ async function loadHistory(){
     "none";
 
 
+  empty.style.display =
+    "none";
+
+
   historyBody.innerHTML = `
 
     <tr>
@@ -1931,7 +1558,7 @@ async function loadHistory(){
         class="loading"
       >
 
-        Connecting to your Deriv account...
+        Connecting to your real Deriv account...
 
       </td>
 
@@ -1940,69 +1567,109 @@ async function loadHistory(){
   `;
 
 
-  empty.style.display =
-    "none";
-
-
   try{
 
-    const accountId =
-      getAccountId();
+    /*
+    -------------------------------------------------------
+    USE EXISTING PELI DERIV AUTHENTICATION
+    -------------------------------------------------------
+    */
+
+    const account =
+      await window.PELI_DERIV
+        .connectAuthenticated();
 
 
-    if(!accountId){
+    if(!account){
 
       throw new Error(
-        "You are not connected to a Deriv trading account. Connect Deriv first."
+        "Deriv did not return an authenticated account."
       );
 
     }
 
 
-    const type =
-      getAccountType(
-        accountId
+    connectionDot
+      .classList.add(
+        "connected"
       );
+
+
+    const loginId =
+      account.loginid ||
+      account.login_id ||
+      account.account_id ||
+      "Connected";
+
+
+    currency =
+      account.currency ||
+      "USD";
 
 
     accountText.innerHTML =
       escapeHtml(
-        accountId
+        loginId
       ) +
-      (
-        type === "real"
-          ? '<span class="real-label">REAL</span>'
-          : '<span class="demo-label">DEMO</span>'
-      );
+      `
+        <span class="real-badge">
+          REAL
+        </span>
+      `;
 
 
-    accountType.textContent =
-      type === "real"
-        ? "Live Deriv account"
-        : "Deriv virtual account";
+    accountStatus.textContent =
+      "Live Deriv trading account";
 
 
-    const socketUrl =
-      await getAuthenticatedSocketUrl();
-
-
-    await openSocket(
-      socketUrl
-    );
-
+    /*
+    -------------------------------------------------------
+    REAL BALANCE
+    -------------------------------------------------------
+    */
 
     await loadBalance();
 
 
-    await loadProfitTable();
+    /*
+    -------------------------------------------------------
+    REAL PROFIT TABLE
+    -------------------------------------------------------
+    */
+
+    const response =
+      await window.PELI_DERIV
+        .getProfitTable({
+
+          limit:100
+
+        });
 
 
-    if(historyData.length === 0){
+    const trades =
+      extractTrades(
+        response
+      );
 
-      historyBody.innerHTML = "";
+
+    historyData =
+      trades.map(
+        normalizeTrade
+      );
+
+
+    renderHistory();
+
+
+    if(
+      historyData.length === 0
+    ){
+
+      historyBody.innerHTML =
+        "";
 
       empty.textContent =
-        "No completed trades were found on this Deriv account.";
+        "No completed trades were found on this real Deriv account.";
 
       empty.style.display =
         "block";
@@ -2013,7 +1680,7 @@ async function loadHistory(){
   }catch(error){
 
     console.error(
-      "REAL HISTORY ERROR:",
+      "PELI REAL HISTORY ERROR:",
       error
     );
 
@@ -2024,20 +1691,29 @@ async function loadHistory(){
       );
 
 
+    accountText.textContent =
+      "Deriv not connected";
+
+
+    accountStatus.textContent =
+      "Unable to authenticate real account";
+
+
     errorTitle.textContent =
       "Unable to load real trading history";
 
 
     errorMessage.textContent =
-      error.message ||
-      "Something went wrong while connecting to Deriv.";
+      error?.message ||
+      "Unable to connect to your real Deriv account.";
 
 
     errorBox.style.display =
       "block";
 
 
-    historyBody.innerHTML = "";
+    historyBody.innerHTML =
+      "";
 
   }finally{
 
@@ -2052,10 +1728,11 @@ async function loadHistory(){
 }
 
 
+
 /*
----------------------------------------------------------
+===========================================================
 FILTER
----------------------------------------------------------
+===========================================================
 */
 
 function filterHistory(
@@ -2072,10 +1749,13 @@ function filterHistory(
       ".filter"
     )
     .forEach(
-      b =>
-        b.classList.remove(
+      item => {
+
+        item.classList.remove(
           "active"
-        )
+        );
+
+      }
     );
 
 
@@ -2089,10 +1769,11 @@ function filterHistory(
 }
 
 
+
 /*
----------------------------------------------------------
+===========================================================
 SEARCH
----------------------------------------------------------
+===========================================================
 */
 
 search.addEventListener(
@@ -2101,18 +1782,78 @@ search.addEventListener(
 );
 
 
+
 /*
----------------------------------------------------------
-START
----------------------------------------------------------
+===========================================================
+WAIT FOR DERIV ENGINE
+
+deriv.js creates window.PELI_DERIV immediately and
+starts its public market connection.
+
+We wait briefly for the object before authenticating.
+===========================================================
+*/
+
+function startHistory(){
+
+  if(
+    window.PELI_DERIV
+  ){
+
+    loadHistory();
+
+    return;
+
+  }
+
+
+  setTimeout(
+    startHistory,
+    100
+  );
+
+}
+
+
+startHistory();
+
+
+
+/*
+===========================================================
+REFRESH WHEN PAGE BECOMES VISIBLE
+===========================================================
 */
 
 document.addEventListener(
-  "DOMContentLoaded",
-  loadHistory
+  "visibilitychange",
+  () => {
+
+    if(
+      document.visibilityState ===
+      "visible"
+    ){
+
+      const info =
+        window.PELI_DERIV
+          ?.getConnectionInfo?.();
+
+
+      if(
+        info?.authenticated
+      ){
+
+        loadHistory();
+
+      }
+
+    }
+
+  }
 );
 
 </script>
 
 </body>
+
 </html>
