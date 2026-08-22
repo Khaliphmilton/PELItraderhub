@@ -1,4318 +1,496 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<title>Trading Terminal | PELItradershub</title>
-
-<meta
-  name="description"
-  content="PELItradershub binary options trading terminal."
->
-
-<link
-  rel="stylesheet"
-  href="styles.css"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PELItradershub — Real Digits Trader</title>
+<link rel="stylesheet" href="styles.css">
 <style>
-
-/* =====================================================
-   PAGE
-===================================================== */
-
-body{
-  overflow-x:hidden;
-}
-
-
-/* =====================================================
-   TERMINAL
-===================================================== */
-
-.terminal{
-  min-height:calc(100vh - 72px);
-  display:grid;
-  grid-template-columns:1fr 370px;
-  background:#070910;
-}
-
-
-/* =====================================================
-   CHART AREA
-===================================================== */
-
-.chart-area{
-  padding:20px;
-  min-width:0;
-}
-
-
-.terminal-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  margin-bottom:15px;
-}
-
-
-.symbol-box{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-
-.symbol-box h1{
-  font-size:22px;
-  margin:0;
-}
-
-
-.symbol-box small{
-  color:#69748a;
-}
-
-
-.price-box{
-  text-align:right;
-}
-
-
-.price{
-  font-size:25px;
-  font-weight:800;
-}
-
-
-.status{
-  font-size:11px;
-  color:#39d4b6;
-}
-
-
-/* =====================================================
-   CHART
-===================================================== */
-
-.chart-container{
-  height:calc(100vh - 190px);
-  min-height:450px;
-  background:#0b1018;
-  border:1px solid #202838;
-  border-radius:15px;
-  position:relative;
-  overflow:hidden;
-}
-
-
-.chart-grid{
-  position:absolute;
-  inset:0;
-
-  background-image:
-    linear-gradient(
-      #202838 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      #202838 1px,
-      transparent 1px
-    );
-
-  background-size:10% 20%;
-
-  opacity:.35;
-}
-
-
-.chart-line{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-}
-
-
-.chart-toolbar{
-  position:absolute;
-  top:12px;
-  left:12px;
-  right:12px;
-
-  display:flex;
-  justify-content:space-between;
-
-  z-index:2;
-}
-
-
-.chart-tools{
-  display:flex;
-  gap:5px;
-}
-
-
-.chart-tool{
-  border:1px solid #252e40;
-  background:#111722;
-  color:#8792a8;
-
-  padding:7px 10px;
-
-  border-radius:7px;
-
-  font-size:11px;
-
-  cursor:pointer;
-}
-
-
-.chart-tool.active,
-.chart-tool:hover{
-  background:#786cff;
-  color:white;
-}
-
-
-.chart-message{
-  position:absolute;
-  inset:0;
-
-  display:grid;
-  place-items:center;
-
-  text-align:center;
-
-  pointer-events:none;
-}
-
-
-.chart-message div{
-  background:#0d121cdd;
-
-  border:1px solid #293246;
-
-  border-radius:14px;
-
-  padding:22px;
-
-  max-width:350px;
-}
-
-
-.chart-message h2{
-  font-size:18px;
-  margin-bottom:8px;
-}
-
-
-.chart-message p{
-  color:#7d879b;
-  font-size:13px;
-}
-
-
-/* =====================================================
-   TRADE PANEL
-===================================================== */
-
-.trade-panel{
-  border-left:1px solid #202838;
-
-  background:#0a0e16;
-
-  padding:20px;
-
-  overflow-y:auto;
-}
-
-
-.trade-panel h2{
-  margin:0 0 20px;
-
-  font-size:20px;
-}
-
-
-/* =====================================================
-   ACCOUNT
-===================================================== */
-
-.account-box{
-  background:#101622;
-
-  border:1px solid #202838;
-
-  border-radius:12px;
-
-  padding:15px;
-
-  margin-bottom:20px;
-}
-
-
-.account-label{
-  color:#7d879b;
-  font-size:11px;
-}
-
-
-.account-balance{
-  font-size:24px;
-
-  font-weight:800;
-
-  margin-top:4px;
-}
-
-
-.account-status{
-  margin-top:5px;
-
-  font-size:11px;
-
-  color:#ffcf6b;
-}
-
-
-/* =====================================================
-   FORM
-===================================================== */
-
-.form-group{
-  margin-bottom:16px;
-}
-
-
-.form-group label{
-  display:block;
-
-  font-size:12px;
-
-  color:#8a94a8;
-
-  margin-bottom:7px;
-}
-
-
-.trade-input{
-  width:100%;
-
-  padding:13px;
-
-  background:#0b1018;
-
-  border:1px solid #293246;
-
-  border-radius:9px;
-
-  color:white;
-
-  outline:none;
-
-  box-sizing:border-box;
-}
-
-
-.trade-input:focus{
-  border-color:#786cff;
-}
-
-
-.trade-row{
-  display:grid;
-
-  grid-template-columns:1fr 1fr;
-
-  gap:8px;
-}
-
-
-/* =====================================================
-   CONTRACT TYPE
-===================================================== */
-
-.contract-grid{
-  display:grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap:7px;
-}
-
-
-.contract-button{
-  min-height:46px;
-
-  padding:8px;
-
-  border:1px solid #293246;
-
-  border-radius:9px;
-
-  background:#111722;
-
-  color:#a8b1c2;
-
-  font-weight:700;
-
-  font-size:12px;
-
-  cursor:pointer;
-
-  transition:.15s ease;
-}
-
-
-.contract-button:hover{
-  border-color:#786cff;
-  color:white;
-}
-
-
-.contract-button.active{
-  background:#211d45;
-
-  border-color:#786cff;
-
-  color:#aaa5ff;
-
-  box-shadow:
-    0 0 0 1px
-    rgba(120,108,255,.12);
-}
-
-
-/* =====================================================
-   DIGIT CONTROLS
-===================================================== */
-
-.digit-section{
-  display:none;
-
-  margin-bottom:16px;
-
-  padding:12px;
-
-  background:#101622;
-
-  border:1px solid #202838;
-
-  border-radius:10px;
-}
-
-
-.digit-section.visible{
-  display:block;
-}
-
-
-.digit-label{
-  display:block;
-
-  font-size:11px;
-
-  color:#8a94a8;
-
-  margin-bottom:9px;
-}
-
-
-.digit-grid{
-  display:grid;
-
-  grid-template-columns:
-    repeat(5, 1fr);
-
-  gap:6px;
-}
-
-
-.digit-button{
-  height:38px;
-
-  border-radius:7px;
-
-  border:1px solid #293246;
-
-  background:#0b1018;
-
-  color:#c5cada;
-
-  font-weight:800;
-
-  cursor:pointer;
-}
-
-
-.digit-button:hover{
-  border-color:#786cff;
-}
-
-
-.digit-button.active{
-  background:#786cff;
-
-  border-color:#786cff;
-
-  color:white;
-}
-
-
-/* =====================================================
-   SUMMARY
-===================================================== */
-
-.trade-summary{
-  border-top:1px solid #202838;
-
-  border-bottom:1px solid #202838;
-
-  padding:15px 0;
-
-  margin:20px 0;
-}
-
-
-.summary-row{
-  display:flex;
-
-  justify-content:space-between;
-
-  gap:10px;
-
-  margin:9px 0;
-
-  font-size:13px;
-}
-
-
-.summary-row span:first-child{
-  color:#7d879b;
-}
-
-
-.positive{
-  color:#39d4b6;
-}
-
-
-.neutral{
-  color:#a8b1c2;
-}
-
-
-/* =====================================================
-   BUTTONS
-===================================================== */
-
-.buy-button{
-  width:100%;
-
-  padding:15px;
-
-  border:0;
-
-  border-radius:10px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #786cff,
-      #39d4b6
-    );
-
-  color:#061016;
-
-  font-weight:900;
-
-  cursor:pointer;
-}
-
-
-.buy-button:disabled{
-  opacity:.55;
-
-  cursor:not-allowed;
-}
-
-
-.connection-button{
-  width:100%;
-
-  padding:12px;
-
-  margin-top:10px;
-
-  border-radius:9px;
-
-  border:1px solid #786cff;
-
-  background:#17142e;
-
-  color:#aaa5ff;
-
-  font-weight:700;
-
-  cursor:pointer;
-}
-
-
-.connection-button:hover{
-  background:#211d45;
-}
-
-
-.warning{
-  font-size:11px;
-
-  line-height:1.5;
-
-  color:#747f94;
-
-  margin-top:14px;
-}
-
-
-/* =====================================================
-   TRADE STATE
-===================================================== */
-
-.trade-state{
-  display:none;
-
-  padding:11px;
-
-  margin-bottom:15px;
-
-  border-radius:9px;
-
-  background:#101622;
-
-  border:1px solid #293246;
-
-  color:#a8b1c2;
-
-  font-size:12px;
-
-  line-height:1.5;
-}
-
-
-.trade-state.visible{
-  display:block;
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media(max-width:900px){
-
-  .terminal{
-    grid-template-columns:1fr;
-  }
-
-  .chart-area{
-    padding:12px;
-  }
-
-  .chart-container{
-    height:55vh;
-    min-height:380px;
-  }
-
-  .trade-panel{
-    border-left:0;
-
-    border-top:1px solid #202838;
-  }
-
-}
-
-
-@media(max-width:600px){
-
-  .terminal-header{
-    align-items:flex-start;
-  }
-
-  .symbol-box h1{
-    font-size:18px;
-  }
-
-  .price{
-    font-size:20px;
-  }
-
-  .chart-container{
-    height:420px;
-  }
-
-  .contract-grid{
-    grid-template-columns:
-      repeat(2, 1fr);
-  }
-
-}
-
+:root{--bg:#070b12;--card:#0e1520;--line:#202b3c;--muted:#8490a4;--text:#f4f7fb;--blue:#2d8cff;--teal:#2cc9bb;--red:#f0444d;--yellow:#ffd24a}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+.navbar{position:sticky;top:0;z-index:20}
+.terminal{display:grid;grid-template-columns:minmax(0,1fr) 390px;min-height:calc(100vh - 72px);gap:0}
+.market{padding:18px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.symbol h1{font-size:22px;margin:0}.symbol small{color:var(--muted)}
+.price{text-align:right}.price strong{display:block;font-size:27px}.live{font-size:11px;color:var(--teal)}
+.chart{height:270px;border:1px solid var(--line);border-radius:16px;background:#0a111b;position:relative;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(#1a2636 1px,transparent 1px),linear-gradient(90deg,#1a2636 1px,transparent 1px);background-size:10% 25%;opacity:.5}
+.tick-stream{position:absolute;inset:55px 15px 15px;display:flex;align-items:flex-end;gap:3px}
+.bar{width:4px;border-radius:3px 3px 0 0;background:#2d8cff;opacity:.7}
+.chart-center{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.chart-center div{background:#0b121de8;border:1px solid #2a374b;border-radius:14px;padding:18px;text-align:center}
+.chart-center b{font-size:15px}.chart-center span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+.panel{border-left:1px solid var(--line);background:#0a1019;padding:18px;overflow:auto}
+.panel h2{margin:0 0 14px;font-size:20px}
+.account{background:#111a27;border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:16px}
+.label{color:var(--muted);font-size:11px;text-transform:uppercase}.balance{font-size:25px;font-weight:800;margin:4px 0}.account-status{font-size:12px;color:var(--yellow)}
+button,select,input{font:inherit}.field{margin:13px 0}.field label{display:block;color:#929caf;font-size:11px;margin-bottom:6px;text-transform:uppercase}
+.input,.select{width:100%;box-sizing:border-box;background:#0b121c;border:1px solid #29364a;color:#fff;border-radius:9px;padding:12px;outline:none}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.type-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}.type{border:1px solid #29364a;background:#111a27;color:#c6ceda;border-radius:9px;padding:11px;font-weight:800;cursor:pointer}.type.active{background:#222b5d;border-color:#786cff;color:#fff}
+.digits{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:8px 0 14px}.digit{border:1px solid #29364a;background:#111a27;color:#dbe2ec;border-radius:10px;padding:8px 3px;text-align:center;cursor:pointer}.digit strong{display:block;font-size:17px}.digit small{color:#8b97a9;font-size:10px}.digit.active{border-color:#2d8cff;background:#102b4d}
+.summary{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:15px 0}.sum{display:flex;justify-content:space-between;margin:8px 0;font-size:13px}.sum span{color:var(--muted)}
+.buy{width:100%;border:0;border-radius:10px;padding:14px;background:linear-gradient(135deg,#786cff,#2cc9bb);color:#061016;font-weight:900;cursor:pointer}.buy:disabled{opacity:.45;cursor:not-allowed}
+.connect{width:100%;margin-top:8px;border:1px solid #786cff;background:#17142e;color:#b8b2ff;border-radius:9px;padding:11px;font-weight:800;cursor:pointer}
+.notice{font-size:11px;color:#788397;line-height:1.5;margin-top:12px}
+.result{margin-top:12px;padding:10px;border-radius:9px;background:#111a27;border:1px solid var(--line);font-size:12px;color:#aeb8c7;white-space:pre-line}
+@media(max-width:900px){.terminal{grid-template-columns:1fr}.panel{border-left:0;border-top:1px solid var(--line)}.chart{height:250px}}
 </style>
-
 </head>
-
-
 <body>
 
-
-<!-- ====================================================
-     NAVBAR
-===================================================== -->
-
 <header class="navbar">
-
-
-<a
-  href="index.html"
-  class="brand"
->
-
-<span class="brand-icon">
-P
-</span>
-
-
-<span>
-PELI<span>tradershub</span>
-</span>
-
-</a>
-
-
-<nav>
-
-<a href="dashboard.html">
-Dashboard
-</a>
-
-<a href="markets.html">
-Markets
-</a>
-
-<a href="trade.html">
-Trade
-</a>
-
-<a href="strategies.html">
-Strategies
-</a>
-
-</nav>
-
-
-<div class="nav-actions">
-
-<a
-  href="portfolio.html"
-  class="login-link"
->
-Portfolio
-</a>
-
-
-<a
-  href="dashboard.html"
-  class="button primary"
->
-Dashboard
-</a>
-
-</div>
-
-
+<a href="index.html" class="brand"><span class="brand-icon">P</span><span>PELI<span>tradershub</span></span></a>
+<nav><a href="dashboard.html">Dashboard</a><a href="markets.html">Markets</a><a href="trade.html">Trade</a><a href="strategies.html">Strategies</a></nav>
+<div class="nav-actions"><a href="portfolio.html" class="login-link">Portfolio</a><a href="dashboard.html" class="button primary">Dashboard</a></div>
 </header>
 
-
-<!-- ====================================================
-     TERMINAL
-===================================================== -->
-
 <main class="terminal">
+<section class="market">
+  <div class="top">
+    <div class="symbol">
+      <h1 id="symbolName">Volatility 100 Index</h1>
+      <small id="symbolSub">REAL-TIME DERIV MARKET</small>
+    </div>
+    <div class="price"><strong id="price">—</strong><span class="live" id="liveStatus">● Connecting...</span></div>
+  </div>
 
-
-<!-- ==================================================
-     CHART
-=================================================== -->
-
-<section class="chart-area">
-
-
-<div class="terminal-header">
-
-
-<div class="symbol-box">
-
-<div>
-
-<h1 id="symbolName">
-Volatility 75
-</h1>
-
-<small>
-Synthetic Index
-</small>
-
-</div>
-
-</div>
-
-
-<div class="price-box">
-
-<div
-  class="price"
-  id="price"
->
-—
-</div>
-
-
-<div
-  class="status"
-  id="connectionStatus"
->
-● Connecting to Deriv...
-</div>
-
-</div>
-
-
-</div>
-
-
-<div class="chart-container">
-
-
-<div class="chart-grid"></div>
-
-
-<div class="chart-toolbar">
-
-
-<div class="chart-tools">
-
-<button
-  type="button"
-  class="chart-tool active"
-  data-timeframe="1m"
->
-1m
-</button>
-
-
-<button
-  type="button"
-  class="chart-tool"
-  data-timeframe="5m"
->
-5m
-</button>
-
-
-<button
-  type="button"
-  class="chart-tool"
-  data-timeframe="15m"
->
-15m
-</button>
-
-
-<button
-  type="button"
-  class="chart-tool"
-  data-timeframe="1h"
->
-1h
-</button>
-
-</div>
-
-
-<div class="chart-tools">
-
-<button
-  type="button"
-  class="chart-tool"
-  id="indicatorsButton"
->
-Indicators
-</button>
-
-
-<button
-  type="button"
-  class="chart-tool"
-  id="fullscreenButton"
->
-Fullscreen
-</button>
-
-</div>
-
-</div>
-
-
-<svg
-  class="chart-line"
-  viewBox="0 0 1000 600"
-  preserveAspectRatio="none"
->
-
-<path
-  d="
-  M0 500
-  L45 470
-  L90 490
-  L135 420
-  L180 445
-  L225 390
-  L270 410
-  L315 350
-  L360 370
-  L405 300
-  L450 330
-  L495 270
-  L540 300
-  L585 245
-  L630 270
-  L675 205
-  L720 230
-  L765 175
-  L810 195
-  L855 130
-  L900 155
-  L950 95
-  L1000 120
-  "
-
-  fill="none"
-
-  stroke="#786cff"
-
-  stroke-width="5"
-
-  opacity=".55"
-/>
-
-</svg>
-
-
-<div
-  class="chart-message"
-  id="chartMessage"
->
-
-<div>
-
-<h2>
-Live Market
-</h2>
-
-<p id="chartMessageText">
-Connecting to Deriv market data...
-</p>
-
-</div>
-
-</div>
-
-
-</div>
-
-
+  <div class="chart">
+    <div class="grid"></div>
+    <div class="tick-stream" id="tickStream"></div>
+    <div class="chart-center"><div><b>Live Market</b><span id="chartStatus">Waiting for real Deriv ticks...</span></div></div>
+  </div>
 </section>
 
-
-<!-- ==================================================
-     TRADE PANEL
-=================================================== -->
-
-<aside class="trade-panel">
-
-
-<h2>
-Binary Options
-</h2>
-
-
-<!-- ==================================================
-     ACCOUNT
-=================================================== -->
-
-<div class="account-box">
-
-
-<div class="account-label">
-ACCOUNT
-</div>
-
-
-<div
-  class="account-balance"
-  id="accountBalance"
->
-—
-</div>
-
-
-<div
-  class="account-label"
-  id="accountCurrency"
->
-Checking account...
-</div>
-
-
-<div
-  class="account-status"
-  id="accountStatus"
->
-Deriv account not connected
-</div>
-
-
-<button
-  type="button"
-  class="connection-button"
-  id="connectAccountButton"
->
-Connect Deriv Account
-</button>
-
-
-</div>
-
-
-<!-- ==================================================
-     MARKET
-=================================================== -->
-
-<div class="form-group">
-
-<label for="market">
-Market
-</label>
-
-
-<select
-  id="market"
-  class="trade-input"
->
-
-<option value="R_10">
-Volatility 10
-</option>
-
-<option value="R_25">
-Volatility 25
-</option>
-
-<option value="R_50">
-Volatility 50
-</option>
-
-<option
-  value="R_75"
-  selected
->
-Volatility 75
-</option>
-
-<option value="R_100">
-Volatility 100
-</option>
-
-<option value="frxEURUSD">
-EUR/USD
-</option>
-
-<option value="frxGBPUSD">
-GBP/USD
-</option>
-
-</select>
-
-</div>
-
-
-<!-- ==================================================
-     CONTRACT TYPE
-=================================================== -->
-
-<div class="form-group">
-
-<label>
-Contract Type
-</label>
-
-
-<div class="contract-grid">
-
-
-<button
-  type="button"
-  class="contract-button active"
-  data-contract="CALL"
->
-Rise
-</button>
-
-
-<button
-  type="button"
-  class="contract-button"
-  data-contract="PUT"
->
-Fall
-</button>
-
-
-<button
-  type="button"
-  class="contract-button"
-  data-contract="DIGITMATCH"
->
-Matches
-</button>
-
-
-<button
-  type="button"
-  class="contract-button"
-  data-contract="DIGITDIFF"
->
-Differs
-</button>
-
-
-<button
-  type="button"
-  class="contract-button"
-  data-contract="DIGITEVEN"
->
-Even
-</button>
-
-
-<button
-  type="button"
-  class="contract-button"
-  data-contract="DIGITODD"
->
-Odd
-</button>
-
-
-<button
-  type="button"
-  class="contract-button"
-  data-contract="DIGITOVER"
->
-Over
-</button>
-
-
-<button
-  type="button"
-  class="contract-button"
-  data-contract="DIGITUNDER"
->
-Under
-</button>
-
-
-</div>
-
-</div>
-
-
-<!-- ==================================================
-     PREDICTION DIGIT
-=================================================== -->
-
-<div
-  class="digit-section"
-  id="predictionSection"
->
-
-<label class="digit-label">
-Prediction digit
-</label>
-
-
-<div
-  class="digit-grid"
-  id="predictionDigits"
->
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="0"
->
-0
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="1"
->
-1
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="2"
->
-2
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="3"
->
-3
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="4"
->
-4
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="5"
->
-5
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="6"
->
-6
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="7"
->
-7
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="8"
->
-8
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="9"
->
-9
-</button>
-
-</div>
-
-</div>
-
-
-<!-- ==================================================
-     BARRIER DIGIT
-=================================================== -->
-
-<div
-  class="digit-section"
-  id="barrierSection"
->
-
-<label class="digit-label">
-Barrier digit
-</label>
-
-
-<div
-  class="digit-grid"
-  id="barrierDigits"
->
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="0"
->
-0
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="1"
->
-1
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="2"
->
-2
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="3"
->
-3
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="4"
->
-4
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="5"
->
-5
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="6"
->
-6
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="7"
->
-7
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="8"
->
-8
-</button>
-
-<button
-  type="button"
-  class="digit-button"
-  data-digit="9"
->
-9
-</button>
-
-</div>
-
-</div>
-
-
-<!-- ==================================================
-     DURATION / CURRENCY
-=================================================== -->
-
-<div class="trade-row">
-
-
-<div class="form-group">
-
-<label for="duration">
-Duration
-</label>
-
-
-<select
-  id="duration"
-  class="trade-input"
->
-
-<option value="1t">
-1 tick
-</option>
-
-<option value="5t">
-5 ticks
-</option>
-
-<option value="10t">
-10 ticks
-</option>
-
-<option value="1m">
-1 minute
-</option>
-
-<option value="5m">
-5 minutes
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label for="currency">
-Currency
-</label>
-
-
-<select
-  id="currency"
-  class="trade-input"
->
-
-<option value="USD">
-USD
-</option>
-
-<option value="EUR">
-EUR
-</option>
-
-<option value="GBP">
-GBP
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-
-<!-- ==================================================
-     STAKE
-=================================================== -->
-
-<div class="form-group">
-
-<label for="stake">
-Stake
-</label>
-
-
-<input
-  id="stake"
-  class="trade-input"
-  type="number"
-  min="0.01"
-  step="0.01"
-  value="10"
-  placeholder="Enter stake"
->
-
-</div>
-
-
-<!-- ==================================================
-     TRADE STATE
-=================================================== -->
-
-<div
-  class="trade-state"
-  id="tradeState"
->
-Waiting for a Deriv proposal...
-</div>
-
-
-<!-- ==================================================
-     SUMMARY
-=================================================== -->
-
-<div class="trade-summary">
-
-
-<div class="summary-row">
-
-<span>
-Contract
-</span>
-
-<strong
-  id="summaryContract"
-  class="neutral"
->
-Rise
-</strong>
-
-</div>
-
-
-<div class="summary-row">
-
-<span>
-Prediction
-</span>
-
-<strong
-  id="summaryPrediction"
-  class="neutral"
->
-—
-</strong>
-
-</div>
-
-
-<div class="summary-row">
-
-<span>
-Stake
-</span>
-
-<strong id="summaryStake">
-$10.00
-</strong>
-
-</div>
-
-
-<div class="summary-row">
-
-<span>
-Contract price
-</span>
-
-<strong id="contractPrice">
-—
-</strong>
-
-</div>
-
-
-<div class="summary-row">
-
-<span>
-Potential payout
-</span>
-
-<strong id="payout">
-—
-</strong>
-
-</div>
-
-
-<div class="summary-row">
-
-<span>
-Potential profit
-</span>
-
-<strong
-  id="profit"
-  class="positive"
->
-—
-</strong>
-
-</div>
-
-</div>
-
-
-<!-- ==================================================
-     TRADE BUTTON
-=================================================== -->
-
-<button
-  type="button"
-  class="buy-button"
-  id="tradeButton"
-  disabled
->
-CONNECT DERIV TO TRADE
-</button>
-
-
-<p class="warning">
-
-The payout and profit shown above come from the
-actual Deriv proposal response. This page does not
-invent or hard-code a payout.
-
-</p>
-
-
+<aside class="panel">
+  <h2>Digits Order Ticket</h2>
+
+  <div class="account">
+    <div class="label">REAL ACCOUNT</div>
+    <div class="balance" id="accountBalance">—</div>
+    <div class="label" id="accountCurrency">Checking account...</div>
+    <div class="account-status" id="accountStatus">Real Deriv account not connected</div>
+    <button class="connect" id="connectButton">CONNECT DERIV ACCOUNT</button>
+  </div>
+
+  <div class="field">
+    <label>Market</label>
+    <select class="select" id="market">
+      <option value="R_10">Volatility 10 Index</option>
+      <option value="R_25">Volatility 25 Index</option>
+      <option value="R_50">Volatility 50 Index</option>
+      <option value="R_75">Volatility 75 Index</option>
+      <option value="R_100" selected>Volatility 100 Index</option>
+      <option value="R_10_1s">Volatility 10 (1s) Index</option>
+      <option value="R_25_1s">Volatility 25 (1s) Index</option>
+      <option value="R_50_1s">Volatility 50 (1s) Index</option>
+      <option value="R_75_1s">Volatility 75 (1s) Index</option>
+      <option value="R_100_1s">Volatility 100 (1s) Index</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Trade Type</label>
+    <div class="type-buttons" id="typeButtons">
+      <button class="type active" data-type="DIGITMATCH">Matches</button>
+      <button class="type" data-type="DIGITDIFF">Differs</button>
+      <button class="type" data-type="DIGITEVEN">Even</button>
+      <button class="type" data-type="DIGITODD">Odd</button>
+      <button class="type" data-type="DIGITOVER">Over</button>
+      <button class="type" data-type="DIGITUNDER">Under</button>
+    </div>
+  </div>
+
+  <div class="field" id="predictionField">
+    <label>Prediction Digit</label>
+    <div class="digits" id="digits"></div>
+  </div>
+
+  <div class="field">
+    <label>Number of Ticks</label>
+    <select class="select" id="duration">
+      <option value="1">1 tick</option>
+      <option value="2">2 ticks</option>
+      <option value="5" selected>5 ticks</option>
+      <option value="10">10 ticks</option>
+      <option value="20">20 ticks</option>
+    </select>
+  </div>
+
+  <div class="row3">
+    <div class="field"><label>Ticks</label><input class="input" id="ticksDisplay" value="5" readonly></div>
+    <div class="field"><label>Stake</label><input class="input" id="stake" type="number" min="0.01" step="0.01" value="0.50"></div>
+    <div class="field"><label>No. Trades</label><input class="input" id="tradeCount" type="number" min="1" max="20" step="1" value="1"></div>
+  </div>
+
+  <div class="field">
+    <label>Live Digit Frequency — last <span id="sampleSize">0</span> ticks</label>
+    <div class="digits" id="frequency"></div>
+  </div>
+
+  <div class="summary">
+    <div class="sum"><span>Stake</span><strong id="summaryStake">USD 0.50</strong></div>
+    <div class="sum"><span>Potential payout</span><strong id="payout">—</strong></div>
+    <div class="sum"><span>Potential profit</span><strong id="profit">—</strong></div>
+  </div>
+
+  <button class="buy" id="buyButton" disabled>CONNECT REAL DERIV ACCOUNT TO TRADE</button>
+  <div class="result" id="result">No contract selected.</div>
+  <p class="notice">Real-money trading only. Prices, ticks, proposals, payout and contract results are supplied by Deriv. This page does not generate demo digits or fake profit figures.</p>
 </aside>
-
-
 </main>
 
-
-<!-- ====================================================
-     DERIV ENGINE
-===================================================== -->
-
 <script src="deriv.js"></script>
-
-
-<!-- ====================================================
-     TERMINAL APPLICATION
-===================================================== -->
-
 <script>
-
 "use strict";
 
+const $ = id => document.getElementById(id);
+const market = $("market");
+const price = $("price");
+const liveStatus = $("liveStatus");
+const chartStatus = $("chartStatus");
+const symbolName = $("symbolName");
+const accountBalance = $("accountBalance");
+const accountCurrency = $("accountCurrency");
+const accountStatus = $("accountStatus");
+const connectButton = $("connectButton");
+const buyButton = $("buyButton");
+const stake = $("stake");
+const duration = $("duration");
+const ticksDisplay = $("ticksDisplay");
+const tradeCount = $("tradeCount");
+const payout = $("payout");
+const profit = $("profit");
+const result = $("result");
+const digitsBox = $("digits");
+const frequencyBox = $("frequency");
+const sampleSize = $("sampleSize");
+const predictionField = $("predictionField");
 
-/* =====================================================
-   ELEMENTS
-===================================================== */
+let type = "DIGITMATCH";
+let prediction = 0;
+let proposal = null;
+let connected = false;
+let lastProposalKey = "";
+let bars = [];
 
-const marketSelector =
-  document.getElementById(
-    "market"
-  );
-
-
-const symbolName =
-  document.getElementById(
-    "symbolName"
-  );
-
-
-const livePrice =
-  document.getElementById(
-    "price"
-  );
-
-
-const connectionStatus =
-  document.getElementById(
-    "connectionStatus"
-  );
-
-
-const chartMessageText =
-  document.getElementById(
-    "chartMessageText"
-  );
-
-
-const accountBalance =
-  document.getElementById(
-    "accountBalance"
-  );
-
-
-const accountCurrency =
-  document.getElementById(
-    "accountCurrency"
-  );
-
-
-const accountStatus =
-  document.getElementById(
-    "accountStatus"
-  );
-
-
-const connectAccountButton =
-  document.getElementById(
-    "connectAccountButton"
-  );
-
-
-const tradeButton =
-  document.getElementById(
-    "tradeButton"
-  );
-
-
-const stakeInput =
-  document.getElementById(
-    "stake"
-  );
-
-
-const summaryStake =
-  document.getElementById(
-    "summaryStake"
-  );
-
-
-const payout =
-  document.getElementById(
-    "payout"
-  );
-
-
-const profit =
-  document.getElementById(
-    "profit"
-  );
-
-
-const contractPrice =
-  document.getElementById(
-    "contractPrice"
-  );
-
-
-const durationInput =
-  document.getElementById(
-    "duration"
-  );
-
-
-const currencyInput =
-  document.getElementById(
-    "currency"
-  );
-
-
-const tradeState =
-  document.getElementById(
-    "tradeState"
-  );
-
-
-const summaryContract =
-  document.getElementById(
-    "summaryContract"
-  );
-
-
-const summaryPrediction =
-  document.getElementById(
-    "summaryPrediction"
-  );
-
-
-const predictionSection =
-  document.getElementById(
-    "predictionSection"
-  );
-
-
-const barrierSection =
-  document.getElementById(
-    "barrierSection"
-  );
-
-
-/* =====================================================
-   MARKET NAMES
-===================================================== */
-
-const marketNames = {
-
-  R_10:
-    "Volatility 10",
-
-  R_25:
-    "Volatility 25",
-
-  R_50:
-    "Volatility 50",
-
-  R_75:
-    "Volatility 75",
-
-  R_100:
-    "Volatility 100",
-
-  frxEURUSD:
-    "EUR/USD",
-
-  frxGBPUSD:
-    "GBP/USD"
-
+const names = {
+  R_10:"Volatility 10 Index", R_25:"Volatility 25 Index",
+  R_50:"Volatility 50 Index", R_75:"Volatility 75 Index",
+  R_100:"Volatility 100 Index", R_10_1s:"Volatility 10 (1s) Index",
+  R_25_1s:"Volatility 25 (1s) Index", R_50_1s:"Volatility 50 (1s) Index",
+  R_75_1s:"Volatility 75 (1s) Index", R_100_1s:"Volatility 100 (1s) Index"
 };
 
+function money(v, currency) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return "—";
+  return new Intl.NumberFormat(undefined,{
+    style:"currency",currency:currency || "USD",
+    minimumFractionDigits:2,maximumFractionDigits:2
+  }).format(n);
+}
 
-/* =====================================================
-   CONTRACT NAMES
-===================================================== */
+function renderDigits() {
+  digitsBox.innerHTML = "";
+  for (let i=0;i<10;i++) {
+    const b = document.createElement("button");
+    b.className = "digit" + (i === prediction ? " active" : "");
+    b.innerHTML = `<strong>${i}</strong>`;
+    b.onclick = () => { prediction = i; renderDigits(); requestProposalSoon(); };
+    digitsBox.appendChild(b);
+  }
+}
 
-const contractNames = {
+function renderFrequency(counts, total) {
+  frequencyBox.innerHTML = "";
+  sampleSize.textContent = total || 0;
+  for (let i=0;i<10;i++) {
+    const pct = total ? ((counts[i] / total) * 100) : 0;
+    const b = document.createElement("div");
+    b.className = "digit";
+    b.innerHTML = `<strong>${i}</strong><small>${pct.toFixed(2)}%</small>`;
+    frequencyBox.appendChild(b);
+  }
+}
 
-  CALL:
-    "Rise",
-
-  PUT:
-    "Fall",
-
-  DIGITMATCH:
-    "Matches",
-
-  DIGITDIFF:
-    "Differs",
-
-  DIGITEVEN:
-    "Even",
-
-  DIGITODD:
-    "Odd",
-
-  DIGITOVER:
-    "Over",
-
-  DIGITUNDER:
-    "Under"
-
-};
-
-
-/* =====================================================
-   STATE
-===================================================== */
-
-let selectedContract =
-  "CALL";
-
-
-let selectedPrediction =
-  null;
-
-
-let selectedBarrier =
-  null;
-
-
-let authenticated =
-  false;
-
-
-let currentProposal =
-  null;
-
-
-let proposalTimer =
-  null;
-
-
-let proposalSequence =
-  0;
-
-
-/* =====================================================
-   URL SYMBOL
-===================================================== */
-
-const urlParams =
-  new URLSearchParams(
-    window.location.search
+function updateTypeUI() {
+  document.querySelectorAll(".type").forEach(b =>
+    b.classList.toggle("active", b.dataset.type === type)
   );
-
-
-const requestedSymbol =
-  urlParams.get(
-    "symbol"
-  );
-
-
-if (
-  requestedSymbol &&
-  marketNames[
-    requestedSymbol
-  ]
-) {
-
-  marketSelector.value =
-    requestedSymbol;
-
+  predictionField.style.display =
+    ["DIGITMATCH","DIGITDIFF","DIGITOVER","DIGITUNDER"].includes(type)
+      ? "" : "none";
+  proposal = null;
+  payout.textContent = "—";
+  profit.textContent = "—";
+  lastProposalKey = "";
+  requestProposalSoon();
 }
 
-
-/* =====================================================
-   MONEY
-===================================================== */
-
-function money(
-  value,
-  currency
-) {
-
-  const number =
-    Number(value);
-
-
-  if (
-    !Number.isFinite(
-      number
-    )
-  ) {
-
-    return "—";
-
-  }
-
-
-  const code =
-    currency ||
-    "USD";
-
-
-  try {
-
-    return new Intl.NumberFormat(
-      undefined,
-      {
-        style:
-          "currency",
-
-        currency:
-          code,
-
-        minimumFractionDigits:
-          2,
-
-        maximumFractionDigits:
-          2
-      }
-    ).format(
-      number
-    );
-
-  } catch (
-    error
-  ) {
-
-    return (
-      code +
-      " " +
-      number.toFixed(2)
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   UPDATE SYMBOL
-===================================================== */
-
-function updateSymbolName() {
-
-  const symbol =
-    marketSelector.value;
-
-
-  symbolName.textContent =
-    marketNames[
-      symbol
-    ] ||
-    symbol;
-
-}
-
-
-/* =====================================================
-   RESET PROPOSAL
-===================================================== */
-
-function resetProposal() {
-
-  currentProposal =
-    null;
-
-
-  contractPrice.textContent =
-    "—";
-
-
-  payout.textContent =
-    "—";
-
-
-  profit.textContent =
-    "—";
-
-
-  tradeButton.disabled =
-    !authenticated;
-
-
-  if (
-    authenticated
-  ) {
-
-    tradeButton.textContent =
-      "WAITING FOR PROPOSAL";
-
-  } else {
-
-    tradeButton.textContent =
-      "CONNECT DERIV TO TRADE";
-
-  }
-
-}
-
-
-/* =====================================================
-   STAKE DISPLAY
-===================================================== */
-
-function updateStakeDisplay() {
-
-  const amount =
-    Number(
-      stakeInput.value
-    );
-
-
-  summaryStake.textContent =
-    money(
-      Number.isFinite(
-        amount
-      )
-        ? amount
-        : 0,
-
-      currencyInput.value
-    );
-
-}
-
-
-stakeInput.addEventListener(
-  "input",
-  function() {
-
-    resetProposal();
-
-    updateStakeDisplay();
-
-    requestProposalSoon();
-
-  }
-);
-
-
-/* =====================================================
-   CONTRACT TYPE UI
-===================================================== */
-
-function updateContractUI() {
-
-  const name =
-    contractNames[
-      selectedContract
-    ] ||
-    selectedContract;
-
-
-  summaryContract.textContent =
-    name;
-
-
-  predictionSection.classList.remove(
-    "visible"
-  );
-
-
-  barrierSection.classList.remove(
-    "visible"
-  );
-
-
-  /*
-   * Matches and Differs require
-   * a prediction digit.
-   */
-
-  if (
-    selectedContract ===
-      "DIGITMATCH" ||
-
-    selectedContract ===
-      "DIGITDIFF"
-  ) {
-
-    predictionSection.classList.add(
-      "visible"
-    );
-
-  }
-
-
-  /*
-   * Over and Under require
-   * a barrier digit.
-   */
-
-  if (
-    selectedContract ===
-      "DIGITOVER" ||
-
-    selectedContract ===
-      "DIGITUNDER"
-  ) {
-
-    barrierSection.classList.add(
-      "visible"
-    );
-
-  }
-
-
-  if (
-    selectedContract ===
-      "DIGITMATCH" ||
-
-    selectedContract ===
-      "DIGITDIFF"
-  ) {
-
-    summaryPrediction.textContent =
-      selectedPrediction === null
-        ? "Select digit"
-        : String(
-            selectedPrediction
-          );
-
-  }
-
-  else if (
-    selectedContract ===
-      "DIGITOVER" ||
-
-    selectedContract ===
-      "DIGITUNDER"
-  ) {
-
-    summaryPrediction.textContent =
-      selectedBarrier === null
-        ? "Select barrier"
-        : String(
-            selectedBarrier
-          );
-
-  }
-
-  else {
-
-    summaryPrediction.textContent =
-      "—";
-
-  }
-
-}
-
-
-document
-  .querySelectorAll(
-    "[data-contract]"
-  )
-  .forEach(
-    function(button) {
-
-      button.addEventListener(
-        "click",
-        function() {
-
-          selectedContract =
-            button.dataset.contract;
-
-
-          document
-            .querySelectorAll(
-              "[data-contract]"
-            )
-            .forEach(
-              function(item) {
-
-                item.classList.remove(
-                  "active"
-                );
-
-              }
-            );
-
-
-          button.classList.add(
-            "active"
-          );
-
-
-          resetProposal();
-
-          updateContractUI();
-
-          requestProposalSoon();
-
-        }
-      );
-
-    }
-  );
-
-
-/* =====================================================
-   DIGIT BUTTONS
-===================================================== */
-
-document
-  .querySelectorAll(
-    "#predictionDigits .digit-button"
-  )
-  .forEach(
-    function(button) {
-
-      button.addEventListener(
-        "click",
-        function() {
-
-          selectedPrediction =
-            Number(
-              button.dataset.digit
-            );
-
-
-          document
-            .querySelectorAll(
-              "#predictionDigits .digit-button"
-            )
-            .forEach(
-              function(item) {
-
-                item.classList.remove(
-                  "active"
-                );
-
-              }
-            );
-
-
-          button.classList.add(
-            "active"
-          );
-
-
-          resetProposal();
-
-          updateContractUI();
-
-          requestProposalSoon();
-
-        }
-      );
-
-    }
-  );
-
-
-document
-  .querySelectorAll(
-    "#barrierDigits .digit-button"
-  )
-  .forEach(
-    function(button) {
-
-      button.addEventListener(
-        "click",
-        function() {
-
-          selectedBarrier =
-            Number(
-              button.dataset.digit
-            );
-
-
-          document
-            .querySelectorAll(
-              "#barrierDigits .digit-button"
-            )
-            .forEach(
-              function(item) {
-
-                item.classList.remove(
-                  "active"
-                );
-
-              }
-            );
-
-
-          button.classList.add(
-            "active"
-          );
-
-
-          resetProposal();
-
-          updateContractUI();
-
-          requestProposalSoon();
-
-        }
-      );
-
-    }
-  );
-
-
-/* =====================================================
-   DURATION
-===================================================== */
-
-durationInput.addEventListener(
-  "change",
-  function() {
-
-    resetProposal();
-
-    requestProposalSoon();
-
-  }
-);
-
-
-/* =====================================================
-   CURRENCY
-===================================================== */
-
-currencyInput.addEventListener(
-  "change",
-  function() {
-
-    resetProposal();
-
-    updateStakeDisplay();
-
-    requestProposalSoon();
-
-  }
-);
-
-
-/* =====================================================
-   DERIV STATUS
-===================================================== */
-
-window.PELI_DERIV.on(
-  "status",
-  function(
-    status
-  ) {
-
-    console.log(
-      "Deriv status:",
-      status
-    );
-
-
-    if (
-      status &&
-      status.authenticated
-    ) {
-
-      connectionStatus.textContent =
-        "● Deriv account connected";
-
-
-      connectionStatus.style.color =
-        "#39d4b6";
-
-
-      chartMessageText.textContent =
-        "Authenticated Deriv connection active.";
-
-
-      return;
-
-    }
-
-
-    if (
-      status &&
-      status.connecting
-    ) {
-
-      connectionStatus.textContent =
-        "● Connecting to Deriv...";
-
-
-      connectionStatus.style.color =
-        "#ffcf6b";
-
-
-      return;
-
-    }
-
-
-    if (
-      status &&
-      status.connected
-    ) {
-
-      connectionStatus.textContent =
-        "● Live Deriv market connected";
-
-
-      connectionStatus.style.color =
-        "#39d4b6";
-
-
-      chartMessageText.textContent =
-        "Live Deriv market data connected.";
-
-
-      return;
-
-    }
-
-
-    connectionStatus.textContent =
-      "● Disconnected";
-
-
-    connectionStatus.style.color =
-      "#ff7186";
-
-  }
-);
-
-
-/* =====================================================
-   TICKS
-===================================================== */
-
-window.PELI_DERIV.on(
-  "tick",
-  function(
-    tick
-  ) {
-
-    if (
-      !tick ||
-      tick.quote === undefined
-    ) {
-
-      return;
-
-    }
-
-
-    const quote =
-      Number(
-        tick.quote
-      );
-
-
-    if (
-      !Number.isFinite(
-        quote
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    livePrice.textContent =
-      quote.toLocaleString(
-        undefined,
-        {
-          minimumFractionDigits:
-            2,
-
-          maximumFractionDigits:
-            5
-        }
-      );
-
-
-    chartMessageText.textContent =
-      "Live Deriv market data connected.";
-
-  }
-);
-
-
-/* =====================================================
-   DERIV ERRORS
-===================================================== */
-
-window.PELI_DERIV.on(
-  "error",
-  function(
-    error
-  ) {
-
-    console.error(
-      "Deriv error:",
-      error
-    );
-
-
-    const message =
-      error &&
-      error.message
-        ? error.message
-        : "Deriv connection error.";
-
-
-    chartMessageText.textContent =
-      message;
-
-
-    if (
-      tradeState
-    ) {
-
-      tradeState.textContent =
-        message;
-
-      tradeState.classList.add(
-        "visible"
-      );
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   MARKET
-===================================================== */
-
-function startMarket() {
-
-  const symbol =
-    marketSelector.value ||
-    "R_75";
-
-
-  updateSymbolName();
-
-
-  try {
-
-    window.PELI_DERIV
-      .connect(
-        symbol
-      );
-
-  } catch (
-    error
-  ) {
-
-    console.error(
-      "Market connection error:",
-      error
-    );
-
-  }
-
-}
-
-
-marketSelector.addEventListener(
-  "change",
-  function() {
-
-    const symbol =
-      marketSelector.value;
-
-
-    updateSymbolName();
-
-
-    resetProposal();
-
-
-    try {
-
-      window.PELI_DERIV
-        .changeSymbol(
-          symbol
-        );
-
-    } catch (
-      error
-    ) {
-
-      console.error(
-        "Unable to change market:",
-        error
-      );
-
-    }
-
-
-    requestProposalSoon();
-
-  }
-);
-
-
-/* =====================================================
-   CONNECT ACCOUNT
-===================================================== */
-
-connectAccountButton.addEventListener(
-  "click",
-  function() {
-
-    window.location.href =
-      "/api/deriv/start";
-
-  }
-);
-
-
-/* =====================================================
-   AUTHENTICATED ACCOUNT
-===================================================== */
-
-async function connectDerivAccount() {
-
-  if (
-    !window.PELI_DERIV
-  ) {
-
-    return;
-
-  }
-
-
-  accountStatus.textContent =
-    "Connecting to Deriv...";
-
-
-  accountStatus.style.color =
-    "#ffcf6b";
-
-
-  try {
-
-    await window.PELI_DERIV
-      .connectAuthenticated();
-
-
-    authenticated =
-      true;
-
-
-    accountStatus.textContent =
-      "Deriv account connected";
-
-
-    accountStatus.style.color =
-      "#39d4b6";
-
-
-    connectAccountButton.style.display =
-      "none";
-
-
-    tradeButton.disabled =
-      true;
-
-
-    tradeButton.textContent =
-      "WAITING FOR PROPOSAL";
-
-
-    tradeState.textContent =
-      "Choose a contract type and wait for the live Deriv price.";
-
-
-    tradeState.classList.add(
-      "visible"
-    );
-
-
-    window.PELI_DERIV
-      .subscribeBalance();
-
-
-    requestProposalSoon();
-
-  } catch (
-    error
-  ) {
-
-    authenticated =
-      false;
-
-
-    console.warn(
-      "Deriv authentication unavailable:",
-      error
-    );
-
-
-    accountStatus.textContent =
-      "Deriv account not connected";
-
-
-    accountStatus.style.color =
-      "#ffcf6b";
-
-
-    connectAccountButton.style.display =
-      "block";
-
-
-    tradeButton.disabled =
-      true;
-
-
-    tradeButton.textContent =
-      "CONNECT DERIV TO TRADE";
-
-  }
-
-}
-
-
-/* =====================================================
-   BALANCE
-===================================================== */
-
-window.PELI_DERIV.on(
-  "balance",
-  function(
-    balance
-  ) {
-
-    if (
-      !balance
-    ) {
-
-      return;
-
-    }
-
-
-    const value =
-      Number(
-        balance.balance
-      );
-
-
-    if (
-      Number.isFinite(
-        value
-      )
-    ) {
-
-      accountBalance.textContent =
-        money(
-          value,
-          balance.currency ||
-            currencyInput.value
-        );
-
-    }
-
-
-    if (
-      balance.currency
-    ) {
-
-      accountCurrency.textContent =
-        balance.currency;
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   DURATION PARSER
-===================================================== */
-
-function parseDuration() {
-
-  const value =
-    durationInput.value;
-
-
-  if (
-    value.endsWith(
-      "t"
-    )
-  ) {
-
-    return {
-
-      duration:
-        Number(
-          value.slice(
-            0,
-            -1
-          )
-        ),
-
-      unit:
-        "t"
-
-    };
-
-  }
-
-
-  if (
-    value.endsWith(
-      "m"
-    )
-  ) {
-
-    return {
-
-      duration:
-        Number(
-          value.slice(
-            0,
-            -1
-          )
-        ),
-
-      unit:
-        "m"
-
-    };
-
-  }
-
-
-  return {
-
-    duration:
-      1,
-
-    unit:
-      "t"
-
-  };
-
-}
-
-
-/* =====================================================
-   CHECK DIGIT REQUIREMENTS
-===================================================== */
-
-function hasRequiredPrediction() {
-
-  if (
-    selectedContract ===
-      "DIGITMATCH" ||
-
-    selectedContract ===
-      "DIGITDIFF"
-  ) {
-
-    return (
-      selectedPrediction !== null
-    );
-
-  }
-
-
-  if (
-    selectedContract ===
-      "DIGITOVER" ||
-
-    selectedContract ===
-      "DIGITUNDER"
-  ) {
-
-    return (
-      selectedBarrier !== null
-    );
-
-  }
-
-
-  return true;
-
-}
-
-
-/* =====================================================
-   REQUEST PROPOSAL SOON
-===================================================== */
+document.querySelectorAll(".type").forEach(b => {
+  b.addEventListener("click", () => {
+    type = b.dataset.type;
+    updateTypeUI();
+  });
+});
 
 function requestProposalSoon() {
-
-  if (
-    proposalTimer
-  ) {
-
-    clearTimeout(
-      proposalTimer
-    );
-
-  }
-
-
-  proposalTimer =
-    setTimeout(
-      function() {
-
-        requestProposal();
-
-      },
-      300
-    );
-
+  clearTimeout(window.__proposalTimer);
+  window.__proposalTimer = setTimeout(requestProposal, 250);
 }
-
-
-/* =====================================================
-   REQUEST PROPOSAL
-===================================================== */
 
 function requestProposal() {
+  if (!connected || !window.PELI_DERIV.authenticated) return;
 
-  if (
-    !authenticated
-  ) {
+  const amount = Number(stake.value);
+  const dur = Number(duration.value);
+  if (!Number.isFinite(amount) || amount <= 0) return;
 
-    return;
+  const barrierRequired =
+    ["DIGITMATCH","DIGITDIFF","DIGITOVER","DIGITUNDER"].includes(type);
 
-  }
+  const key = [
+    market.value,type,prediction,amount,dur,
+    barrierRequired ? prediction : ""
+  ].join("|");
 
+  if (key === lastProposalKey) return;
+  lastProposalKey = key;
 
-  if (
-    !window.PELI_DERIV.authenticated
-  ) {
+  payout.textContent = "Loading...";
+  profit.textContent = "Loading...";
 
-    return;
-
-  }
-
-
-  if (
-    !hasRequiredPrediction()
-  ) {
-
-    tradeState.textContent =
-      "Select the required digit before requesting a proposal.";
-
-
-    tradeState.classList.add(
-      "visible"
-    );
-
-
-    return;
-
-  }
-
-
-  const amount =
-    Number(
-      stakeInput.value
-    );
-
-
-  if (
-    !Number.isFinite(
-      amount
-    ) ||
-    amount <= 0
-  ) {
-
-    return;
-
-  }
-
-
-  const duration =
-    parseDuration();
-
-
-  const symbol =
-    marketSelector.value;
-
-
-  const currency =
-    currencyInput.value;
-
-
-  const sequence =
-    ++proposalSequence;
-
-
-  currentProposal =
-    null;
-
-
-  contractPrice.textContent =
-    "Loading...";
-
-
-  payout.textContent =
-    "Loading...";
-
-
-  profit.textContent =
-    "Loading...";
-
-
-  tradeButton.disabled =
-    true;
-
-
-  tradeButton.textContent =
-    "LOADING PROPOSAL";
-
-
-  tradeState.textContent =
-    "Requesting live Deriv proposal...";
-
-
-  tradeState.classList.add(
-    "visible"
-  );
-
-
-  const params = {
-
-    amount:
+  try {
+    window.PELI_DERIV.getProposal({
       amount,
-
-    basis:
-      "stake",
-
-    contractType:
-      selectedContract,
-
-    currency:
-      currency,
-
-    duration:
-      duration.duration,
-
-    durationUnit:
-      duration.unit,
-
-    symbol:
-      symbol
-
-  };
-
-
-  /*
-   * Matches / Differs use prediction.
-   */
-
-  if (
-    selectedContract ===
-      "DIGITMATCH" ||
-
-    selectedContract ===
-      "DIGITDIFF"
-  ) {
-
-    params.barrier =
-      String(
-        selectedPrediction
-      );
-
+      contractType:type,
+      currency:"USD",
+      duration:dur,
+      durationUnit:"t",
+      symbol:market.value,
+      barrier:barrierRequired ? prediction : undefined
+    });
+  } catch (e) {
+    payout.textContent = "—";
+    profit.textContent = "—";
+    result.textContent = e.message;
   }
-
-
-  /*
-   * Over / Under use barrier.
-   */
-
-  if (
-    selectedContract ===
-      "DIGITOVER" ||
-
-    selectedContract ===
-      "DIGITUNDER"
-  ) {
-
-    params.barrier =
-      String(
-        selectedBarrier
-      );
-
-  }
-
-
-  try {
-
-    window.PELI_DERIV
-      .getProposal(
-        params
-      );
-
-    /*
-     * The sequence is kept so a stale
-     * response can be ignored if the user
-     * changes the trade before Deriv
-     * responds.
-     */
-
-    window.__PELI_LAST_PROPOSAL_SEQUENCE =
-      sequence;
-
-  } catch (
-    error
-  ) {
-
-    console.error(
-      "Proposal error:",
-      error
-    );
-
-
-    tradeState.textContent =
-      error.message ||
-      "Unable to request Deriv proposal.";
-
-
-    contractPrice.textContent =
-      "—";
-
-
-    payout.textContent =
-      "—";
-
-
-    profit.textContent =
-      "—";
-
-
-    tradeButton.disabled =
-      true;
-
-  }
-
 }
 
-
-/* =====================================================
-   PROPOSAL RESPONSE
-===================================================== */
-
-window.PELI_DERIV.on(
-  "proposal",
-  function(
-    proposal
-  ) {
-
-    if (
-      !proposal
-    ) {
-
-      return;
-
-    }
-
-
-    console.log(
-      "Live Deriv proposal:",
-      proposal
-    );
-
-
-    /*
-     * The new Deriv API guarantees the
-     * proposal ID but other fields can be
-     * optional, so validate everything.
-     */
-
-    const proposalId =
-      proposal.id ||
-      proposal.proposal_id;
-
-
-    const askPrice =
-      Number(
-        proposal.ask_price
-      );
-
-
-    const proposalPayout =
-      Number(
-        proposal.payout
-      );
-
-
-    if (
-      !proposalId
-    ) {
-
-      console.warn(
-        "Proposal has no ID:",
-        proposal
-      );
-
-
-      return;
-
-    }
-
-
-    currentProposal =
-      proposal;
-
-
-    const currency =
-      proposal.currency ||
-      currencyInput.value ||
-      "USD";
-
-
-    /*
-     * Real contract price.
-     */
-
-    if (
-      Number.isFinite(
-        askPrice
-      )
-    ) {
-
-      contractPrice.textContent =
-        money(
-          askPrice,
-          currency
-        );
-
-    } else {
-
-      contractPrice.textContent =
-        "—";
-
-    }
-
-
-    /*
-     * Real Deriv payout.
-     */
-
-    if (
-      Number.isFinite(
-        proposalPayout
-      )
-    ) {
-
-      payout.textContent =
-        money(
-          proposalPayout,
-          currency
-        );
-
-    } else {
-
-      payout.textContent =
-        "—";
-
-    }
-
-
-    /*
-     * Real potential profit:
-     *
-     * payout - contract price
-     *
-     * Never hard-code this value.
-     */
-
-    if (
-      Number.isFinite(
-        proposalPayout
-      ) &&
-
-      Number.isFinite(
-        askPrice
-      )
-    ) {
-
-      const potentialProfit =
-        proposalPayout -
-        askPrice;
-
-
-      profit.textContent =
-        money(
-          potentialProfit,
-          currency
-        );
-
-    } else {
-
-      profit.textContent =
-        "—";
-
-    }
-
-
-    tradeState.textContent =
-      "Live Deriv proposal received. Review the price and payout before buying.";
-
-
-    tradeState.classList.add(
-      "visible"
-    );
-
-
-    if (
-      authenticated &&
-      window.PELI_DERIV.authenticated
-    ) {
-
-      tradeButton.disabled =
-        false;
-
-
-      tradeButton.textContent =
-        "PLACE TRADE";
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   PLACE TRADE
-===================================================== */
-
-tradeButton.addEventListener(
-  "click",
-  function() {
-
-    placeTrade();
-
-  }
-);
-
-
-function placeTrade() {
-
-  if (
-    !authenticated
-  ) {
-
-    window.location.href =
-      "/api/deriv/start";
-
-
-    return;
-
-  }
-
-
-  if (
-    !window.PELI_DERIV.authenticated
-  ) {
-
-    alert(
-      "Your Deriv trading connection is no longer active. Please reconnect."
-    );
-
-
-    return;
-
-  }
-
-
-  if (
-    !currentProposal
-  ) {
-
-    alert(
-      "Wait for a live Deriv proposal first."
-    );
-
-
-    return;
-
-  }
-
-
-  const proposalId =
-    currentProposal.id ||
-    currentProposal.proposal_id;
-
-
-  const askPrice =
-    Number(
-      currentProposal.ask_price
-    );
-
-
-  const proposalPayout =
-    Number(
-      currentProposal.payout
-    );
-
-
-  if (
-    !proposalId
-  ) {
-
-    alert(
-      "Deriv did not return a valid proposal ID."
-    );
-
-
-    return;
-
-  }
-
-
-  if (
-    !Number.isFinite(
-      askPrice
-    )
-  ) {
-
-    alert(
-      "Deriv did not return a valid contract price."
-    );
-
-
-    return;
-
-  }
-
-
-  const stake =
-    Number(
-      stakeInput.value
-    );
-
-
-  const currency =
-    currencyInput.value ||
-    "USD";
-
-
-  const contractName =
-    contractNames[
-      selectedContract
-    ] ||
-    selectedContract;
-
-
-  let details =
-    "Contract: " +
-    contractName;
-
-
-  if (
-    selectedContract ===
-      "DIGITMATCH" ||
-
-    selectedContract ===
-      "DIGITDIFF"
-  ) {
-
-    details +=
-      "\nPrediction: " +
-      selectedPrediction;
-
-  }
-
-
-  if (
-    selectedContract ===
-      "DIGITOVER" ||
-
-    selectedContract ===
-      "DIGITUNDER"
-  ) {
-
-    details +=
-      "\nBarrier: " +
-      selectedBarrier;
-
-  }
-
-
-  let confirmation =
-    "Confirm contract purchase\n\n" +
-
-    "Market: " +
-    (
-      marketNames[
-        marketSelector.value
-      ] ||
-      marketSelector.value
-    ) +
-
-    "\n" +
-
-    details +
-
-    "\nDuration: " +
-    durationInput.options[
-      durationInput.selectedIndex
-    ].text +
-
-    "\nStake: " +
-    money(
-      stake,
-      currency
-    ) +
-
-    "\nContract price: " +
-    money(
-      askPrice,
-      currency
-    );
-
-
-  if (
-    Number.isFinite(
-      proposalPayout
-    )
-  ) {
-
-    confirmation +=
-      "\nPotential payout: " +
-      money(
-        proposalPayout,
-        currency
-      );
-
-  }
-
-
-  confirmation +=
-    "\n\nContinue?";
-
-
-  const confirmed =
-    window.confirm(
-      confirmation
-    );
-
-
-  if (
-    !confirmed
-  ) {
-
-    return;
-
-  }
-
-
-  tradeButton.disabled =
-    true;
-
-
-  tradeButton.textContent =
-    "BUYING...";
-
-
-  tradeState.textContent =
-    "Sending real contract purchase to Deriv...";
-
-
-  try {
-
-    window.PELI_DERIV
-      .buyContract(
-        proposalId,
-        askPrice
-      );
-
-  } catch (
-    error
-  ) {
-
-    console.error(
-      "Buy error:",
-      error
-    );
-
-
-    alert(
-      error.message ||
-      "Unable to purchase contract."
-    );
-
-
-    tradeButton.disabled =
-      false;
-
-
-    tradeButton.textContent =
-      "PLACE TRADE";
-
-  }
-
+function updateStake() {
+  const n = Number(stake.value);
+  $("summaryStake").textContent = money(n, "USD");
+  proposal = null;
+  lastProposalKey = "";
+  payout.textContent = "—";
+  profit.textContent = "—";
+  requestProposalSoon();
 }
 
+stake.addEventListener("input", updateStake);
+duration.addEventListener("change", () => {
+  ticksDisplay.value = duration.value;
+  proposal = null; lastProposalKey = "";
+  requestProposalSoon();
+});
 
-/* =====================================================
-   BUY RESPONSE
-===================================================== */
+market.addEventListener("change", () => {
+  symbolName.textContent = names[market.value] || market.value;
+  window.PELI_DERIV.changeSymbol(market.value);
+  proposal = null; lastProposalKey = "";
+  payout.textContent = "—"; profit.textContent = "—";
+  result.textContent = "Loading real market data...";
+  requestProposalSoon();
+});
 
-window.PELI_DERIV.on(
-  "buy",
-  function(
-    result
-  ) {
+connectButton.addEventListener("click", () => {
+  window.location.href = "/api/deriv/start";
+});
 
-    console.log(
-      "Deriv buy result:",
-      result
-    );
-
-
-    if (
-      !result
-    ) {
-
-      alert(
-        "Deriv returned an empty purchase response."
-      );
-
-
-      tradeButton.disabled =
-        false;
-
-
-      tradeButton.textContent =
-        "PLACE TRADE";
-
-
-      return;
-
-    }
-
-
-    const contractId =
-      result.contract_id;
-
-
-    if (
-      !contractId
-    ) {
-
-      alert(
-        "Deriv did not return a contract ID."
-      );
-
-
-      tradeButton.disabled =
-        false;
-
-
-      tradeButton.textContent =
-        "PLACE TRADE";
-
-
-      return;
-
-    }
-
-
-    tradeButton.textContent =
-      "TRADE OPEN";
-
-
-    tradeState.textContent =
-      "Contract " +
-      contractId +
-      " is open. Waiting for the final result.";
-
-
-    tradeState.classList.add(
-      "visible"
-    );
-
-
-    try {
-
-      window.PELI_DERIV
-        .monitorContract(
-          contractId
-        );
-
-    } catch (
-      error
-    ) {
-
-      console.error(
-        "Contract monitoring error:",
-        error
-      );
-
-    }
-
-
-    alert(
-      "Contract purchased successfully.\n\n" +
-      "Contract ID: " +
-      contractId
-    );
-
+window.PELI_DERIV.on("status", s => {
+  if (s.authenticated) {
+    liveStatus.textContent = "● REAL DERIV ACCOUNT CONNECTED";
+    liveStatus.style.color = "#2cc9bb";
+  } else if (s.publicConnected) {
+    liveStatus.textContent = "● LIVE DERIV MARKET";
+    liveStatus.style.color = "#2cc9bb";
+    chartStatus.textContent = "Live Deriv ticks connected.";
+  } else if (s.publicConnecting || s.connecting) {
+    liveStatus.textContent = "● Connecting...";
+    liveStatus.style.color = "#ffd24a";
+  } else {
+    liveStatus.textContent = "● Disconnected";
+    liveStatus.style.color = "#f0444d";
   }
-);
-
-
-/* =====================================================
-   CONTRACT UPDATES
-===================================================== */
-
-window.PELI_DERIV.on(
-  "contract",
-  function(
-    contract
-  ) {
-
-    if (
-      !contract
-    ) {
-
-      return;
-
-    }
-
-
-    console.log(
-      "Contract update:",
-      contract
-    );
-
-
-    /*
-     * Still open.
-     */
-
-    if (
-      !contract.is_sold
-    ) {
-
-      tradeButton.disabled =
-        true;
-
-
-      tradeButton.textContent =
-        "TRADE OPEN";
-
-
-      return;
-
-    }
-
-
-    /*
-     * Finished.
-     */
-
-    const contractProfit =
-      Number(
-        contract.profit
-      );
-
-
-    const contractPayout =
-      Number(
-        contract.payout
-      );
-
-
-    const currency =
-      contract.currency ||
-      currencyInput.value ||
-      "USD";
-
-
-    let message =
-      "Contract finished.";
-
-
-    if (
-      Number.isFinite(
-        contractProfit
-      )
-    ) {
-
-      if (
-        contractProfit > 0
-      ) {
-
-        message +=
-          "\n\nProfit: " +
-          money(
-            contractProfit,
-            currency
-          );
-
-      }
-
-      else if (
-        contractProfit < 0
-      ) {
-
-        message +=
-          "\n\nLoss: " +
-          money(
-            Math.abs(
-              contractProfit
-            ),
-            currency
-          );
-
-      }
-
-      else {
-
-        message +=
-          "\n\nResult: " +
-          money(
-            0,
-            currency
-          );
-
-      }
-
-    }
-
-
-    if (
-      Number.isFinite(
-        contractPayout
-      )
-    ) {
-
-      message +=
-        "\nPayout: " +
-        money(
-          contractPayout,
-          currency
-        );
-
-    }
-
-
-    tradeState.textContent =
-      message;
-
-
-    tradeState.classList.add(
-      "visible"
-    );
-
-
-    alert(
-      message
-    );
-
-
-    currentProposal =
-      null;
-
-
-    resetProposal();
-
-
-    tradeButton.disabled =
-      authenticated;
-
-
-    tradeButton.textContent =
-      authenticated
-        ? "WAITING FOR PROPOSAL"
-        : "CONNECT DERIV TO TRADE";
-
-
-    try {
-
-      window.PELI_DERIV
-        .subscribeBalance();
-
-    } catch (
-      error
-    ) {
-
-      console.warn(
-        "Balance refresh failed:",
-        error
-      );
-
-    }
-
-
+});
+
+window.PELI_DERIV.on("tick", t => {
+  price.textContent = Number(t.quote).toLocaleString(undefined,{
+    minimumFractionDigits:2,maximumFractionDigits:5
+  });
+  chartStatus.textContent = `Last digit: ${t.lastDigit ?? "—"} • live tick`;
+  renderFrequency(t.counts, t.sampleSize);
+
+  bars.push(Number(t.quote));
+  if (bars.length > 90) bars.shift();
+  const stream = $("tickStream");
+  stream.innerHTML = "";
+  if (bars.length > 1) {
+    const min = Math.min(...bars), max = Math.max(...bars);
+    const range = max - min || 1;
+    bars.forEach(v => {
+      const bar = document.createElement("div");
+      bar.className = "bar";
+      bar.style.height = `${12 + ((v-min)/range)*80}%`;
+      stream.appendChild(bar);
+    });
+  }
+});
+
+window.PELI_DERIV.on("history", h => {
+  renderFrequency(h.counts, h.sampleSize);
+});
+
+window.PELI_DERIV.on("authenticated", account => {
+  connected = true;
+  accountStatus.textContent = "REAL Deriv account connected";
+  accountStatus.style.color = "#2cc9bb";
+  connectButton.style.display = "none"; // disappears after real connection
+  buyButton.disabled = false;
+  buyButton.textContent = "BUY REAL CONTRACT";
+  if (account?.currency) accountCurrency.textContent = account.currency;
+  if (account?.balance !== undefined) accountBalance.textContent = money(account.balance, account.currency || "USD");
+  requestProposalSoon();
+});
+
+window.PELI_DERIV.on("balance", b => {
+  if (b?.balance !== undefined) {
+    accountBalance.textContent = money(b.balance, b.currency || "USD");
+  }
+  if (b?.currency) accountCurrency.textContent = b.currency;
+});
+
+window.PELI_DERIV.on("proposal", p => {
+  proposal = p;
+  if (!p) return;
+
+  const ask = Number(p.ask_price);
+  const pay = Number(p.payout);
+
+  payout.textContent = Number.isFinite(pay) ? money(pay, p.currency || "USD") : "—";
+  profit.textContent =
+    Number.isFinite(pay) && Number.isFinite(ask)
+      ? money(Math.max(pay - ask, 0), p.currency || "USD")
+      : "—";
+
+  result.textContent = `REAL DERIV PROPOSAL\nAsk price: ${money(ask, p.currency || "USD")}`;
+});
+
+window.PELI_DERIV.on("error", e => {
+  const msg = e?.message || e?.error?.message || "Deriv error";
+  result.textContent = msg;
+});
+
+window.PELI_DERIV.on("buy", buy => {
+  if (!buy?.contract_id) {
+    buyButton.disabled = false;
+    buyButton.textContent = "BUY REAL CONTRACT";
+    return;
+  }
+
+  result.textContent =
+    `REAL CONTRACT OPEN\nContract ID: ${buy.contract_id}`;
+
+  buyButton.disabled = true;
+  buyButton.textContent = "CONTRACT OPEN";
+
+  try { window.PELI_DERIV.monitorContract(buy.contract_id); }
+  catch (e) { result.textContent += `\n${e.message}`; }
+});
+
+window.PELI_DERIV.on("contract", c => {
+  if (!c) return;
+
+  const profitValue = Number(c.profit);
+  const currency = c.currency || "USD";
+
+  if (c.is_sold || c.status === "won" || c.status === "lost") {
+    result.textContent =
+      `CONTRACT FINISHED\nStatus: ${c.status || (profitValue > 0 ? "won" : "lost")}\n` +
+      `Profit/Loss: ${Number.isFinite(profitValue) ? money(profitValue,currency) : "—"}`;
+    buyButton.disabled = false;
+    buyButton.textContent = "BUY REAL CONTRACT";
+    proposal = null;
+    lastProposalKey = "";
     requestProposalSoon();
-
   }
-);
-
-
-/* =====================================================
-   TIMEFRAME BUTTONS
-===================================================== */
-
-document
-  .querySelectorAll(
-    "[data-timeframe]"
-  )
-  .forEach(
-    function(
-      button
-    ) {
-
-      button.addEventListener(
-        "click",
-        function() {
-
-          document
-            .querySelectorAll(
-              "[data-timeframe]"
-            )
-            .forEach(
-              function(
-                item
-              ) {
-
-                item.classList.remove(
-                  "active"
-                );
-
-              }
-            );
-
-
-          button.classList.add(
-            "active"
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-/* =====================================================
-   INDICATORS
-===================================================== */
-
-document
-  .getElementById(
-    "indicatorsButton"
-  )
-  .addEventListener(
-    "click",
-    function() {
-
-      alert(
-        "Indicators are not connected to the live chart module yet."
-      );
-
-    }
-  );
-
-
-/* =====================================================
-   FULLSCREEN
-===================================================== */
-
-document
-  .getElementById(
-    "fullscreenButton"
-  )
-  .addEventListener(
-    "click",
-    async function() {
-
-      const chart =
-        document.querySelector(
-          ".chart-container"
-        );
-
-
-      try {
-
-        if (
-          !document.fullscreenElement
-        ) {
-
-          await chart.requestFullscreen();
-
-        } else {
-
-          await document.exitFullscreen();
-
-        }
-
-      } catch (
-        error
-      ) {
-
-        console.warn(
-          "Fullscreen failed:",
-          error
-        );
-
-      }
-
-    }
-  );
-
-
-/* =====================================================
-   INITIALIZATION
-===================================================== */
-
-updateSymbolName();
-
-updateContractUI();
-
-updateStakeDisplay();
-
-startMarket();
-
-connectDerivAccount();
-
-
-</script>
-
-<script>
-/* =========================================================
-   PELItradershub - LIVE MARKET CURSOR
-   ADD-ON ONLY
-   Does not replace your existing trading engine.
-========================================================= */
-
-(function () {
-
-    let prices = [];
-    const MAX_POINTS = 60;
-
-    function startLiveCursor() {
-
-        /* Find the existing chart */
-        const chart =
-            document.querySelector(".chart-container");
-
-        const svg =
-            document.querySelector(".chart-line");
-
-        if (!chart || !svg) {
-            console.log(
-                "PELI: chart not found yet"
-            );
-            return;
-        }
-
-
-        /* Create cursor */
-        const cursor =
-            document.createElement("div");
-
-        cursor.style.position = "absolute";
-        cursor.style.top = "0";
-        cursor.style.bottom = "0";
-        cursor.style.width = "1px";
-        cursor.style.background =
-            "rgba(255,255,255,.65)";
-        cursor.style.pointerEvents = "none";
-        cursor.style.zIndex = "20";
-
-
-        /* Create cursor dot */
-        const dot =
-            document.createElement("div");
-
-        dot.style.position = "absolute";
-        dot.style.width = "12px";
-        dot.style.height = "12px";
-        dot.style.borderRadius = "50%";
-        dot.style.background = "#39d4b6";
-        dot.style.border =
-            "3px solid #0b1018";
-        dot.style.transform =
-            "translate(-50%,-50%)";
-        dot.style.pointerEvents = "none";
-        dot.style.zIndex = "21";
-
-
-        /* Create label */
-        const label =
-            document.createElement("div");
-
-        label.style.position = "absolute";
-        label.style.padding = "7px 10px";
-        label.style.background = "#111722";
-        label.style.border =
-            "1px solid #39445a";
-        label.style.borderRadius = "8px";
-        label.style.color = "#fff";
-        label.style.fontSize = "12px";
-        label.style.fontWeight = "800";
-        label.style.transform =
-            "translate(-50%,-125%)";
-        label.style.pointerEvents = "none";
-        label.style.zIndex = "22";
-        label.innerHTML =
-            "DIGIT: <strong>—</strong>";
-
-
-        chart.style.position =
-            "relative";
-
-        chart.appendChild(cursor);
-        chart.appendChild(dot);
-        chart.appendChild(label);
-
-
-        /* Listen to the EXISTING Deriv engine */
-        if (
-            window.PELI_DERIV &&
-            typeof window.PELI_DERIV.on ===
-            "function"
-        ) {
-
-            window.PELI_DERIV.on(
-                "tick",
-                function (tick) {
-
-                    if (
-                        !tick ||
-                        tick.quote === undefined
-                    ) {
-                        return;
-                    }
-
-                    const price =
-                        Number(tick.quote);
-
-                    if (
-                        !Number.isFinite(price)
-                    ) {
-                        return;
-                    }
-
-
-                    prices.push(price);
-
-                    if (
-                        prices.length >
-                        MAX_POINTS
-                    ) {
-                        prices.shift();
-                    }
-
-
-                    /* Get last digit */
-                    const text =
-                        String(price);
-
-                    const digits =
-                        text.replace(
-                            /[^0-9]/g,
-                            ""
-                        );
-
-                    const digit =
-                        digits.length
-                            ? Number(
-                                digits[
-                                    digits.length - 1
-                                ]
-                              )
-                            : null;
-
-
-                    label.innerHTML =
-                        digit === null
-                            ? "DIGIT: —"
-                            :
-                            "DIGIT: <strong>" +
-                            digit +
-                            "</strong>";
-
-
-                    /* Position cursor at latest tick */
-                    const width =
-                        chart.clientWidth;
-
-                    const height =
-                        chart.clientHeight;
-
-
-                    const x =
-                        width - 20;
-
-
-                    cursor.style.left =
-                        x + "px";
-
-
-                    /* Use chart's SVG viewBox */
-                    const min =
-                        Math.min(...prices);
-
-                    const max =
-                        Math.max(...prices);
-
-                    const range =
-                        max - min || 1;
-
-
-                    const normalized =
-                        (price - min) /
-                        range;
-
-
-                    const y =
-                        height -
-                        (
-                            normalized *
-                            (height - 50)
-                        ) -
-                        25;
-
-
-                    dot.style.left =
-                        x + "px";
-
-                    dot.style.top =
-                        y + "px";
-
-
-                    label.style.left =
-                        x + "px";
-
-                    label.style.top =
-                        y + "px";
-
-
-                    /* Show current digit in
-                       existing UI if available */
-
-                    const digitFields =
-                        document.querySelectorAll(
-                            "[id*='digit']"
-                        );
-
-
-                    digitFields.forEach(
-                        function (field) {
-
-                            if (
-                                field.tagName ===
-                                "INPUT"
-                            ) {
-                                return;
-                            }
-
-                        }
-                    );
-
-                }
-            );
-
-            console.log(
-                "PELI: live market cursor connected"
-            );
-
-        } else {
-
-            console.log(
-                "PELI: Deriv engine not ready"
-            );
-
-        }
-
-    }
-
-
-    /* Wait for your existing Deriv engine */
-    let attempts = 0;
-
-    const timer =
-        setInterval(
-            function () {
-
-                attempts++;
-
-                if (
-                    window.PELI_DERIV
-                ) {
-
-                    clearInterval(timer);
-
-                    startLiveCursor();
-
-                }
-
-                if (
-                    attempts >= 30
-                ) {
-
-                    clearInterval(timer);
-
-                    console.log(
-                        "PELI: waiting for Deriv timed out"
-                    );
-
-                }
-
-            },
-            500
-        );
-
-})();
+});
+
+buyButton.addEventListener("click", () => {
+  if (!connected || !window.PELI_DERIV.authenticated) {
+    window.location.href = "/api/deriv/start";
+    return;
+  }
+
+  if (!proposal?.id) {
+    alert("Wait for the real Deriv proposal.");
+    return;
+  }
+
+  const price = Number(proposal.ask_price);
+  if (!Number.isFinite(price)) {
+    alert("Deriv did not return a valid contract price.");
+    return;
+  }
+
+  const amountTrades = Math.max(1, Math.min(20, Number(tradeCount.value) || 1));
+  if (amountTrades > 1) {
+    alert("The current button executes one real contract at a time. Set No. Trades to 1 for this first live version.");
+    return;
+  }
+
+  const label = {
+    DIGITMATCH:"Matches", DIGITDIFF:"Differs",
+    DIGITEVEN:"Even", DIGITODD:"Odd",
+    DIGITOVER:"Over", DIGITUNDER:"Under"
+  }[type];
+
+  const extra = ["DIGITMATCH","DIGITDIFF","DIGITOVER","DIGITUNDER"].includes(type)
+    ? `\nPrediction: ${prediction}` : "";
+
+  if (!confirm(
+    `BUY REAL DERIV CONTRACT?\n\n` +
+    `Market: ${names[market.value]}\nType: ${label}${extra}\n` +
+    `Ticks: ${duration.value}\nStake: ${money(Number(stake.value),"USD")}\n` +
+    `Deriv price: ${money(price,"USD")}\n\nThis uses real money.`
+  )) return;
+
+  buyButton.disabled = true;
+  buyButton.textContent = "BUYING REAL CONTRACT...";
+
+  try {
+    window.PELI_DERIV.buyContract(proposal.id, price);
+  } catch (e) {
+    buyButton.disabled = false;
+    buyButton.textContent = "BUY REAL CONTRACT";
+    alert(e.message);
+  }
+});
+
+renderDigits();
+renderFrequency(Array(10).fill(0), 0);
+symbolName.textContent = names[market.value];
+updateStake();
+window.PELI_DERIV.connect(market.value);
+
+// If OAuth already succeeded, attempt the real session automatically.
+// If it has not, the public market still works and the Connect button remains.
+window.PELI_DERIV.connectAuthenticated().catch(() => {
+  accountStatus.textContent = "Real Deriv account not connected";
+  connectButton.style.display = "";
+});
 </script>
 </body>
-
 </html>
