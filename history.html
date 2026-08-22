@@ -1,150 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Trade History | PELItradershub</title>
 
-<meta name="description" content="View your trading and transaction history on PELItradershub.">
+<meta
+  name="description"
+  content="View your real Deriv trading history on PELItradershub."
+>
 
 <link rel="stylesheet" href="styles.css">
 
 <style>
 
 .history-page{
-max-width:1400px;
-margin:auto;
-padding:35px 5%;
+  max-width:1400px;
+  margin:auto;
+  padding:35px 5%;
 }
 
 .page-heading{
-margin-bottom:30px;
+  margin-bottom:25px;
 }
 
 .page-heading h1{
-font-size:42px;
-margin:8px 0;
+  font-size:42px;
+  margin:8px 0;
 }
 
 .page-heading p{
-color:#7d879b;
+  color:#7d879b;
+}
+
+.account-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:16px 18px;
+  margin-bottom:20px;
+  background:#0d121c;
+  border:1px solid #202838;
+  border-radius:14px;
+}
+
+.account-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.connection-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#ff647c;
+  box-shadow:0 0 10px rgba(255,100,124,.45);
+}
+
+.connection-dot.connected{
+  background:#39d4b6;
+  box-shadow:0 0 10px rgba(57,212,182,.55);
+}
+
+.account-info strong{
+  display:block;
+  font-size:13px;
+}
+
+.account-info span{
+  display:block;
+  margin-top:3px;
+  color:#68748a;
+  font-size:11px;
+}
+
+.account-balance{
+  text-align:right;
+}
+
+.account-balance strong{
+  display:block;
+  font-size:16px;
+}
+
+.account-balance span{
+  color:#68748a;
+  font-size:10px;
 }
 
 .history-toolbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:15px;
-margin-bottom:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:15px;
+}
+
+.filters{
+  display:flex;
+  gap:8px;
+}
+
+.filter{
+  border:1px solid #252e40;
+  background:#0d121c;
+  color:#8994a8;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+}
+
+.filter:hover{
+  border-color:#786cff;
+  color:white;
+}
+
+.filter.active{
+  background:#786cff;
+  color:white;
+  border-color:#786cff;
 }
 
 .history-search{
-width:280px;
-padding:12px 14px;
-background:#0d121c;
-border:1px solid #252e40;
-border-radius:9px;
-color:white;
-outline:none;
+  width:280px;
+  padding:12px 14px;
+  background:#0d121c;
+  border:1px solid #252e40;
+  border-radius:9px;
+  color:white;
+  outline:none;
 }
 
 .history-search:focus{
-border-color:#786cff;
+  border-color:#786cff;
 }
 
 .history-panel{
-background:#0d121c;
-border:1px solid #202838;
-border-radius:16px;
-overflow:hidden;
+  background:#0d121c;
+  border:1px solid #202838;
+  border-radius:16px;
+  overflow:hidden;
 }
 
 .history-table{
-width:100%;
-border-collapse:collapse;
+  width:100%;
+  border-collapse:collapse;
 }
 
 .history-table th{
-text-align:left;
-padding:16px;
-font-size:11px;
-color:#68748a;
-border-bottom:1px solid #202838;
+  text-align:left;
+  padding:16px;
+  font-size:11px;
+  color:#68748a;
+  border-bottom:1px solid #202838;
 }
 
 .history-table td{
-padding:16px;
-border-bottom:1px solid #202838;
-font-size:13px;
+  padding:16px;
+  border-bottom:1px solid #202838;
+  font-size:13px;
 }
 
 .history-table tr:last-child td{
-border-bottom:0;
+  border-bottom:0;
 }
 
 .symbol{
-font-weight:800;
+  font-weight:800;
 }
 
 .type{
-display:block;
-font-size:10px;
-color:#68748a;
-margin-top:3px;
+  display:block;
+  font-size:10px;
+  color:#68748a;
+  margin-top:3px;
 }
 
 .badge{
-padding:5px 8px;
-border-radius:6px;
-font-size:10px;
-font-weight:800;
+  padding:5px 8px;
+  border-radius:6px;
+  font-size:10px;
+  font-weight:800;
 }
 
 .badge.win{
-background:#102c28;
-color:#39d4b6;
+  background:#102c28;
+  color:#39d4b6;
 }
 
 .badge.loss{
-background:#351923;
-color:#ff7186;
+  background:#351923;
+  color:#ff7186;
 }
 
 .badge.pending{
-background:#302817;
-color:#ffcf6b;
+  background:#302817;
+  color:#ffcf6b;
+}
+
+.positive{
+  color:#39d4b6;
+  font-weight:800;
+}
+
+.negative{
+  color:#ff7186;
+  font-weight:800;
+}
+
+.loading{
+  text-align:center;
+  padding:55px 20px;
+  color:#7d879b;
+}
+
+.error-box{
+  display:none;
+  margin-bottom:20px;
+  padding:15px 18px;
+  border-radius:12px;
+  background:#351923;
+  border:1px solid #5a2936;
+  color:#ff9aaa;
+  font-size:12px;
+}
+
+.error-box strong{
+  display:block;
+  margin-bottom:5px;
+  color:#ff7186;
 }
 
 .empty{
-display:none;
-text-align:center;
-padding:50px;
-color:#7d879b;
+  display:none;
+  text-align:center;
+  padding:50px;
+  color:#7d879b;
+}
+
+.refresh-button{
+  border:1px solid #252e40;
+  background:#121826;
+  color:white;
+  padding:9px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:700;
+}
+
+.refresh-button:hover{
+  border-color:#786cff;
+}
+
+.real-label{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-left:8px;
+  padding:4px 7px;
+  border-radius:5px;
+  background:#102c28;
+  color:#39d4b6;
+  font-size:9px;
+  font-weight:800;
+}
+
+.demo-label{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-left:8px;
+  padding:4px 7px;
+  border-radius:5px;
+  background:#302817;
+  color:#ffcf6b;
+  font-size:9px;
+  font-weight:800;
 }
 
 @media(max-width:800px){
 
-.history-toolbar{
-align-items:stretch;
-flex-direction:column;
-}
+  .account-bar{
+    align-items:flex-start;
+    flex-direction:column;
+  }
 
-.history-search{
-width:100%;
-}
+  .account-balance{
+    text-align:left;
+  }
 
-.history-panel{
-overflow-x:auto;
-}
+  .history-toolbar{
+    align-items:stretch;
+    flex-direction:column;
+  }
 
-.history-table{
-min-width:700px;
-}
+  .filters{
+    width:100%;
+  }
+
+  .filter{
+    flex:1;
+  }
+
+  .history-search{
+    width:100%;
+  }
+
+  .history-panel{
+    overflow-x:auto;
+  }
+
+  .history-table{
+    min-width:850px;
+  }
 
 }
 
 </style>
+
 </head>
 
 <body>
@@ -152,25 +332,25 @@ min-width:700px;
 <header class="navbar">
 
 <a href="index.html" class="brand">
-<span class="brand-icon">P</span>
-<span>PELI<span>tradershub</span></span>
+  <span class="brand-icon">P</span>
+  <span>PELI<span>tradershub</span></span>
 </a>
 
 <nav>
-<a href="dashboard.html">Dashboard</a>
-<a href="markets.html">Markets</a>
-<a href="trade.html">Trade</a>
-<a href="strategies.html">Strategies</a>
+  <a href="dashboard.html">Dashboard</a>
+  <a href="markets.html">Markets</a>
+  <a href="trade.html">Trade</a>
+  <a href="strategies.html">Strategies</a>
 </nav>
 
 <div class="nav-actions">
 
 <a href="portfolio.html" class="login-link">
-Portfolio
+  Portfolio
 </a>
 
 <a href="dashboard.html" class="button primary">
-Dashboard
+  Dashboard
 </a>
 
 </div>
@@ -180,20 +360,69 @@ Dashboard
 
 <main class="history-page">
 
-
 <div class="page-heading">
 
 <div class="eyebrow">
-ACTIVITY
+  ACTIVITY
 </div>
 
 <h1>
-Trade History
+  Trade History
 </h1>
 
 <p>
-Review your previous trading activity.
+  Your actual completed Deriv trading activity.
 </p>
+
+</div>
+
+
+<div id="errorBox" class="error-box">
+
+<strong id="errorTitle">
+  Unable to load trading history
+</strong>
+
+<span id="errorMessage"></span>
+
+</div>
+
+
+<div class="account-bar">
+
+<div class="account-left">
+
+<div
+  id="connectionDot"
+  class="connection-dot"
+></div>
+
+<div class="account-info">
+
+<strong id="accountText">
+  Connecting to Deriv...
+</strong>
+
+<span id="accountType">
+  Authenticating account
+</span>
+
+</div>
+
+</div>
+
+
+<div class="account-balance">
+
+<strong id="balanceText">
+  —
+</strong>
+
+<span>
+  CURRENT BALANCE
+</span>
+
+</div>
 
 </div>
 
@@ -203,35 +432,47 @@ Review your previous trading activity.
 <div class="filters">
 
 <button
-class="filter active"
-onclick="filterHistory('all',this)"
+  class="filter active"
+  onclick="filterHistory('all',this)"
 >
-All
+  All
 </button>
 
 <button
-class="filter"
-onclick="filterHistory('win',this)"
+  class="filter"
+  onclick="filterHistory('win',this)"
 >
-Wins
+  Wins
 </button>
 
 <button
-class="filter"
-onclick="filterHistory('loss',this)"
+  class="filter"
+  onclick="filterHistory('loss',this)"
 >
-Losses
+  Losses
 </button>
 
 </div>
 
 
+<div style="display:flex;gap:8px;">
+
 <input
-id="historySearch"
-class="history-search"
-type="search"
-placeholder="Search history..."
+  id="historySearch"
+  class="history-search"
+  type="search"
+  placeholder="Search history..."
 >
+
+<button
+  id="refreshButton"
+  class="refresh-button"
+  onclick="loadHistory()"
+>
+  Refresh
+</button>
+
+</div>
 
 </div>
 
@@ -245,27 +486,27 @@ placeholder="Search history..."
 <tr>
 
 <th>
-MARKET
+  MARKET
 </th>
 
 <th>
-TYPE
+  TYPE
 </th>
 
 <th>
-STAKE
+  STAKE
 </th>
 
 <th>
-RESULT
+  RESULT
 </th>
 
 <th>
-P/L
+  P/L
 </th>
 
 <th>
-DATE
+  DATE
 </th>
 
 </tr>
@@ -275,317 +516,16 @@ DATE
 
 <tbody id="historyBody">
 
+<tr id="loadingRow">
 
-<tr data-result="win">
-
-<td>
-
-<span class="symbol">
-Volatility 75
-</span>
-
-<span class="type">
-Synthetic
-</span>
-
-</td>
-
-<td>
-UP
-</td>
-
-<td>
-$25.00
-</td>
-
-<td>
-<span class="badge win">
-WON
-</span>
-</td>
-
-<td class="positive">
-+$22.50
-</td>
-
-<td>
-Today, 14:32
+<td
+  colspan="6"
+  class="loading"
+>
+  Loading real trading history...
 </td>
 
 </tr>
-
-
-<tr data-result="win">
-
-<td>
-
-<span class="symbol">
-Volatility 25
-</span>
-
-<span class="type">
-Synthetic
-</span>
-
-</td>
-
-<td>
-DOWN
-</td>
-
-<td>
-$10.00
-</td>
-
-<td>
-<span class="badge win">
-WON
-</span>
-</td>
-
-<td class="positive">
-+$9.00
-</td>
-
-<td>
-Today, 13:51
-</td>
-
-</tr>
-
-
-<tr data-result="loss">
-
-<td>
-
-<span class="symbol">
-EUR/USD
-</span>
-
-<span class="type">
-Forex
-</span>
-
-</td>
-
-<td>
-UP
-</td>
-
-<td>
-$30.00
-</td>
-
-<td>
-<span class="badge loss">
-LOST
-</span>
-</td>
-
-<td class="negative">
--$30.00
-</td>
-
-<td>
-Today, 12:18
-</td>
-
-</tr>
-
-
-<tr data-result="win">
-
-<td>
-
-<span class="symbol">
-Volatility 100
-</span>
-
-<span class="type">
-Synthetic
-</span>
-
-</td>
-
-<td>
-UP
-</td>
-
-<td>
-$15.00
-</td>
-
-<td>
-<span class="badge win">
-WON
-</span>
-</td>
-
-<td class="positive">
-+$13.50
-</td>
-
-<td>
-Yesterday, 18:44
-</td>
-
-</tr>
-
-
-<tr data-result="loss">
-
-<td>
-
-<span class="symbol">
-GBP/USD
-</span>
-
-<span class="type">
-Forex
-</span>
-
-</td>
-
-<td>
-DOWN
-</td>
-
-<td>
-$20.00
-</td>
-
-<td>
-<span class="badge loss">
-LOST
-</span>
-</td>
-
-<td class="negative">
--$20.00
-</td>
-
-<td>
-Yesterday, 16:23
-</td>
-
-</tr>
-
-
-<tr data-result="win">
-
-<td>
-
-<span class="symbol">
-Volatility 50
-</span>
-
-<span class="type">
-Synthetic
-</span>
-
-</td>
-
-<td>
-UP
-</td>
-
-<td>
-$40.00
-</td>
-
-<td>
-<span class="badge win">
-WON
-</span>
-</td>
-
-<td class="positive">
-+$36.00
-</td>
-
-<td>
-Yesterday, 11:06
-</td>
-
-</tr>
-
-
-<tr data-result="win">
-
-<td>
-
-<span class="symbol">
-Volatility 10
-</span>
-
-<span class="type">
-Synthetic
-</span>
-
-</td>
-
-<td>
-DOWN
-</td>
-
-<td>
-$12.00
-</td>
-
-<td>
-<span class="badge win">
-WON
-</span>
-</td>
-
-<td class="positive">
-+$10.80
-</td>
-
-<td>
-Aug 20, 09:45
-</td>
-
-</tr>
-
-
-<tr data-result="loss">
-
-<td>
-
-<span class="symbol">
-BTC/USD
-</span>
-
-<span class="type">
-Crypto
-</span>
-
-</td>
-
-<td>
-UP
-</td>
-
-<td>
-$50.00
-</td>
-
-<td>
-<span class="badge loss">
-LOST
-</span>
-
-<td class="negative">
--$50.00
-</td>
-
-<td>
-Aug 20, 08:22
-</td>
-
-</tr>
-
 
 </tbody>
 
@@ -593,29 +533,11 @@ Aug 20, 08:22
 
 
 <div
-id="empty"
-class="empty"
+  id="empty"
+  class="empty"
 >
-No matching trades found.
+  No matching trades found.
 </div>
-
-</div>
-
-
-<div style="
-margin-top:20px;
-padding:15px;
-border-radius:12px;
-background:#121122;
-border:1px solid #30294e;
-color:#aaa5ff;
-font-size:12px;
-">
-
-<strong>Demo history:</strong>
-These transactions are sample interface data.
-Real trading history will be populated from the authenticated
-Deriv account after the secure API integration is completed.
 
 </div>
 
@@ -626,12 +548,15 @@ Deriv account after the secure API integration is completed.
 <footer>
 
 <div class="brand">
+
 <span class="brand-icon">P</span>
+
 PELItradershub
+
 </div>
 
 <p>
-Trading involves risk. No profits are guaranteed.
+  Trading involves risk. No profits are guaranteed.
 </p>
 
 </footer>
@@ -639,83 +564,1553 @@ Trading involves risk. No profits are guaranteed.
 
 <script>
 
-const search =
-document.getElementById("historySearch");
+"use strict";
 
-const rows =
-document.querySelectorAll("#historyBody tr");
+/*
+=========================================================
+PELItradershub REAL DERIV TRADE HISTORY
+=========================================================
 
-const empty =
-document.getElementById("empty");
+This page DOES NOT use sample/demo trades.
+
+It reads the authenticated Deriv session already created
+by the platform and requests the real account profit table.
+
+Expected authentication storage:
+
+sessionStorage:
+    auth_info.access_token
+
+localStorage:
+    active_loginid
+    account_type
+
+The authenticated WebSocket URL is obtained from Deriv's
+current OTP flow.
+
+=========================================================
+*/
+
+
+/*
+---------------------------------------------------------
+DERIV APP ID
+---------------------------------------------------------
+
+Use the same Deriv App ID used by your existing login/trade
+integration.
+
+If your existing platform stores it in localStorage,
+the code will try that first.
+
+Otherwise put your App ID here.
+---------------------------------------------------------
+*/
+
+const DEFAULT_DERIV_APP_ID = "";
+
+
+/*
+---------------------------------------------------------
+STATE
+---------------------------------------------------------
+*/
+
+let historyData = [];
 
 let activeFilter = "all";
 
+let currency = "USD";
 
-function updateHistory(){
-
-const query =
-search.value.toLowerCase();
-
-let visible = 0;
+let socket = null;
 
 
-rows.forEach(row => {
+/*
+---------------------------------------------------------
+DOM
+---------------------------------------------------------
+*/
 
-const text =
-row.textContent.toLowerCase();
+const historyBody =
+  document.getElementById("historyBody");
 
-const result =
-row.dataset.result;
+const empty =
+  document.getElementById("empty");
 
-const matchesSearch =
-text.includes(query);
+const search =
+  document.getElementById("historySearch");
 
-const matchesFilter =
-activeFilter === "all" ||
-result === activeFilter;
+const errorBox =
+  document.getElementById("errorBox");
+
+const errorTitle =
+  document.getElementById("errorTitle");
+
+const errorMessage =
+  document.getElementById("errorMessage");
+
+const accountText =
+  document.getElementById("accountText");
+
+const accountType =
+  document.getElementById("accountType");
+
+const balanceText =
+  document.getElementById("balanceText");
+
+const connectionDot =
+  document.getElementById("connectionDot");
+
+const refreshButton =
+  document.getElementById("refreshButton");
 
 
-if(matchesSearch && matchesFilter){
+/*
+---------------------------------------------------------
+GET APP ID
+---------------------------------------------------------
+*/
 
-row.style.display = "";
-visible++;
+function getAppId(){
 
-}else{
+  const candidates = [
 
-row.style.display = "none";
+    localStorage.getItem("deriv_app_id"),
+
+    localStorage.getItem("derivAppId"),
+
+    localStorage.getItem("app_id"),
+
+    sessionStorage.getItem("deriv_app_id"),
+
+    sessionStorage.getItem("derivAppId"),
+
+    DEFAULT_DERIV_APP_ID
+
+  ];
+
+  for(const value of candidates){
+
+    if(
+      value &&
+      String(value).trim()
+    ){
+
+      return String(value).trim();
+
+    }
+
+  }
+
+  return "";
 
 }
 
-});
+
+/*
+---------------------------------------------------------
+GET AUTH INFO
+---------------------------------------------------------
+*/
+
+function getAuthInfo(){
+
+  const raw =
+    sessionStorage.getItem("auth_info");
+
+  if(raw){
+
+    try{
+
+      const info =
+        JSON.parse(raw);
+
+      if(
+        info &&
+        info.access_token
+      ){
+
+        return info;
+
+      }
+
+    }catch(error){
+
+      console.warn(
+        "Invalid auth_info:",
+        error
+      );
+
+    }
+
+  }
 
 
-empty.style.display =
-visible === 0 ? "block" : "none";
+  /*
+  Legacy fallback used by some Deriv integrations.
+  */
+
+  const legacyKeys = [
+
+    "authToken",
+    "deriv_token",
+    "derivToken",
+    "deriv_access_token",
+    "access_token"
+
+  ];
+
+
+  for(const key of legacyKeys){
+
+    const token =
+      localStorage.getItem(key) ||
+      sessionStorage.getItem(key);
+
+    if(token){
+
+      return {
+        access_token: token
+      };
+
+    }
+
+  }
+
+
+  return null;
 
 }
 
+
+/*
+---------------------------------------------------------
+GET ACTIVE ACCOUNT
+---------------------------------------------------------
+*/
+
+function getAccountId(){
+
+  const candidates = [
+
+    localStorage.getItem("active_loginid"),
+
+    localStorage.getItem("activeLoginId"),
+
+    localStorage.getItem("loginid"),
+
+    sessionStorage.getItem("active_loginid")
+
+  ];
+
+
+  for(const value of candidates){
+
+    if(
+      value &&
+      String(value).trim()
+    ){
+
+      return String(value).trim();
+
+    }
+
+  }
+
+
+  /*
+  Try accounts saved by the OAuth flow.
+  */
+
+  const stored =
+    sessionStorage.getItem("deriv_accounts");
+
+  if(stored){
+
+    try{
+
+      const accounts =
+        JSON.parse(stored);
+
+      if(
+        Array.isArray(accounts) &&
+        accounts.length
+      ){
+
+        return accounts[0].account_id || "";
+
+      }
+
+    }catch(error){
+
+      console.warn(
+        "Could not read deriv_accounts:",
+        error
+      );
+
+    }
+
+  }
+
+
+  return "";
+
+}
+
+
+/*
+---------------------------------------------------------
+GET ACCOUNT TYPE
+---------------------------------------------------------
+*/
+
+function getAccountType(accountId){
+
+  const stored =
+    localStorage.getItem("account_type");
+
+  if(stored){
+
+    return stored.toLowerCase();
+
+  }
+
+
+  /*
+  Deriv virtual accounts normally begin with VRT.
+  */
+
+  if(
+    accountId &&
+    accountId.toUpperCase().startsWith("VRT")
+  ){
+
+    return "demo";
+
+  }
+
+
+  return "real";
+
+}
+
+
+/*
+---------------------------------------------------------
+GET AUTHENTICATED WEBSOCKET URL
+---------------------------------------------------------
+*/
+
+async function getAuthenticatedSocketUrl(){
+
+  const auth =
+    getAuthInfo();
+
+  const accountId =
+    getAccountId();
+
+  const appId =
+    getAppId();
+
+
+  if(!auth || !auth.access_token){
+
+    throw new Error(
+      "No authenticated Deriv session was found. Connect your Deriv account first."
+    );
+
+  }
+
+
+  if(!accountId){
+
+    throw new Error(
+      "No active Deriv trading account was found."
+    );
+
+  }
+
+
+  if(!appId){
+
+    throw new Error(
+      "Deriv App ID is missing. Use the same App ID configured by your Trade page."
+    );
+
+  }
+
+
+  const response =
+    await fetch(
+      "https://api.derivws.com/trading/v1/options/accounts/" +
+      encodeURIComponent(accountId) +
+      "/otp",
+      {
+
+        method:"POST",
+
+        headers:{
+
+          "Content-Type":
+            "application/json",
+
+          "Deriv-App-ID":
+            appId,
+
+          "Authorization":
+            "Bearer " + auth.access_token
+
+        }
+
+      }
+    );
+
+
+  let data = null;
+
+  try{
+
+    data =
+      await response.json();
+
+  }catch(error){
+
+    throw new Error(
+      "Deriv returned an invalid authentication response."
+    );
+
+  }
+
+
+  if(!response.ok){
+
+    const message =
+      data?.errors?.[0]?.message ||
+      "Deriv authentication failed.";
+
+    throw new Error(message);
+
+  }
+
+
+  /*
+  Current Deriv API returns a ready-to-use
+  authenticated WebSocket URL.
+  */
+
+  const socketUrl =
+    data?.data?.websocket_url ||
+    data?.websocket_url ||
+    data?.url;
+
+
+  if(!socketUrl){
+
+    throw new Error(
+      "Deriv did not return an authenticated WebSocket URL."
+    );
+
+  }
+
+
+  return socketUrl;
+
+}
+
+
+/*
+---------------------------------------------------------
+OPEN AUTHENTICATED SOCKET
+---------------------------------------------------------
+*/
+
+function openSocket(url){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      let settled = false;
+
+
+      socket =
+        new WebSocket(url);
+
+
+      const timeout =
+        setTimeout(
+          ()=>{
+
+            if(!settled){
+
+              settled = true;
+
+              try{
+                socket.close();
+              }catch(error){}
+
+              reject(
+                new Error(
+                  "Timed out connecting to Deriv."
+                )
+              );
+
+            }
+
+          },
+          15000
+        );
+
+
+      socket.onopen =
+        ()=>{
+
+          if(settled){
+            return;
+          }
+
+          settled = true;
+
+          clearTimeout(timeout);
+
+          connectionDot
+            .classList.add("connected");
+
+          resolve(socket);
+
+        };
+
+
+      socket.onerror =
+        ()=>{
+
+          if(settled){
+            return;
+          }
+
+          settled = true;
+
+          clearTimeout(timeout);
+
+          reject(
+            new Error(
+              "Unable to connect to Deriv."
+            )
+          );
+
+        };
+
+
+      socket.onclose =
+        ()=>{
+
+          connectionDot
+            .classList.remove("connected");
+
+        };
+
+    }
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+SEND REQUEST AND WAIT FOR RESPONSE
+---------------------------------------------------------
+*/
+
+function requestSocket(payload){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      if(
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
+      ){
+
+        reject(
+          new Error(
+            "Deriv connection is not open."
+          )
+        );
+
+        return;
+
+      }
+
+
+      const requestId =
+        Date.now() +
+        Math.floor(Math.random()*100000);
+
+
+      payload.req_id =
+        requestId;
+
+
+      const timeout =
+        setTimeout(
+          ()=>{
+
+            cleanup();
+
+            reject(
+              new Error(
+                "Deriv request timed out."
+              )
+            );
+
+          },
+          15000
+        );
+
+
+      function cleanup(){
+
+        clearTimeout(timeout);
+
+        socket.removeEventListener(
+          "message",
+          handler
+        );
+
+      }
+
+
+      function handler(event){
+
+        let response;
+
+        try{
+
+          response =
+            JSON.parse(event.data);
+
+        }catch(error){
+
+          return;
+
+        }
+
+
+        if(
+          response.req_id !== requestId
+        ){
+
+          return;
+
+        }
+
+
+        cleanup();
+
+
+        if(response.error){
+
+          reject(
+            new Error(
+              response.error.message ||
+              "Deriv returned an error."
+            )
+          );
+
+          return;
+
+        }
+
+
+        resolve(response);
+
+      }
+
+
+      socket.addEventListener(
+        "message",
+        handler
+      );
+
+
+      socket.send(
+        JSON.stringify(payload)
+      );
+
+    }
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+FORMAT MONEY
+---------------------------------------------------------
+*/
+
+function formatMoney(value){
+
+  const number =
+    Number(value);
+
+  if(!Number.isFinite(number)){
+    return "—";
+  }
+
+
+  return (
+    number >= 0 ? "+" : ""
+  ) +
+  number.toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+FORMAT DATE
+---------------------------------------------------------
+*/
+
+function formatDate(epoch){
+
+  const date =
+    new Date(
+      Number(epoch) * 1000
+    );
+
+
+  if(
+    !Number.isFinite(
+      date.getTime()
+    )
+  ){
+
+    return "—";
+
+  }
+
+
+  return date.toLocaleString(
+    undefined,
+    {
+      year:"numeric",
+      month:"short",
+      day:"numeric",
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+GET MARKET NAME
+---------------------------------------------------------
+*/
+
+function getMarketName(contract){
+
+  return (
+    contract.underlying_symbol ||
+    contract.display_name ||
+    contract.symbol ||
+    contract.underlying ||
+    contract.shortcode ||
+    "Deriv Contract"
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+GET CONTRACT TYPE
+---------------------------------------------------------
+*/
+
+function getContractType(contract){
+
+  return (
+    contract.contract_type ||
+    contract.contract_category ||
+    contract.contract_display ||
+    "Contract"
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+GET STAKE
+---------------------------------------------------------
+*/
+
+function getStake(contract){
+
+  /*
+  buy_price is the amount actually paid for
+  the contract.
+  */
+
+  const values = [
+
+    contract.buy_price,
+
+    contract.purchase_price,
+
+    contract.buy_price_display
+
+  ];
+
+
+  for(const value of values){
+
+    const number =
+      Number(value);
+
+    if(
+      Number.isFinite(number)
+    ){
+
+      return number;
+
+    }
+
+  }
+
+
+  return 0;
+
+}
+
+
+/*
+---------------------------------------------------------
+GET PROFIT / LOSS
+---------------------------------------------------------
+*/
+
+function getProfit(contract){
+
+  const values = [
+
+    contract.profit,
+
+    contract.sell_profit,
+
+    contract.profit_loss
+
+  ];
+
+
+  for(const value of values){
+
+    const number =
+      Number(value);
+
+    if(
+      Number.isFinite(number)
+    ){
+
+      return number;
+
+    }
+
+  }
+
+
+  /*
+  Some profit-table responses provide
+  sell_price and buy_price rather than
+  an explicit profit field.
+  */
+
+  const sell =
+    Number(
+      contract.sell_price
+    );
+
+  const buy =
+    Number(
+      contract.buy_price
+    );
+
+
+  if(
+    Number.isFinite(sell) &&
+    Number.isFinite(buy)
+  ){
+
+    return sell - buy;
+
+  }
+
+
+  return 0;
+
+}
+
+
+/*
+---------------------------------------------------------
+GET RESULT
+---------------------------------------------------------
+*/
+
+function getResult(profit){
+
+  if(profit > 0){
+    return "win";
+  }
+
+  if(profit < 0){
+    return "loss";
+  }
+
+  return "pending";
+
+}
+
+
+/*
+---------------------------------------------------------
+NORMALIZE CONTRACT
+---------------------------------------------------------
+*/
+
+function normalizeContract(contract){
+
+  const profit =
+    getProfit(contract);
+
+  const stake =
+    getStake(contract);
+
+  const result =
+    getResult(profit);
+
+
+  return {
+
+    raw:contract,
+
+    market:
+      getMarketName(contract),
+
+    type:
+      getContractType(contract),
+
+    stake,
+
+    profit,
+
+    result,
+
+    date:
+      formatDate(
+        contract.sell_time ||
+        contract.exit_time ||
+        contract.purchase_time ||
+        contract.transaction_time
+      )
+
+  };
+
+}
+
+
+/*
+---------------------------------------------------------
+RENDER HISTORY
+---------------------------------------------------------
+*/
+
+function renderHistory(){
+
+  const query =
+    search.value
+      .trim()
+      .toLowerCase();
+
+
+  const filtered =
+    historyData.filter(
+      item => {
+
+        const searchText =
+          (
+            item.market +
+            " " +
+            item.type +
+            " " +
+            item.stake +
+            " " +
+            item.profit +
+            " " +
+            item.date
+          ).toLowerCase();
+
+
+        const matchesSearch =
+          searchText.includes(query);
+
+
+        const matchesFilter =
+          activeFilter === "all" ||
+          item.result === activeFilter;
+
+
+        return (
+          matchesSearch &&
+          matchesFilter
+        );
+
+      }
+    );
+
+
+  historyBody.innerHTML = "";
+
+
+  if(!filtered.length){
+
+    empty.style.display =
+      "block";
+
+    return;
+
+  }
+
+
+  empty.style.display =
+    "none";
+
+
+  filtered.forEach(
+    item => {
+
+      const row =
+        document.createElement("tr");
+
+
+      const resultLabel =
+        item.result === "win"
+          ? "WON"
+          : item.result === "loss"
+            ? "LOST"
+            : "PENDING";
+
+
+      const resultClass =
+        item.result;
+
+
+      const profitClass =
+        item.profit >= 0
+          ? "positive"
+          : "negative";
+
+
+      const profitText =
+        item.profit >= 0
+          ? "+" +
+            Math.abs(item.profit)
+              .toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits:2,
+                  maximumFractionDigits:2
+                }
+              )
+          :
+            "-" +
+            Math.abs(item.profit)
+              .toLocaleString(
+                undefined,
+                {
+                  minimumFractionDigits:2,
+                  maximumFractionDigits:2
+                }
+              );
+
+
+      row.dataset.result =
+        item.result;
+
+
+      row.innerHTML = `
+
+        <td>
+
+          <span class="symbol">
+            ${escapeHtml(item.market)}
+          </span>
+
+          <span class="type">
+            ${escapeHtml(item.type)}
+          </span>
+
+        </td>
+
+        <td>
+          ${escapeHtml(
+            getDirection(
+              item.raw
+            )
+          )}
+        </td>
+
+        <td>
+          ${escapeHtml(
+            currency
+          )}
+          ${Number(item.stake)
+            .toLocaleString(
+              undefined,
+              {
+                minimumFractionDigits:2,
+                maximumFractionDigits:2
+              }
+            )}
+        </td>
+
+        <td>
+
+          <span class="badge ${resultClass}">
+            ${resultLabel}
+          </span>
+
+        </td>
+
+        <td class="${profitClass}">
+
+          ${escapeHtml(
+            currency
+          )}
+          ${profitText}
+
+        </td>
+
+        <td>
+          ${escapeHtml(item.date)}
+        </td>
+
+      `;
+
+
+      historyBody.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+GET DIRECTION
+---------------------------------------------------------
+*/
+
+function getDirection(contract){
+
+  const type =
+    String(
+      contract.contract_type ||
+      ""
+    ).toUpperCase();
+
+
+  const directionMap = {
+
+    CALL:"UP",
+
+    PUT:"DOWN",
+
+    RISE:"UP",
+
+    FALL:"DOWN",
+
+    HIGHER:"UP",
+
+    LOWER:"DOWN",
+
+    ACCUMULATOR:"ACCUMULATOR",
+
+    TURBOS:"TURBO"
+
+  };
+
+
+  if(
+    directionMap[type]
+  ){
+
+    return directionMap[type];
+
+  }
+
+
+  return (
+    contract.contract_type ||
+    "—"
+  );
+
+}
+
+
+/*
+---------------------------------------------------------
+ESCAPE HTML
+---------------------------------------------------------
+*/
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/*
+---------------------------------------------------------
+LOAD BALANCE
+---------------------------------------------------------
+*/
+
+async function loadBalance(){
+
+  try{
+
+    const response =
+      await requestSocket(
+        {
+          balance:1
+        }
+      );
+
+
+    const balance =
+      response?.balance;
+
+
+    if(balance){
+
+      currency =
+        balance.currency ||
+        currency;
+
+
+      balanceText.textContent =
+        currency +
+        " " +
+        Number(
+          balance.balance
+        ).toLocaleString(
+          undefined,
+          {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+          }
+        );
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Balance request failed:",
+      error
+    );
+
+  }
+
+}
+
+
+/*
+---------------------------------------------------------
+LOAD REAL PROFIT TABLE
+---------------------------------------------------------
+*/
+
+async function loadProfitTable(){
+
+  const response =
+    await requestSocket(
+      {
+        profit_table:1,
+
+        description:1,
+
+        limit:500,
+
+        offset:0,
+
+        sort:"DESC"
+
+      }
+    );
+
+
+  const table =
+    response?.profit_table;
+
+
+  if(!table){
+
+    throw new Error(
+      "Deriv returned no trading history."
+    );
+
+  }
+
+
+  const contracts =
+    table.transactions ||
+    table.profit_table ||
+    table.contracts ||
+    [];
+
+
+  historyData =
+    Array.isArray(contracts)
+      ? contracts.map(
+          normalizeContract
+        )
+      : [];
+
+
+  renderHistory();
+
+}
+
+
+/*
+---------------------------------------------------------
+LOAD EVERYTHING
+---------------------------------------------------------
+*/
+
+async function loadHistory(){
+
+  refreshButton.disabled =
+    true;
+
+  refreshButton.textContent =
+    "Loading...";
+
+
+  errorBox.style.display =
+    "none";
+
+
+  historyBody.innerHTML = `
+
+    <tr>
+
+      <td
+        colspan="6"
+        class="loading"
+      >
+
+        Connecting to your Deriv account...
+
+      </td>
+
+    </tr>
+
+  `;
+
+
+  empty.style.display =
+    "none";
+
+
+  try{
+
+    const accountId =
+      getAccountId();
+
+
+    if(!accountId){
+
+      throw new Error(
+        "You are not connected to a Deriv trading account. Connect Deriv first."
+      );
+
+    }
+
+
+    const type =
+      getAccountType(
+        accountId
+      );
+
+
+    accountText.innerHTML =
+      escapeHtml(
+        accountId
+      ) +
+      (
+        type === "real"
+          ? '<span class="real-label">REAL</span>'
+          : '<span class="demo-label">DEMO</span>'
+      );
+
+
+    accountType.textContent =
+      type === "real"
+        ? "Live Deriv account"
+        : "Deriv virtual account";
+
+
+    const socketUrl =
+      await getAuthenticatedSocketUrl();
+
+
+    await openSocket(
+      socketUrl
+    );
+
+
+    await loadBalance();
+
+
+    await loadProfitTable();
+
+
+    if(historyData.length === 0){
+
+      historyBody.innerHTML = "";
+
+      empty.textContent =
+        "No completed trades were found on this Deriv account.";
+
+      empty.style.display =
+        "block";
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "REAL HISTORY ERROR:",
+      error
+    );
+
+
+    connectionDot
+      .classList.remove(
+        "connected"
+      );
+
+
+    errorTitle.textContent =
+      "Unable to load real trading history";
+
+
+    errorMessage.textContent =
+      error.message ||
+      "Something went wrong while connecting to Deriv.";
+
+
+    errorBox.style.display =
+      "block";
+
+
+    historyBody.innerHTML = "";
+
+  }finally{
+
+    refreshButton.disabled =
+      false;
+
+    refreshButton.textContent =
+      "Refresh";
+
+  }
+
+}
+
+
+/*
+---------------------------------------------------------
+FILTER
+---------------------------------------------------------
+*/
+
+function filterHistory(
+  type,
+  button
+){
+
+  activeFilter =
+    type;
+
+
+  document
+    .querySelectorAll(
+      ".filter"
+    )
+    .forEach(
+      b =>
+        b.classList.remove(
+          "active"
+        )
+    );
+
+
+  button.classList.add(
+    "active"
+  );
+
+
+  renderHistory();
+
+}
+
+
+/*
+---------------------------------------------------------
+SEARCH
+---------------------------------------------------------
+*/
 
 search.addEventListener(
-"input",
-updateHistory
+  "input",
+  renderHistory
 );
 
 
-function filterHistory(type,button){
+/*
+---------------------------------------------------------
+START
+---------------------------------------------------------
+*/
 
-activeFilter = type;
-
-document
-.querySelectorAll(".filter")
-.forEach(
-b => b.classList.remove("active")
+document.addEventListener(
+  "DOMContentLoaded",
+  loadHistory
 );
-
-button.classList.add("active");
-
-updateHistory();
-
-}
 
 </script>
 
