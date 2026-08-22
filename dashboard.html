@@ -22,9 +22,9 @@
 <style>
 
 .dashboard {
-  max-width: 1400px;
-  margin: auto;
-  padding: 30px 5%;
+  max-width:1400px;
+  margin:auto;
+  padding:30px 5%;
 }
 
 .dashboard-header {
@@ -230,11 +230,23 @@
   width:8px;
   height:8px;
   border-radius:50%;
-  background:#ff7186;
+  background:#ffb347;
+}
+
+.connection.live {
+  color:#39d4b6;
 }
 
 .connection.live .connection-dot {
   background:#39d4b6;
+}
+
+.connection.failed {
+  color:#ff7186;
+}
+
+.connection.failed .connection-dot {
+  background:#ff7186;
 }
 
 .account-info {
@@ -289,22 +301,6 @@
   height:6px;
   border-radius:50%;
   background:#39d4b6;
-}
-
-.connection.failed {
-  color:#ff7186;
-}
-
-.connection.failed .connection-dot {
-  background:#ff7186;
-}
-
-.connection.live {
-  color:#39d4b6;
-}
-
-.loading {
-  opacity:.7;
 }
 
 @media(max-width:900px) {
@@ -388,14 +384,12 @@ PELI<span>tradershub</span>
 Markets
 </a>
 
-
 <a
   href="settings.html"
   class="button secondary"
 >
 ⚙
 </a>
-
 
 <button
   type="button"
@@ -410,30 +404,24 @@ Log out
 </header>
 
 
-
 <main class="dashboard">
 
 
 <div class="dashboard-header">
 
-
 <div>
-
 
 <div class="eyebrow">
 REAL TRADING DASHBOARD
 </div>
 
-
 <h1 id="welcomeTitle">
 Good day, Trader.
 </h1>
 
-
 <p>
 Your real Deriv account and live market information.
 </p>
-
 
 <div class="user-box">
 
@@ -445,7 +433,6 @@ Checking session...
 
 </div>
 
-
 <div
   id="connectionStatus"
   class="connection"
@@ -454,11 +441,10 @@ Checking session...
 <span class="connection-dot"></span>
 
 <span id="connectionText">
-Checking connection...
+Connecting to Deriv...
 </span>
 
 </div>
-
 
 <div class="real-badge">
 
@@ -468,13 +454,10 @@ REAL ACCOUNT DATA ONLY
 
 </div>
 
-
 </div>
 
 
-
 <div class="dashboard-actions">
-
 
 <a
   href="trade.html"
@@ -483,7 +466,6 @@ REAL ACCOUNT DATA ONLY
 Open Terminal
 </a>
 
-
 <a
   href="markets.html"
   class="button secondary"
@@ -491,19 +473,15 @@ Open Terminal
 Markets
 </a>
 
-
 </div>
 
-
 </div>
-
 
 
 <div
   id="errorBox"
   class="error-box"
 ></div>
-
 
 
 <section class="dash-grid">
@@ -532,7 +510,6 @@ Waiting for real account...
 </div>
 
 
-
 <div class="dash-card">
 
 <div class="dash-label">
@@ -556,7 +533,6 @@ Waiting for closed trades...
 </div>
 
 
-
 <div class="dash-card">
 
 <div class="dash-label">
@@ -575,7 +551,6 @@ Real Deriv portfolio
 </span>
 
 </div>
-
 
 
 <div class="dash-card">
@@ -602,7 +577,6 @@ Waiting for trade history...
 
 
 </section>
-
 
 
 <section class="dashboard-grid">
@@ -670,9 +644,7 @@ Live Market
 </div>
 
 
-
 <div class="account-info">
-
 
 <div>
 
@@ -712,11 +684,9 @@ Last Digit
 
 </div>
 
-
 </div>
 
 </div>
-
 
 
 <div class="panel">
@@ -749,7 +719,6 @@ View All Markets
 </section>
 
 
-
 <section class="dashboard-bottom">
 
 
@@ -778,7 +747,6 @@ View Portfolio
 </a>
 
 </div>
-
 
 
 <div class="panel">
@@ -862,12 +830,10 @@ Account configuration
 </section>
 
 
-
 <div
   class="account-info"
   style="margin-top:20px;"
 >
-
 
 <div>
 
@@ -907,12 +873,10 @@ Currency
 
 </div>
 
-
 </div>
 
 
 </main>
-
 
 
 <footer>
@@ -927,7 +891,6 @@ PELItradershub
 
 </div>
 
-
 <p>
 Trading involves risk. No profits are guaranteed.
 </p>
@@ -935,52 +898,34 @@ Trading involves risk. No profits are guaranteed.
 </footer>
 
 
-
-<!-- =====================================================
-     SUPABASE CLIENT
-===================================================== -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 
 <script>
 
 "use strict";
 
 
-/*
-=========================================================
-PELI SUPABASE CONFIGURATION
-=========================================================
-*/
+/* =====================================================
+   SUPABASE
+===================================================== */
 
 const PELI_SUPABASE_URL =
   "https://juzbrgcipfxemdvpwisw.supabase.co";
 
-
 const PELI_SUPABASE_KEY =
   "sb_publishable_62-dkeCb0yO9_Llh1hF-tA_MyfjfTKL";
 
-
 let dashboardSupabase = null;
-
 
 try {
 
-  if (
-    window.supabase &&
-    typeof window.supabase.createClient === "function"
-  ) {
+  dashboardSupabase =
+    window.supabase.createClient(
+      PELI_SUPABASE_URL,
+      PELI_SUPABASE_KEY
+    );
 
-    dashboardSupabase =
-      window.supabase.createClient(
-        PELI_SUPABASE_URL,
-        PELI_SUPABASE_KEY
-      );
-
-  }
-
-} catch (error) {
+} catch(error) {
 
   console.error(
     "Supabase initialization:",
@@ -989,17 +934,11 @@ try {
 
 }
 
-
 </script>
 
 
-
-<!-- =====================================================
-     REAL DERIV CLIENT
-===================================================== -->
-
+<!-- YOUR REAL DERIV CLIENT -->
 <script src="deriv.js"></script>
-
 
 
 <script>
@@ -1007,10 +946,12 @@ try {
 "use strict";
 
 
-const $ =
-  id =>
-    document.getElementById(id);
+/* =====================================================
+   STATE
+===================================================== */
 
+const $ =
+  id => document.getElementById(id);
 
 let currency = "USD";
 
@@ -1024,26 +965,23 @@ let todayLoss = 0;
 
 let dashboardStarted = false;
 
+let derivDataLoaded = false;
 
-/*
-=========================================================
-ERROR
-=========================================================
-*/
+
+/* =====================================================
+   ERROR
+===================================================== */
 
 function showError(message) {
 
   const box =
     $("errorBox");
 
-
   if (!box) return;
-
 
   box.textContent =
     message ||
     "Dashboard connection failed.";
-
 
   box.style.display =
     "block";
@@ -1051,11 +989,9 @@ function showError(message) {
 }
 
 
-/*
-=========================================================
-CONNECTION STATUS
-=========================================================
-*/
+/* =====================================================
+   CONNECTION
+===================================================== */
 
 function setConnection(
   state,
@@ -1065,21 +1001,15 @@ function setConnection(
   const box =
     $("connectionStatus");
 
-
   const text =
     $("connectionText");
 
-
-  if (!box || !text) {
-    return;
-  }
-
+  if (!box || !text) return;
 
   box.classList.remove(
     "live",
     "failed"
   );
-
 
   if (state === "live") {
 
@@ -1089,7 +1019,6 @@ function setConnection(
 
   }
 
-
   if (state === "failed") {
 
     box.classList.add(
@@ -1098,24 +1027,20 @@ function setConnection(
 
   }
 
-
   text.textContent =
     message;
 
 }
 
 
-/*
-=========================================================
-MONEY
-=========================================================
-*/
+/* =====================================================
+   MONEY
+===================================================== */
 
 function money(value) {
 
   const number =
     Number(value);
-
 
   if (
     !Number.isFinite(number)
@@ -1125,15 +1050,13 @@ function money(value) {
 
   }
 
-
   try {
 
     return new Intl.NumberFormat(
       undefined,
       {
         style:"currency",
-        currency:
-          currency || "USD",
+        currency:currency || "USD",
         minimumFractionDigits:2,
         maximumFractionDigits:2
       }
@@ -1152,17 +1075,13 @@ function money(value) {
 }
 
 
-/*
-=========================================================
-ACCOUNT
-=========================================================
-*/
+/* =====================================================
+   ACCOUNT
+===================================================== */
 
 function updateAccount(account) {
 
-  if (!account) {
-    return;
-  }
+  if (!account) return;
 
 
   currency =
@@ -1179,7 +1098,6 @@ function updateAccount(account) {
         account.balance
       );
 
-
     if (
       Number.isFinite(value)
     ) {
@@ -1195,6 +1113,7 @@ function updateAccount(account) {
   const accountId =
     account.account_id ||
     account.loginid ||
+    account.login_id ||
     account.id ||
     "Connected";
 
@@ -1228,24 +1147,18 @@ function updateAccount(account) {
 }
 
 
-/*
-=========================================================
-REAL BALANCE
-=========================================================
-*/
+/* =====================================================
+   BALANCE EVENT
+===================================================== */
 
 function handleBalance(data) {
 
-  if (!data) {
-    return;
-  }
-
+  if (!data) return;
 
   const value =
     Number(
       data.balance
     );
-
 
   if (
     !Number.isFinite(value)
@@ -1254,7 +1167,6 @@ function handleBalance(data) {
     return;
 
   }
-
 
   balance =
     value;
@@ -1281,11 +1193,9 @@ function handleBalance(data) {
 }
 
 
-/*
-=========================================================
-TODAY P/L
-=========================================================
-*/
+/* =====================================================
+   TODAY P/L
+===================================================== */
 
 function updateTodayPL() {
 
@@ -1316,7 +1226,6 @@ function updateTodayPL() {
       balance -
       pl;
 
-
     if (before !== 0) {
 
       const percent =
@@ -1325,7 +1234,6 @@ function updateTodayPL() {
           before
         ) *
         100;
-
 
       $("todayPLPercent").textContent =
         (
@@ -1336,12 +1244,10 @@ function updateTodayPL() {
         percent.toFixed(2) +
         "% today";
 
-
       $("todayPLPercent").className =
         pl >= 0
           ? "positive"
           : "negative";
-
 
       return;
 
@@ -1356,11 +1262,9 @@ function updateTodayPL() {
 }
 
 
-/*
-=========================================================
-PORTFOLIO
-=========================================================
-*/
+/* =====================================================
+   PORTFOLIO
+===================================================== */
 
 function handlePortfolio(data) {
 
@@ -1383,11 +1287,9 @@ function handlePortfolio(data) {
 }
 
 
-/*
-=========================================================
-POSITIONS
-=========================================================
-*/
+/* =====================================================
+   POSITIONS
+===================================================== */
 
 function renderPositions(
   contracts
@@ -1395,7 +1297,6 @@ function renderPositions(
 
   const container =
     $("positions");
-
 
   if (
     !contracts.length
@@ -1474,11 +1375,9 @@ ${profitText}
 }
 
 
-/*
-=========================================================
-PROFIT TABLE
-=========================================================
-*/
+/* =====================================================
+   PROFIT TABLE
+===================================================== */
 
 function handleProfitTable(data) {
 
@@ -1506,11 +1405,9 @@ function handleProfitTable(data) {
 }
 
 
-/*
-=========================================================
-WIN RATE
-=========================================================
-*/
+/* =====================================================
+   WIN RATE
+===================================================== */
 
 function calculateWinRate(
   trades
@@ -1543,7 +1440,9 @@ function calculateWinRate(
 
         wins++;
 
-      } else if (profit < 0) {
+      }
+
+      else if (profit < 0) {
 
         losses++;
 
@@ -1595,11 +1494,9 @@ function calculateWinRate(
 }
 
 
-/*
-=========================================================
-TODAY'S REAL CLOSED P/L
-=========================================================
-*/
+/* =====================================================
+   TODAY PROFIT
+===================================================== */
 
 function calculateTodayProfit(
   trades
@@ -1689,17 +1586,13 @@ function calculateTodayProfit(
 }
 
 
-/*
-=========================================================
-LIVE TICK
-=========================================================
-*/
+/* =====================================================
+   LIVE TICK
+===================================================== */
 
 function handleTick(tick) {
 
-  if (!tick) {
-    return;
-  }
+  if (!tick) return;
 
 
   const quote =
@@ -1762,29 +1655,26 @@ function handleTick(tick) {
 }
 
 
-/*
-=========================================================
-LAST DIGIT
-=========================================================
-*/
+/* =====================================================
+   LAST DIGIT
+===================================================== */
 
 function getLastDigit(
   value
 ) {
 
-  const stringValue =
-    String(value);
-
-
   const digits =
-    stringValue.replace(
-      /\D/g,
-      ""
-    );
+    String(value)
+      .replace(
+        /\D/g,
+        ""
+      );
 
 
   if (!digits.length) {
+
     return "—";
+
   }
 
 
@@ -1795,11 +1685,9 @@ function getLastDigit(
 }
 
 
-/*
-=========================================================
-WATCHLIST
-=========================================================
-*/
+/* =====================================================
+   WATCHLIST
+===================================================== */
 
 function handleSymbols(
   symbols
@@ -1829,7 +1717,6 @@ function handleSymbols(
         const symbol =
           item.underlying_symbol ||
           item.symbol;
-
 
         return wanted.includes(
           symbol
@@ -1863,7 +1750,6 @@ function handleSymbols(
           item.underlying_symbol ||
           item.symbol;
 
-
         const name =
           item.display_name ||
           symbol;
@@ -1871,9 +1757,7 @@ function handleSymbols(
 
         return `
 
-<div
-class="market-row"
->
+<div class="market-row">
 
 <div>
 
@@ -1888,8 +1772,8 @@ Deriv Synthetic
 </div>
 
 <div
-class="market-price"
-id="price-${escapeHTML(symbol)}"
+  class="market-price"
+  id="price-${escapeHTML(symbol)}"
 >
 —
 </div>
@@ -1904,11 +1788,9 @@ id="price-${escapeHTML(symbol)}"
 }
 
 
-/*
-=========================================================
-WATCHLIST PRICE
-=========================================================
-*/
+/* =====================================================
+   WATCHLIST PRICE
+===================================================== */
 
 function updateWatchlistPrice(
   symbol,
@@ -1921,9 +1803,7 @@ function updateWatchlistPrice(
     );
 
 
-  if (!element) {
-    return;
-  }
+  if (!element) return;
 
 
   element.textContent =
@@ -1932,11 +1812,9 @@ function updateWatchlistPrice(
 }
 
 
-/*
-=========================================================
-CHART
-=========================================================
-*/
+/* =====================================================
+   CHART
+===================================================== */
 
 function drawChart() {
 
@@ -2061,11 +1939,9 @@ function drawChart() {
 }
 
 
-/*
-=========================================================
-REGISTER DERIV EVENTS
-=========================================================
-*/
+/* =====================================================
+   DERIV EVENTS
+===================================================== */
 
 function registerDerivEvents() {
 
@@ -2078,12 +1954,10 @@ function registerDerivEvents() {
       "deriv.js loaded, but PELI_DERIV is unavailable."
     );
 
-
     setConnection(
       "failed",
       "DERIV CLIENT NOT AVAILABLE"
     );
-
 
     return false;
 
@@ -2100,18 +1974,34 @@ function registerDerivEvents() {
       );
 
 
+      updateAccount(
+        account
+      );
+
+
       setConnection(
         "live",
         "REAL DERIV ACCOUNT CONNECTED"
       );
 
 
-      updateAccount(
-        account
-      );
+      /*
+       * IMPORTANT:
+       * Do NOT call subscribeBalance()
+       * here. deriv.js handles the
+       * balance subscription.
+       */
 
+      if (
+        !derivDataLoaded
+      ) {
 
-      loadRealAccountData();
+        derivDataLoaded =
+          true;
+
+        loadRealAccountData();
+
+      }
 
     }
   );
@@ -2163,6 +2053,30 @@ function registerDerivEvents() {
         String(error);
 
 
+      /*
+       * The duplicate balance
+       * subscription message should
+       * no longer be generated here.
+       */
+
+      if (
+        String(message)
+          .toLowerCase()
+          .includes(
+            "already subscribed"
+          )
+      ) {
+
+        console.warn(
+          "Deriv stream already subscribed:",
+          message
+        );
+
+        return;
+
+      }
+
+
       showError(
         message
       );
@@ -2201,11 +2115,9 @@ function registerDerivEvents() {
 }
 
 
-/*
-=========================================================
-LOAD REAL ACCOUNT DATA
-=========================================================
-*/
+/* =====================================================
+   LOAD REAL ACCOUNT DATA
+===================================================== */
 
 async function loadRealAccountData() {
 
@@ -2217,6 +2129,10 @@ async function loadRealAccountData() {
 
   }
 
+
+  /*
+   * Portfolio
+   */
 
   try {
 
@@ -2238,6 +2154,10 @@ async function loadRealAccountData() {
 
   }
 
+
+  /*
+   * Profit table
+   */
 
   try {
 
@@ -2261,6 +2181,10 @@ async function loadRealAccountData() {
 
   }
 
+
+  /*
+   * Statement
+   */
 
   try {
 
@@ -2286,34 +2210,25 @@ async function loadRealAccountData() {
   }
 
 
-  try {
-
-    if (
-      typeof PELI_DERIV.subscribeBalance ===
-      "function"
-    ) {
-
-      await PELI_DERIV.subscribeBalance();
-
-    }
-
-  } catch(error) {
-
-    console.error(
-      "REAL BALANCE:",
-      error
-    );
-
-  }
+  /*
+   * IMPORTANT:
+   *
+   * There is deliberately NO:
+   *
+   * PELI_DERIV.subscribeBalance()
+   *
+   * here.
+   *
+   * deriv.js already owns the balance
+   * subscription.
+   */
 
 }
 
 
-/*
-=========================================================
-CONNECT REAL DERIV ACCOUNT
-=========================================================
-*/
+/* =====================================================
+   CONNECT REAL DERIV
+===================================================== */
 
 async function connectRealAccount() {
 
@@ -2326,11 +2241,9 @@ async function connectRealAccount() {
       "DERIV CLIENT NOT AVAILABLE"
     );
 
-
     showError(
       "deriv.js did not create PELI_DERIV."
     );
-
 
     return;
 
@@ -2347,11 +2260,9 @@ async function connectRealAccount() {
       "REAL AUTHENTICATION UNAVAILABLE"
     );
 
-
     showError(
       "Your deriv.js does not expose connectAuthenticated()."
     );
-
 
     return;
 
@@ -2380,7 +2291,7 @@ async function connectRealAccount() {
 
                 reject(
                   new Error(
-                    "Deriv real-account connection timed out. Check /api/deriv/session."
+                    "Deriv real-account connection timed out."
                   )
                 );
 
@@ -2414,7 +2325,23 @@ async function connectRealAccount() {
     );
 
 
-    await loadRealAccountData();
+    /*
+     * Do not load twice.
+     *
+     * authenticated event will load
+     * the account data.
+     */
+
+    if (
+      !derivDataLoaded
+    ) {
+
+      derivDataLoaded =
+        true;
+
+      await loadRealAccountData();
+
+    }
 
   } catch(error) {
 
@@ -2440,11 +2367,9 @@ async function connectRealAccount() {
 }
 
 
-/*
-=========================================================
-ESCAPE HTML
-=========================================================
-*/
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
 
 function escapeHTML(
   value
@@ -2477,11 +2402,9 @@ function escapeHTML(
 }
 
 
-/*
-=========================================================
-SUPABASE SESSION
-=========================================================
-*/
+/* =====================================================
+   SUPABASE SESSION
+===================================================== */
 
 async function initDashboard() {
 
@@ -2498,10 +2421,6 @@ async function initDashboard() {
     true;
 
 
-  /*
-   * Never redirect endlessly.
-   */
-
   if (!dashboardSupabase) {
 
     setConnection(
@@ -2509,11 +2428,9 @@ async function initDashboard() {
       "DASHBOARD CONNECTION FAILED"
     );
 
-
     showError(
       "Supabase could not be initialized."
     );
-
 
     return;
 
@@ -2547,7 +2464,6 @@ async function initDashboard() {
       window.location.replace(
         "login.html"
       );
-
 
       return;
 
@@ -2589,11 +2505,6 @@ async function initDashboard() {
     }
 
 
-    /*
-     * Connect ONLY to the real Deriv
-     * authenticated account.
-     */
-
     await connectRealAccount();
 
   } catch(error) {
@@ -2620,11 +2531,9 @@ async function initDashboard() {
 }
 
 
-/*
-=========================================================
-LOGOUT
-=========================================================
-*/
+/* =====================================================
+   LOGOUT
+===================================================== */
 
 async function peliLogout() {
 
@@ -2642,7 +2551,7 @@ async function peliLogout() {
           "function"
         ) {
 
-          PELI_DERIV
+          await PELI_DERIV
             .disconnectAuthenticated();
 
         }
@@ -2650,6 +2559,7 @@ async function peliLogout() {
       } catch(error) {
 
         console.warn(
+          "Deriv authenticated disconnect:",
           error
         );
 
@@ -2670,6 +2580,7 @@ async function peliLogout() {
       } catch(error) {
 
         console.warn(
+          "Deriv disconnect:",
           error
         );
 
@@ -2700,7 +2611,6 @@ async function peliLogout() {
       error
     );
 
-
     alert(
       "Unable to log out. Please try again."
     );
@@ -2710,11 +2620,9 @@ async function peliLogout() {
 }
 
 
-/*
-=========================================================
-START
-=========================================================
-*/
+/* =====================================================
+   START
+===================================================== */
 
 window.addEventListener(
   "DOMContentLoaded",
